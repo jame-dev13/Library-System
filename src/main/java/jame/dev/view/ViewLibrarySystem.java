@@ -2,7 +2,6 @@ package jame.dev.view;
 
 import jame.dev.Main;
 import jame.dev.connection.ConnectionDB;
-import jame.dev.emailSender.EmailSender;
 import jame.dev.schema.Schema;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -24,7 +23,6 @@ public class ViewLibrarySystem extends Application {
         Scene scene = new Scene(loader.load());
         stage.setScene(scene);
         stage.show();
-        new EmailSender().mailTo("angelmaciel593@gmail.com");
     }
 
     @Override
