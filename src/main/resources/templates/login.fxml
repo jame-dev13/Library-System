@@ -20,8 +20,8 @@
             <Pane layoutX="73.0" layoutY="80.0" prefHeight="276.0" prefWidth="208.0">
                <children>
                   <Label layoutX="73.0" layoutY="38.0" text="Username:" />
-                  <PasswordField layoutX="26.0" layoutY="163.0" />
-                  <TextField layoutX="26.0" layoutY="77.0" />
+                  <PasswordField fx:id="txtPassword" layoutX="26.0" layoutY="163.0" />
+                  <TextField fx:id="txtUsername" layoutX="26.0" layoutY="77.0" />
                   <Label layoutX="73.0" layoutY="129.0" text="Password:" />
                   <Button fx:id="btnLogin" layoutX="33.0" layoutY="220.0" mnemonicParsing="false" text="Login" />
                   <Button fx:id="btnToSignUp" layoutX="91.0" layoutY="220.0" mnemonicParsing="false" text="Go to SignUp" />
