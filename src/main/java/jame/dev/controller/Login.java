@@ -11,7 +11,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import lombok.SneakyThrows;
+
+import java.io.IOException;
 
 public class Login{
 
@@ -28,8 +29,6 @@ public class Login{
     private PasswordField txtPassword;
 
 
-
-    @SneakyThrows
     @FXML
     public void initialize() {
         btnLogin.setOnAction(this::handleClickLogin);
@@ -38,7 +37,8 @@ public class Login{
 
     @FXML
     private void handleClickLogin(ActionEvent actionEvent) {
-        System.out.println("Login clicked");
+        String username = txtUsername.getText();
+        String password = txtPassword.getText();
     }
 
     @FXML
@@ -50,7 +50,7 @@ public class Login{
             Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             stage.setScene(scene);
             stage.show();
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

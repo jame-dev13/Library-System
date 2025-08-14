@@ -24,7 +24,6 @@ public class Schema implements IDoSchema {
         tables.put("copies", this.queryCopies());
         tables.put("loans", this.queryLoans());
         tables.put("history_loans", this.queryHistoryLoans());
-        tables.put("status_loans", this.queryStatusLoan());
         tables.forEach(this::createTable);
     }
 
@@ -45,12 +44,11 @@ public class Schema implements IDoSchema {
             CREATE TABLE IF NOT EXISTS users (
                 id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
                 name VARCHAR(60) NOT NULL,
-                last_name VARCHAR(30) NOT NULL,
-                role CHAR(10) NOT NULL,
                 email VARCHAR(50) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL,
+                role CHAR(10) NOT NULL,
                 token VARCHAR(8) UNIQUE NOT NULL,
-                verified TINYINT(1)
+                verified TINYINT(1) NOT NULL
             );
             """;
     }
@@ -88,9 +86,10 @@ public class Schema implements IDoSchema {
     private String queryCopies(){
         return """
             CREATE TABLE IF NOT EXISTS copies(
-                n_copy INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+                id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
                 id_book INT NOT NULL,
-                status CHAR(7) NOT NULL,
+                copy_num INT NOT NULL,
+                status CHAR(10) NOT NULL,
                 CONSTRAINT fk_copies_book FOREIGN KEY (id_book)
                 REFERENCES books(id)
                 ON DELETE CASCADE
@@ -105,6 +104,7 @@ public class Schema implements IDoSchema {
                 id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
                 id_user INT NOT NULL,
                 id_copy INT NOT NULL,
+                status CHAR(10) NOT NULL,
                 date_loan DATE NOT NULL,
                 date_expiration DATE NOT NULL,
                 CONSTRAINT fk_loans_user FOREIGN KEY (id_user)
@@ -131,18 +131,4 @@ public class Schema implements IDoSchema {
             );
             """;
     }
-
-    private String queryStatusLoan(){
-        return """
-            CREATE TABLE IF NOT EXISTS status_loans(
-                id_loan INT NOT NULL,
-                status CHAR(10) NOT NULL,
-                CONSTRAINT fk_status_loan FOREIGN KEY (id_loan)
-                REFERENCES loans(id)
-                ON DELETE CASCADE
-                ON UPDATE CASCADE
-            );
-            """;
-    }
-
 }

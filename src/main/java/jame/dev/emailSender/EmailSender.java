@@ -5,15 +5,16 @@ import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.NonNull;
+import lombok.extern.java.Log;
 
 import java.util.Properties;
-
+@Log
 public class EmailSender {
     private final Dotenv env = Dotenv.load();
     private final String FROM = env.get("MAIL_FROM");
     private final String PWD = env.get("PWD_APP");
 
-    public void mailTo(@NonNull String to){
+    public void mailTo(@NonNull String to, String token){
         //Properties SMTP
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -33,14 +34,19 @@ public class EmailSender {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(FROM));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-            message.setSubject("Prueba de correo con Java");
-            message.setText("¡Hola! Este es un correo enviado desde Java.");
+            message.setSubject("Library System - jame-dev13 :)");
+            String html = """
+                    <h1>Hello!</h1>
+                    <p>Please enter the code on the Message Box on the application to verify your account:</p>
+                    <code>%s</code>
+                    """.formatted(token);
+            message.setContent(html, "text/html");
 
             // SEND MESSAGE
             Transport.send(message);
-            System.out.println("Correo enviado correctamente.");
+            log.info("Email sent.\n");
         } catch (MessagingException e) {
-            e.printStackTrace();
+            log.severe("Cannot sent email.\n");
         }
     }
 }

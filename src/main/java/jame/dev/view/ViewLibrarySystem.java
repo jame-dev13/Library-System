@@ -12,8 +12,13 @@ public class ViewLibrarySystem extends Application {
 
     @Override
     public void init() throws Exception {
-        //Init Tables
-        new Schema();
+        Thread db = new Thread(Schema::new);
+        db.start();
+        try{
+            db.join();
+        }catch(RuntimeException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -28,5 +33,6 @@ public class ViewLibrarySystem extends Application {
     @Override
     public void stop() throws Exception {
         ConnectionDB.getInstance().close();
+        System.gc();
     }
 }
