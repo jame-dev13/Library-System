@@ -1,34 +1,107 @@
 package jame.dev.service;
 
 import jame.dev.models.entitys.BookEntity;
+import jame.dev.models.enums.ELanguage;
 import jame.dev.repositorys.CRUDRepo;
+import jame.dev.utils.DMLActions;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 public class BookService implements CRUDRepo<BookEntity> {
     @Override
     public List<BookEntity> getAll() {
-        return List.of();
+        String sql = """
+                SELECT * FROM books;
+                """;
+        return DMLActions.selectWhere(sql,
+                rs-> BookEntity
+                        .builder()
+                        .title(rs.getString("title"))
+                        .author(rs.getString("author"))
+                        .editorial(rs.getString("editorial"))
+                        .ISBN(rs.getString("ISBN"))
+                        .pubDate(rs.getDate("publication_date"))
+                        .numPages(rs.getInt("pages"))
+                        .genre(rs.getString("genre"))
+                        .language(ELanguage.valueOf(rs.getString("language")))
+                        .build()
+        );
     }
 
     @Override
-    public void save(BookEntity bookEntity) {
-
+    public void save(BookEntity bookEntity)  {
+        Object[] params = {
+                bookEntity.getTitle(), bookEntity.getAuthor(),
+                bookEntity.getEditorial(), bookEntity.getISBN(),
+                bookEntity.getPubDate(), bookEntity.getNumPages(),
+                bookEntity.getGenre(), bookEntity.getLanguage()
+        };
+        String sql = """
+                INSERT INTO books
+                (title, author, editorial, ISBN, publication_date, pages, genre, language)
+                VALUES (?,?,?,?,?,?,?,?);
+                """;
+        try{
+            DMLActions.insert(sql, params);
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Optional<BookEntity> findById(Integer id) {
-        return Optional.empty();
+        String sql = """
+                SELECT * FROM books WHERE Id = ?
+                """;
+        List<BookEntity> books = DMLActions.selectWhere(sql, rs-> BookEntity
+                .builder()
+                .title(rs.getString("title"))
+                .author(rs.getString("author"))
+                .editorial(rs.getString("editorial"))
+                .ISBN(rs.getString("ISBN"))
+                .pubDate(rs.getDate("publication_date"))
+                .numPages(rs.getInt("pages"))
+                .genre(rs.getString("genre"))
+                .language(ELanguage.valueOf(rs.getString("language")))
+                .build(),
+                id);
+        return Optional.of(books.getFirst());
     }
 
     @Override
-    public void updateById(Integer id) {
-
+    public void updateById(BookEntity book) {
+        String sql = """
+                UPDATE books SET
+                title = ?, author = ?,
+                editorial = ?, ISBN = ?,
+                publication_date = ?,
+                pages = ?, genre = ?,
+                language = ?
+                """;
+        Object[] params = {
+                book.getTitle(), book.getAuthor(),
+                book.getEditorial(), book.getISBN(),
+                book.getPubDate(), book.getNumPages(),
+                book.getGenre(), book.getLanguage()
+        };
+        try{
+            DMLActions.update(sql, params);
+        }catch (SQLException e ){
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void deleteById(Integer id) {
-
+        String sql = """
+                DELETE FROM books WHERE id = ?
+                """;
+        try {
+            DMLActions.delete(sql, id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

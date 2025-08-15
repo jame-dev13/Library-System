@@ -58,6 +58,7 @@ public class Schema implements IDoSchema {
             CREATE TABLE IF NOT EXISTS books (
                 id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
                 title VARCHAR(80) NOT NULL,
+                author VARCHAR(80) NOT NULL,
                 editorial VARCHAR(15) NOT NULL,
                 ISBN CHAR(13) UNIQUE NOT NULL,
                 publication_date DATE NOT NULL,

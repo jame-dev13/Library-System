@@ -23,7 +23,7 @@ public class CopyService implements CRUDRepo<CopyEntity> {
     }
 
     @Override
-    public void updateById(Integer id) {
+    public void updateById(CopyEntity t) {
 
     }
 

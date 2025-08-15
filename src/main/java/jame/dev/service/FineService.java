@@ -23,7 +23,7 @@ public class FineService implements CRUDRepo<FineEntity> {
     }
 
     @Override
-    public void updateById(Integer id) {
+    public void updateById(FineEntity t) {
 
     }
 

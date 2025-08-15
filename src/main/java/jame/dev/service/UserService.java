@@ -23,7 +23,7 @@ public class UserService implements CRUDRepo<UserEntity> {
     }
 
     @Override
-    public void updateById(Integer id) {
+    public void updateById(UserEntity t) {
 
     }
 
