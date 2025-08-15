@@ -1,4 +1,4 @@
-package jame.dev.emailSender;
+package jame.dev.utils;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.mail.*;
