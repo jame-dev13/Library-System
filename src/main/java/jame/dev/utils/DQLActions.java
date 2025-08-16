@@ -24,7 +24,7 @@ public class DQLActions {
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery()){
             while(rs.next()){
-                result.add(mapper.map((T) rs));
+                result.add(mapper.map(rs));
             }
         }catch (SQLException e){
             throw new RuntimeException("Connection Failed: " + e.getMessage(), e);
@@ -42,7 +42,7 @@ public class DQLActions {
             setParams().accept(ps, params);
             try(ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    result.add(mapper.map((T) rs));
+                    result.add(mapper.map(rs));
                 }
             }
         }catch (SQLException e){

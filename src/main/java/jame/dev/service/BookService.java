@@ -4,18 +4,24 @@ import jame.dev.models.entitys.BookEntity;
 import jame.dev.models.enums.ELanguage;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.utils.DMLActions;
+import jame.dev.utils.DQLActions;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+
+/**
+ * Provides implementations to perform simple CRUD actions on DB and return
+ * his object representation.
+ */
 public class BookService implements CRUDRepo<BookEntity> {
     @Override
     public List<BookEntity> getAll() {
         String sql = """
                 SELECT * FROM books;
                 """;
-        return DMLActions.selectWhere(sql,
+        return DQLActions.select(sql,
                 rs-> BookEntity
                         .builder()
                         .title(rs.getString("title"))
@@ -55,7 +61,7 @@ public class BookService implements CRUDRepo<BookEntity> {
         String sql = """
                 SELECT * FROM books WHERE Id = ?
                 """;
-        List<BookEntity> books = DMLActions.selectWhere(sql, rs-> BookEntity
+        List<BookEntity> books = DQLActions.selectWhere(sql, rs-> BookEntity
                 .builder()
                 .title(rs.getString("title"))
                 .author(rs.getString("author"))
@@ -78,13 +84,13 @@ public class BookService implements CRUDRepo<BookEntity> {
                 editorial = ?, ISBN = ?,
                 publication_date = ?,
                 pages = ?, genre = ?,
-                language = ?
+                language = ? WHERE id = ?
                 """;
         Object[] params = {
                 book.getTitle(), book.getAuthor(),
                 book.getEditorial(), book.getISBN(),
                 book.getPubDate(), book.getNumPages(),
-                book.getGenre(), book.getLanguage()
+                book.getGenre(), book.getLanguage(), book.getId()
         };
         try{
             DMLActions.update(sql, params);
