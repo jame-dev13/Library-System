@@ -14,5 +14,6 @@ import lombok.NoArgsConstructor;
 public class CopyEntity {
     private Integer id;
     private int idBook;
+    private int copyNum;
     private EStatusCopy statusCopy;
 }
