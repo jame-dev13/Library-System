@@ -18,5 +18,5 @@ public class UserEntity {
     private String password;
     private ERole role;
     private String token;
-    private byte verified;
+    private boolean verified;
 }

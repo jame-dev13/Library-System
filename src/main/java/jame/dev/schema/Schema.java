@@ -113,7 +113,7 @@ public class Schema implements IDoSchema {
                 ON DELETE CASCADE
                 ON UPDATE CASCADE,
                 CONSTRAINT fk_loans_copy FOREIGN KEY (id_copy)
-                REFERENCES copies(n_copy)
+                REFERENCES copies(id)
                 ON DELETE CASCADE
                 ON UPDATE CASCADE
             );

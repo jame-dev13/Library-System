@@ -28,9 +28,8 @@ public class Login{
     @FXML
     private PasswordField txtPassword;
 
-
     @FXML
-    public void initialize() {
+    public void initialize() throws IOException {
         btnLogin.setOnAction(this::handleClickLogin);
         btnToSignUp.setOnAction(this::handleClickGoToSignUp);
     }

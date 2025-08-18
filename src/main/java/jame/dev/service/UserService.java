@@ -24,7 +24,7 @@ public class UserService implements CRUDRepo<UserEntity> {
                         .password(rs.getString(4))
                         .role(ERole.valueOf(rs.getString(4)))
                         .token(rs.getString(5))
-                        .verified(rs.getByte(6))
+                        .verified(rs.getBoolean(6))
                         .build()
                 );
     }
@@ -33,11 +33,11 @@ public class UserService implements CRUDRepo<UserEntity> {
     public void save(UserEntity user) {
         String sql = """
                 INSERT INTO users (name, email, password, role, token, verified)
-                VALUES (?,?,?,?,?,0)
+                VALUES (?,?,?,?,?,?)
                 """;
         Object[] params = {
             user.getName(), user.getEmail(), user.getPassword(),
-            user.getRole().name(), user.getToken()
+            user.getRole().name(), user.getToken(), user.isVerified()
         };
         try {
             DMLActions.insert(sql, params);
@@ -57,7 +57,7 @@ public class UserService implements CRUDRepo<UserEntity> {
                         .password(rs.getString(4))
                         .role(ERole.valueOf(rs.getString(5)))
                         .token(rs.getString(6))
-                        .verified(rs.getByte(6))
+                        .verified(rs.getBoolean(6))
                         .build(),
                 id).getFirst();
         return Optional.of(result);
@@ -71,7 +71,7 @@ public class UserService implements CRUDRepo<UserEntity> {
                 """;
         Object[] params = {
                 t.getName(), t.getEmail(), t.getPassword(), t.getRole().name(),
-                t.getVerified()
+                t.isVerified(), t.getId()
         };
         try {
             DMLActions.update(sql, params);
