@@ -12,10 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -23,7 +20,6 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class SignUp {
@@ -76,27 +72,35 @@ public class SignUp {
                 .verified(false)
                 .build();
         this.token = this.user.getToken();
-        EmailSender.mailTo(this.user.getEmail(), this.token);
+        Runnable r = () -> EmailSender.mailTo(this.user.getEmail(), this.token);
+        new Thread(r).start();
         checkVerification(this.token);
     }
 
     private void checkVerification(String token){
-        Consumer<String> verifyCode = tk ->{
-            if(token.equals(tk)){
-                System.out.println("Verification success. ");
-                this.user.setVerified(true);
-                this.repo.save(this.user);
-                this.btnToSignIn.fire();
-            }else System.out.println("Verification went wrong. ");
-        };
+        boolean isValid = false;
         TextInputDialog input = new TextInputDialog();
         input.setTitle("Verification code");
         input.setHeaderText("Enter the code that has sent to your email address: ");
         input.setContentText("Code: ");
-        Optional<String> isInputPresent = input.showAndWait();
-        isInputPresent.ifPresentOrElse(verifyCode, ()-> {
-            throw new NullPointerException("Value is Null. ");
-        });
+
+        while(!isValid){
+            Optional<String> inputPresent = input.showAndWait();
+            if(inputPresent.isPresent()){
+                String value = inputPresent.get();
+                if(value.equals(token)){
+                    showAlert(Alert.AlertType.INFORMATION, "Verification!", "Verification Success :)")
+                            .show();
+                    this.user.setVerified(true);
+                    this.repo.save(this.user);
+                    isValid = true;
+                    this.token = null;
+                    this.user = null;
+                    this.btnToSignIn.fire();
+                }else showAlert(Alert.AlertType.ERROR, "Verification!", "Token invalid!")
+                        .showAndWait();
+            }
+        }
     }
 
     @FXML
@@ -111,5 +115,13 @@ public class SignUp {
         }catch (IOException e){
             e.printStackTrace();
         }
+    }
+
+    private Alert showAlert(Alert.AlertType type, String header, String context){
+        Alert alert = new Alert(type);
+        alert.setTitle("ALERT!");
+        alert.setHeaderText(header);
+        alert.setContentText(context);
+        return alert;
     }
 }

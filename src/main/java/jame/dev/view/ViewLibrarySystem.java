@@ -12,13 +12,8 @@ public class ViewLibrarySystem extends Application {
 
     @Override
     public void init() throws Exception {
-        Thread db = new Thread(Schema::new);
-        db.start();
-        try{
-            db.join();
-        }catch(RuntimeException e){
-            e.printStackTrace();
-        }
+        Runnable r = Schema::new;
+        new Thread(r).start();
     }
 
     @Override

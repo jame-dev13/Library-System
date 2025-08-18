@@ -38,7 +38,7 @@ public class EmailSender {
             String html = """
                     <h1>Hello!</h1>
                     <p>Please enter the code on the Message Box on the application to verify your account:</p>
-                    <code>%s</code>
+                    <code><h2>%s</h2></code>
                     """.formatted(token);
             message.setContent(html, "text/html");
 
