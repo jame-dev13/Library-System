@@ -19,6 +19,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -89,7 +90,7 @@ public class SignUp {
             if(inputPresent.isPresent()){
                 String value = inputPresent.get();
                 if(value.equals(token)){
-                    showAlert(Alert.AlertType.INFORMATION, "Verification!", "Verification Success :)")
+                    showAlert(Alert.AlertType.INFORMATION, "Verification Success :)")
                             .show();
                     this.user.setVerified(true);
                     this.repo.save(this.user);
@@ -97,7 +98,7 @@ public class SignUp {
                     this.token = null;
                     this.user = null;
                     this.btnToSignIn.fire();
-                }else showAlert(Alert.AlertType.ERROR, "Verification!", "Token invalid!")
+                }else showAlert(Alert.AlertType.ERROR, "Token invalid!")
                         .showAndWait();
             }
         }
@@ -106,7 +107,10 @@ public class SignUp {
     @FXML
     private void handleReturnToSignIn(ActionEvent event){
         try{
-            Parent root = FXMLLoader.load(Main.class.getResource("/templates/login.fxml"));
+            Parent root = FXMLLoader
+                    .load(Objects.requireNonNull(
+                            Main.class.getResource("/templates/login.fxml")
+                    ));
             Scene newScene = new Scene(root);
 
             Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
@@ -117,10 +121,10 @@ public class SignUp {
         }
     }
 
-    private Alert showAlert(Alert.AlertType type, String header, String context){
+    private Alert showAlert(Alert.AlertType type, String context){
         Alert alert = new Alert(type);
         alert.setTitle("ALERT!");
-        alert.setHeaderText(header);
+        alert.setHeaderText("Verification!");
         alert.setContentText(context);
         return alert;
     }
