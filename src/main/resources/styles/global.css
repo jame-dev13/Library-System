@@ -34,3 +34,10 @@
     -fx-border-radius: 5px; 
     -fx-padding: 10px; 
 }
+.scroll-pane{
+    -fx-background-color: #2c4b64;
+}
+.table-view{
+    -fx-background-color: #2c4b64;
+    -fx-text-fill: white;
+}
