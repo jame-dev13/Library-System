@@ -22,6 +22,7 @@ public class ViewLibrarySystem extends Application {
                 new FXMLLoader(Main.class.getResource("/templates/login.fxml"));
         Scene scene = new Scene(loader.load());
         stage.setScene(scene);
+        stage.setTitle("Library System");
         stage.show();
     }
 

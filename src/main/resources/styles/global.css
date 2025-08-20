@@ -1,8 +1,10 @@
 .root{
     -fx-base: #1e1e1e;
+    -fx--bg-components: #2c4b64;
+    -fx--bg-color: #202b35;
     -fx-background-color: #202b35;
     -fx-text-fill: white;
-    -fx-border-color: blue; 
+    -fx-border-color: blue;
     -fx-font-style: italic;
 }
 
@@ -10,8 +12,8 @@
     -fx-text-fill: white;
 }
 
-.button{
-    -fx-background-color: #2c4b64;
+.button, .toggle-button{
+    -fx-background-color: -fx--bg-components;
     -fx-text-fill: white;
     -fx-border-color: rgb(76, 25, 218); 
     -fx-border-width: 2px; 
@@ -25,8 +27,8 @@
     -fx-scale-x: 1.1;
     -fx-opacity: 90%; 
 }
-.text-field, .password-field{ 
-    -fx-background-color: #2c4b64;
+.text-field, .password-field{
+    -fx-background-color: -fx--bg-components;
     -fx-text-fill: white;
     -fx-background-radius: 5px; 
     -fx-border-color: rgb(76, 25, 218); 
@@ -35,9 +37,14 @@
     -fx-padding: 10px; 
 }
 .scroll-pane{
-    -fx-background-color: #2c4b64;
+    -fx-background-color: -fx--bg-color;
 }
 .table-view{
-    -fx-background-color: #2c4b64;
+    -fx-background-color: -fx--bg-color;
     -fx-text-fill: white;
+}
+
+.combo-box{
+    -fx-background-color: -fx--bg-components;
+    -fx-border-color: rgb(76, 25, 218);
 }
