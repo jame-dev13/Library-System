@@ -6,6 +6,7 @@ import jame.dev.models.enums.ERole;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.UserService;
 import jame.dev.utils.EmailSender;
+import jame.dev.utils.TokenGenerator;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,11 +18,9 @@ import javafx.stage.Stage;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.UUID;
 
 public class SignUp {
 
@@ -53,23 +52,16 @@ public class SignUp {
 
     @FXML
     private void handleSignUp(ActionEvent event){
-        Supplier<String> genToken = () -> {
-            String token;
-            byte[] bytes = new byte[8];
-            new SecureRandom().nextBytes(bytes);
-            String base64 = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-            token = base64.replaceAll("[^A-Za-z0-9]", "").toUpperCase().substring(0,6);
-            return token;
-        };
         String name = txtName.getText();
         String email = txtEmail.getText();
         String password = txtPassword.getText();
         this.user = UserEntity.builder()
+                .uuid(UUID.randomUUID())
                 .name(name)
                 .email(email)
                 .password(BCrypt.hashpw(password, BCrypt.gensalt(12)))
                 .role(ERole.USER)
-                .token(genToken.get())
+                .token(TokenGenerator.genToken())
                 .verified(false)
                 .build();
         this.token = this.user.getToken();

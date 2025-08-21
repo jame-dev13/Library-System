@@ -7,12 +7,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class UserEntity {
     private Integer id;
+    private UUID uuid;
     private String name;
     private String email;
     private String password;

@@ -2,7 +2,10 @@ package jame.dev.view;
 
 import jame.dev.Main;
 import jame.dev.connection.ConnectionDB;
+import jame.dev.models.entitys.UserEntity;
+import jame.dev.repositorys.CRUDRepo;
 import jame.dev.schema.Schema;
+import jame.dev.service.UserService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -12,6 +15,7 @@ public class ViewLibrarySystem extends Application {
 
     @Override
     public void init() throws Exception {
+        CRUDRepo<UserEntity> repo = new UserService();
         Runnable r = Schema::new;
         new Thread(r).start();
     }

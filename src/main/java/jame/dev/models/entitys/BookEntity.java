@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -14,6 +15,7 @@ import java.util.Date;
 @Builder
 public class BookEntity {
     private Integer id;
+    private UUID uuid;
     private String title;
     private String author;
     private String editorial;

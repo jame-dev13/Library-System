@@ -5,6 +5,7 @@ import jame.dev.dtos.UserDto;
 import jame.dev.models.enums.ERole;
 import jame.dev.repositorys.IAuthRepo;
 import jame.dev.service.AuthService;
+import jame.dev.utils.SessionManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -51,6 +52,8 @@ public class Login{
                 .role(ERole.UNDEFINED)
                 .build();
         ERole role = this.repo.signIn(user);
+        SessionManager session = SessionManager.getInstance();
+        session.login(user.username());
 
         switch (role){
             case USER -> redirectTo(actionEvent, "/templates/userView.fxml");

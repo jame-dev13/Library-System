@@ -43,6 +43,7 @@ public class Schema implements IDoSchema {
         return """
             CREATE TABLE IF NOT EXISTS users (
                 id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+                uuid CHAR(36) NOT NULL,
                 name VARCHAR(60) NOT NULL,
                 email VARCHAR(50) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL,
@@ -57,6 +58,7 @@ public class Schema implements IDoSchema {
         return """
             CREATE TABLE IF NOT EXISTS books (
                 id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+                uuid CHAR(36) NOT NULL,
                 title VARCHAR(80) NOT NULL,
                 author VARCHAR(80) NOT NULL,
                 editorial VARCHAR(15) NOT NULL,
@@ -73,6 +75,7 @@ public class Schema implements IDoSchema {
         return """
             CREATE TABLE IF NOT EXISTS fines(
                 id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+                uuid CHAR(36) NOT NULL,
                 id_user INT NOT NULL,
                 cause VARCHAR(60) NOT NULL,
                 expiration DATE NOT NULL,
@@ -88,6 +91,7 @@ public class Schema implements IDoSchema {
         return """
             CREATE TABLE IF NOT EXISTS copies(
                 id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+                uuid CHAR(36) NOT NULL,
                 id_book INT NOT NULL,
                 copy_num INT NOT NULL,
                 status CHAR(10) NOT NULL,
@@ -103,6 +107,7 @@ public class Schema implements IDoSchema {
         return """
             CREATE TABLE IF NOT EXISTS loans(
                 id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+                uuid CHAR(36) NOT NULL,
                 id_user INT NOT NULL,
                 id_copy INT NOT NULL,
                 status CHAR(10) NOT NULL,

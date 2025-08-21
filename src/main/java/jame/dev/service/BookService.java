@@ -9,6 +9,7 @@ import jame.dev.utils.DQLActions;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 
 /**
@@ -24,6 +25,7 @@ public class BookService implements CRUDRepo<BookEntity> {
         return DQLActions.select(sql,
                 rs-> BookEntity
                         .builder()
+                        .uuid(UUID.fromString(rs.getString("uuid")))
                         .title(rs.getString("title"))
                         .author(rs.getString("author"))
                         .editorial(rs.getString("editorial"))
@@ -39,6 +41,7 @@ public class BookService implements CRUDRepo<BookEntity> {
     @Override
     public void save(BookEntity bookEntity)  {
         Object[] params = {
+                bookEntity.getUuid().toString(),
                 bookEntity.getTitle(), bookEntity.getAuthor(),
                 bookEntity.getEditorial(), bookEntity.getISBN(),
                 bookEntity.getPubDate(), bookEntity.getNumPages(),
@@ -46,8 +49,8 @@ public class BookService implements CRUDRepo<BookEntity> {
         };
         String sql = """
                 INSERT INTO books
-                (title, author, editorial, ISBN, publication_date, pages, genre, language)
-                VALUES (?,?,?,?,?,?,?,?);
+                (uuid, title, author, editorial, ISBN, publication_date, pages, genre, language)
+                VALUES (?,?,?,?,?,?,?,?,?);
                 """;
         try{
             DMLActions.insert(sql, params);
@@ -57,12 +60,13 @@ public class BookService implements CRUDRepo<BookEntity> {
     }
 
     @Override
-    public Optional<BookEntity> findById(Integer id) {
+    public Optional<BookEntity> findByUuid(UUID uuid) {
         String sql = """
-                SELECT * FROM books WHERE Id = ?
+                SELECT * FROM books WHERE uuid = ?
                 """;
         List<BookEntity> books = DQLActions.selectWhere(sql, rs-> BookEntity
                 .builder()
+                .uuid(UUID.fromString(rs.getString("uuid")))
                 .title(rs.getString("title"))
                 .author(rs.getString("author"))
                 .editorial(rs.getString("editorial"))
@@ -72,25 +76,25 @@ public class BookService implements CRUDRepo<BookEntity> {
                 .genre(rs.getString("genre"))
                 .language(ELanguage.valueOf(rs.getString("language")))
                 .build(),
-                id);
+                uuid.toString());
         return Optional.of(books.getFirst());
     }
 
     @Override
-    public void updateById(BookEntity book) {
+    public void update(BookEntity book) {
         String sql = """
                 UPDATE books SET
                 title = ?, author = ?,
                 editorial = ?, ISBN = ?,
                 publication_date = ?,
                 pages = ?, genre = ?,
-                language = ? WHERE id = ?
+                language = ? WHERE uuid = ?
                 """;
         Object[] params = {
                 book.getTitle(), book.getAuthor(),
                 book.getEditorial(), book.getISBN(),
                 book.getPubDate(), book.getNumPages(),
-                book.getGenre(), book.getLanguage(), book.getId()
+                book.getGenre(), book.getLanguage(), book.getUuid().toString()
         };
         try{
             DMLActions.update(sql, params);
@@ -100,12 +104,12 @@ public class BookService implements CRUDRepo<BookEntity> {
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public void deleteByUuid(UUID uuid) {
         String sql = """
-                DELETE FROM books WHERE id = ?
+                DELETE FROM books WHERE uuid = ?
                 """;
         try {
-            DMLActions.delete(sql, id);
+            DMLActions.delete(sql, uuid.toString());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

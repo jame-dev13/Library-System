@@ -49,5 +49,41 @@ public class EmailSender {
             log.severe("Cannot sent email.\n");
         }
     }
+
+    public static void mailToWPassword(@NonNull String to, String password){
+        //Properties SMTP
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        // AUTH
+        Session session = Session.getInstance(props, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(FROM, PWD);
+            }
+        });
+
+        try {
+            // BUILD MESSAGE
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(FROM));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+            message.setSubject("Library System - jame-dev13 :)");
+            String html = """
+                    <h1>Hello!</h1>
+                    <p>This is your admin password login for the system, you can change it latter in the app: </p>
+                    <code><h2>%s</h2></code>
+                    """.formatted(password);
+            message.setContent(html, "text/html");
+
+            // SEND MESSAGE
+            Transport.send(message);
+            log.info("Email sent.\n");
+        } catch (MessagingException e) {
+            log.severe("Cannot sent email.\n");
+        }
+    }
 }
 

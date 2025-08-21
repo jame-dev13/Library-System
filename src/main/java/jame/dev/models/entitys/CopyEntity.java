@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 
 @Data
 @AllArgsConstructor
@@ -13,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CopyEntity {
     private Integer id;
+    private UUID uuid;
     private int idBook;
     private int copyNum;
     private EStatusCopy statusCopy;

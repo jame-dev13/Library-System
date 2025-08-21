@@ -9,6 +9,7 @@ import jame.dev.utils.DQLActions;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class LoanService implements CRUDRepo<LoanEntity> {
 
@@ -19,23 +20,25 @@ public class LoanService implements CRUDRepo<LoanEntity> {
         return DQLActions.select(sql, rs ->
                 LoanEntity.builder()
                         .id(rs.getInt(1))
-                        .idUser(rs.getInt(2))
-                        .idCopy(rs.getInt(3))
-                        .loanDate(rs.getDate(4))
-                        .returnDate(rs.getDate(5))
-                        .statusLoan(EStatusLoan.valueOf(rs.getString(6)))
+                        .uuid(UUID.fromString(rs.getString(2)))
+                        .idUser(rs.getInt(3))
+                        .idCopy(rs.getInt(4))
+                        .loanDate(rs.getDate(5))
+                        .returnDate(rs.getDate(6))
+                        .statusLoan(EStatusLoan.valueOf(rs.getString(7)))
                         .build());
     }
 
     @Override
     public void save(LoanEntity loanEntity) {
         String sql = """
-                INSERT INTO loans (id_user, id_copy, status,
+                INSERT INTO loans (uuid, id_user, id_copy, status,
                 date_loan, date_expiration)
-                VALUES (?,?,?,?,?);
+                VALUES (?,?,?,?,?,?);
                 """;
         Object[] params = {
-                loanEntity.getIdUser(), loanEntity.getIdUser(), loanEntity.getStatusLoan().name(),
+                loanEntity.getUuid(), loanEntity.getIdUser(),
+                loanEntity.getIdUser(), loanEntity.getStatusLoan().name(),
                 loanEntity.getLoanDate(), loanEntity.getReturnDate()
         };
         try {
@@ -46,31 +49,32 @@ public class LoanService implements CRUDRepo<LoanEntity> {
     }
 
     @Override
-    public Optional<LoanEntity> findById(Integer id) {
-        String sql = "SELECT * FROM loans WHERE id = ?";
+    public Optional<LoanEntity> findByUuid(UUID uuid) {
+        String sql = "SELECT * FROM loans WHERE uuid = ?";
         LoanEntity result = DQLActions.selectWhere(sql, rs->
-                LoanEntity.builder()
-                        .id(rs.getInt(1))
-                        .idUser(rs.getInt(2))
-                        .idCopy(rs.getInt(3))
-                        .statusLoan(EStatusLoan.valueOf(rs.getString(4)))
-                        .loanDate(rs.getDate(5))
-                        .returnDate(rs.getDate(6))
-                        .build()
-                ,id).getFirst();
+                        LoanEntity.builder()
+                                .id(rs.getInt(1))
+                                .uuid(UUID.fromString(rs.getString(2)))
+                                .idUser(rs.getInt(3))
+                                .idCopy(rs.getInt(4))
+                                .statusLoan(EStatusLoan.valueOf(rs.getString(5)))
+                                .loanDate(rs.getDate(6))
+                                .returnDate(rs.getDate(7))
+                                .build()
+                ,uuid).getFirst();
         return Optional.of(result);
     }
 
     @Override
-    public void updateById(LoanEntity loanEntity) {
+    public void update(LoanEntity loanEntity) {
         String sql = """
                 UPDATE loans SET id_user = ?, id_copy = ?, status = ?,
-                date_loan = ?, date_expiration = ? WHERE id = ?
+                date_loan = ?, date_expiration = ? WHERE uuid = ?
                 """;
         Object[] params = {
                 loanEntity.getIdUser(), loanEntity.getIdCopy(),
                 loanEntity.getStatusLoan().name(), loanEntity.getLoanDate(),
-                loanEntity.getReturnDate(), loanEntity.getId()
+                loanEntity.getReturnDate(), loanEntity.getUuid()
         };
 
         try {
@@ -81,10 +85,10 @@ public class LoanService implements CRUDRepo<LoanEntity> {
     }
 
     @Override
-    public void deleteById(Integer id) {
-        String sql = "DELETE FROM loans WHERE id = ?";
+    public void deleteByUuid(UUID uuid) {
+        String sql = "DELETE FROM loans WHERE uuid = ?";
         try {
-            DMLActions.delete(sql, id);
+            DMLActions.delete(sql, uuid);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -15,6 +16,7 @@ import java.util.Date;
 @Builder
 public class LoanEntity {
     private Integer id;
+    private UUID uuid;
     private int idUser;
     private int idCopy;
     private Date loanDate;

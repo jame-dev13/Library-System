@@ -8,6 +8,7 @@ import jame.dev.utils.DQLActions;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class FineService implements CRUDRepo<FineEntity> {
     @Override
@@ -16,19 +17,23 @@ public class FineService implements CRUDRepo<FineEntity> {
         return DQLActions.select(sql, rs->
                 FineEntity.builder()
                         .id(rs.getInt(1))
-                        .idUser(rs.getInt(2))
-                        .cause(rs.getString(3))
-                        .expiration(rs.getDate(4))
+                        .uuid(UUID.fromString(rs.getString(2)))
+                        .idUser(rs.getInt(3))
+                        .cause(rs.getString(4))
+                        .expiration(rs.getDate(5))
                         .build());
     }
 
     @Override
     public void save(FineEntity fineEntity) {
         String sql = """
-                INSERT INTO fines (id_user, cause, expiration) VALUES (?,?,?);
+                INSERT INTO fines (uuid, id_user, cause, expiration) VALUES (?,?,?,?);
                 """;
         Object[] params = {
-                fineEntity.getIdUser(), fineEntity.getCause(), fineEntity.getExpiration()
+                fineEntity.getUuid(),
+                fineEntity.getIdUser(),
+                fineEntity.getCause(),
+                fineEntity.getExpiration()
         };
 
         try {
@@ -39,25 +44,26 @@ public class FineService implements CRUDRepo<FineEntity> {
     }
 
     @Override
-    public Optional<FineEntity> findById(Integer id) {
-        String sql = "SELECT * FROM fines WHERE id = ?";
+    public Optional<FineEntity> findByUuid(UUID uuid) {
+        String sql = "SELECT * FROM fines WHERE uuid = ?";
         FineEntity result =  DQLActions.selectWhere(sql, rs ->
-                FineEntity.builder()
-                        .id(rs.getInt(1))
-                        .idUser(rs.getInt(2))
-                        .cause(rs.getString(3))
-                        .expiration(rs.getDate(4))
-                        .build()
-                ,id).getFirst();
+                        FineEntity.builder()
+                                .id(rs.getInt(1))
+                                .uuid(UUID.fromString(rs.getString(2)))
+                                .idUser(rs.getInt(3))
+                                .cause(rs.getString(4))
+                                .expiration(rs.getDate(5))
+                                .build()
+                ,uuid).getFirst();
         return Optional.of(result);
     }
 
     @Override
-    public void updateById(FineEntity t) {
+    public void update(FineEntity t) {
         String sql = """
-                UPDATE fines SET id_user = ?, cause = ?, expiration = ? WHERE id = ?
+                UPDATE fines SET id_user = ?, cause = ?, expiration = ? WHERE uuid = ?
                 """;
-        Object[] params = {t.getIdUser(), t.getCause(), t.getExpiration(), t.getId()};
+        Object[] params = {t.getIdUser(), t.getCause(), t.getExpiration(), t.getUuid()};
         try {
             DMLActions.update(sql, params);
         } catch (SQLException e) {
@@ -66,10 +72,10 @@ public class FineService implements CRUDRepo<FineEntity> {
     }
 
     @Override
-    public void deleteById(Integer id) {
-        String sql = "DELETE FROM fines WHERE id = ?";
+    public void deleteByUuid(UUID uuid) {
+        String sql = "DELETE FROM fines WHERE uuid = ?";
         try {
-            DMLActions.delete(sql, id);
+            DMLActions.delete(sql, uuid);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

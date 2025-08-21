@@ -12,6 +12,7 @@ import jame.dev.utils.DQLActions;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class CopyService implements CRUDRepo<CopyEntity>, IMultiQuery<CopyDto> {
 
@@ -42,9 +43,10 @@ public class CopyService implements CRUDRepo<CopyEntity>, IMultiQuery<CopyDto> {
         return DQLActions.select(sql, rs ->
             CopyEntity.builder()
                     .id(rs.getInt(1))
-                    .idBook(rs.getInt(2))
-                    .copyNum(rs.getInt(3))
-                    .statusCopy(EStatusCopy.valueOf(rs.getString(4)))
+                    .uuid(UUID.fromString(rs.getString(2)))
+                    .idBook(rs.getInt(3))
+                    .copyNum(rs.getInt(4))
+                    .statusCopy(EStatusCopy.valueOf(rs.getString(5)))
                     .build()
             );
     }
@@ -52,9 +54,10 @@ public class CopyService implements CRUDRepo<CopyEntity>, IMultiQuery<CopyDto> {
     @Override
     public void save(CopyEntity copyEntity) {
         String sql = """
-                INSERT INTO copies (id_book, copy_num, status) VALUES (?,?,?);
+                INSERT INTO copies (uuid, id_book, copy_num, status) VALUES (?,?,?,?);
                 """;
         Object[] params = {
+                copyEntity.getUuid(),
                 copyEntity.getIdBook(),
                 copyEntity.getCopyNum(),
                 copyEntity.getStatusCopy().name()
@@ -67,37 +70,38 @@ public class CopyService implements CRUDRepo<CopyEntity>, IMultiQuery<CopyDto> {
     }
 
     @Override
-    public Optional<CopyEntity> findById(Integer id) {
+    public Optional<CopyEntity> findByUuid(UUID uuid) {
         String sql = """
-                SELECT * FROM copies WHERE id = ?
+                SELECT * FROM copies WHERE uuid = ?
                 """;
         List<CopyEntity> result = DQLActions.selectWhere(sql, rs ->
-                CopyEntity.builder()
-                        .id(rs.getInt("id"))
-                        .idBook(rs.getInt("id_book"))
-                        .statusCopy(EStatusCopy.valueOf(rs.getString("status")))
-                        .build()
-                , id);
+                        CopyEntity.builder()
+                                .id(rs.getInt("id"))
+                                .uuid(UUID.fromString(rs.getString("uuid")))
+                                .idBook(rs.getInt("id_book"))
+                                .statusCopy(EStatusCopy.valueOf(rs.getString("status")))
+                                .build()
+                , uuid);
         return Optional.of(result.getFirst());
     }
 
     @Override
-    public void updateById(CopyEntity t) {
+    public void update(CopyEntity t) {
         String sql = """
-                UPDATE copies SET status = ? WHERE id = ?
+                UPDATE copies SET status = ? WHERE uuid = ?
                 """;
         try {
-            DMLActions.update(sql, t.getStatusCopy().name(), t.getId());
+            DMLActions.update(sql, t.getStatusCopy().name(), t.getUuid());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void deleteById(Integer id) {
-        String sql = "DELETE FROM copies WHERE id = ?";
+    public void deleteByUuid(UUID uuid) {
+        String sql = "DELETE FROM copies WHERE uuid = ?";
         try {
-            DMLActions.delete(sql, id);
+            DMLActions.delete(sql, uuid);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
