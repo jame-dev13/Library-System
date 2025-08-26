@@ -23,8 +23,8 @@ public class LoanService implements CRUDRepo<LoanEntity> {
                         .uuid(UUID.fromString(rs.getString(2)))
                         .idUser(rs.getInt(3))
                         .idCopy(rs.getInt(4))
-                        .loanDate(rs.getDate(5))
-                        .returnDate(rs.getDate(6))
+                        .loanDate(rs.getDate(5).toLocalDate())
+                        .returnDate(rs.getDate(6).toLocalDate())
                         .statusLoan(EStatusLoan.valueOf(rs.getString(7)))
                         .build());
     }
@@ -58,8 +58,8 @@ public class LoanService implements CRUDRepo<LoanEntity> {
                                 .idUser(rs.getInt(3))
                                 .idCopy(rs.getInt(4))
                                 .statusLoan(EStatusLoan.valueOf(rs.getString(5)))
-                                .loanDate(rs.getDate(6))
-                                .returnDate(rs.getDate(7))
+                                .loanDate(rs.getDate(6).toLocalDate())
+                                .returnDate(rs.getDate(7).toLocalDate())
                                 .build()
                 ,uuid).getFirst();
         return Optional.of(result);

@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -19,7 +19,7 @@ public class LoanEntity {
     private UUID uuid;
     private int idUser;
     private int idCopy;
-    private Date loanDate;
-    private Date returnDate;
+    private LocalDate loanDate;
+    private LocalDate returnDate;
     private EStatusLoan statusLoan;
 }

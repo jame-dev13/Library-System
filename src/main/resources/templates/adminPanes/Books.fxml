@@ -118,7 +118,7 @@
                     </VBox>
                     <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
                       <children>
-                        <ToggleButton fx:id="togId" mnemonicParsing="false" text="ID" />
+                        <ToggleButton fx:id="togId" mnemonicParsing="false" text="UUID" />
                         <ToggleButton fx:id="togTitle" mnemonicParsing="false" text="TITLE" />
                         <ToggleButton fx:id="togIsbn" mnemonicParsing="false" text="ISBN" />
                         <ToggleButton fx:id="togDate" mnemonicParsing="false" text="PUB. DATE" />
@@ -146,15 +146,15 @@
                   <content>
                     <TableView fx:id="tableBooks" minWidth="700.0" prefHeight="285.0" prefWidth="763.0">
                       <columns>
-                        <TableColumn prefWidth="48.0" resizable="false" text="ID" />
-                        <TableColumn editable="false" prefWidth="102.0" resizable="false" text="TITLE" />
-                        <TableColumn editable="false" prefWidth="110.0" text="AUTHOR" />
-                        <TableColumn prefWidth="83.0" text="EDITORIAL" />
-                        <TableColumn prefWidth="74.0" text="ISBN" />
-                        <TableColumn prefWidth="110.0" text="PUBLISH_DATE" />
-                        <TableColumn prefWidth="52.0" text="PAGES" />
-                        <TableColumn prefWidth="63.0" text="GENRE" />
-                        <TableColumn prefWidth="95.0" text="LANG" />
+                        <TableColumn fx:id="colUuid" prefWidth="48.0" resizable="false" text="UUID" />
+                        <TableColumn fx:id="colTitle" editable="false" prefWidth="102.0" resizable="false" text="TITLE" />
+                        <TableColumn fx:id="colAuthor" editable="false" prefWidth="110.0" text="AUTHOR" />
+                        <TableColumn fx:id="colEditorial" prefWidth="83.0" text="EDITORIAL" />
+                        <TableColumn fx:id="colIsbn" prefWidth="74.0" text="ISBN" />
+                        <TableColumn fx:id="colPubDate" prefWidth="110.0" text="PUBLISH_DATE" />
+                        <TableColumn fx:id="colPages" prefWidth="52.0" text="PAGES" />
+                        <TableColumn fx:id="colGenre" prefWidth="63.0" text="GENRE" />
+                        <TableColumn fx:id="colLang" prefWidth="95.0" text="LANG" />
                       </columns>
                       <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

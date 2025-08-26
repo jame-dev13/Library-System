@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -20,7 +20,7 @@ public class BookEntity {
     private String author;
     private String editorial;
     private String ISBN;
-    private Date pubDate;
+    private LocalDate pubDate;
     private int numPages;
     private String genre;
     private ELanguage language;

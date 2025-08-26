@@ -12,7 +12,7 @@
     -fx-text-fill: white;
 }
 
-.button, .toggle-button{
+.button{
     -fx-background-color: -fx--bg-components;
     -fx-text-fill: white;
     -fx-border-color: rgb(76, 25, 218); 
@@ -47,4 +47,8 @@
 .combo-box{
     -fx-background-color: -fx--bg-components;
     -fx-border-color: rgb(76, 25, 218);
+}
+
+.split-pane{
+    -fx-background-color: -fx--bg-color;
 }
