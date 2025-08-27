@@ -1,10 +1,7 @@
 package jame.dev.models.entitys;
 
 import jame.dev.models.enums.ELanguage;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -15,13 +12,13 @@ import java.util.UUID;
 @Builder
 public class BookEntity {
     private Integer id;
-    private UUID uuid;
-    private String title;
-    private String author;
-    private String editorial;
-    private String ISBN;
-    private LocalDate pubDate;
-    private int numPages;
-    private String genre;
-    private ELanguage language;
+    @NonNull private UUID uuid;
+    @NonNull private String title;
+    @NonNull private String author;
+    @NonNull private String editorial;
+    @NonNull private String ISBN;
+    @NonNull private LocalDate pubDate;
+    @NonNull private int numPages;
+    @NonNull private String genre;
+    @NonNull private ELanguage language;
 }

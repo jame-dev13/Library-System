@@ -45,7 +45,7 @@ public class BookService implements CRUDRepo<BookEntity> {
                 bookEntity.getTitle(), bookEntity.getAuthor(),
                 bookEntity.getEditorial(), bookEntity.getISBN(),
                 bookEntity.getPubDate(), bookEntity.getNumPages(),
-                bookEntity.getGenre(), bookEntity.getLanguage()
+                bookEntity.getGenre(), bookEntity.getLanguage().name()
         };
         String sql = """
                 INSERT INTO books

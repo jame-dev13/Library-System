@@ -5,6 +5,7 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
@@ -54,7 +55,7 @@
                     </VBox>
                     <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="7.0" GridPane.columnIndex="1">
                       <children>
-                        <TextField fx:id="txtPubDate" alignment="CENTER" promptText="Publication Date" />
+                                    <DatePicker fx:id="pickerPubDate" promptText="Pub. Date" />
                         <TextField fx:id="txtPages" alignment="CENTER" prefHeight="39.0" prefWidth="96.0" promptText="Pages" />
                         <TextField fx:id="txtGenre" alignment="CENTER" promptText="Genre" />
                         <ComboBox fx:id="boxLanguages" prefWidth="150.0" promptText="Language" style="-: ;" />
@@ -74,8 +75,8 @@
                     </HBox>
                     <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" GridPane.rowIndex="2">
                       <children>
-                        <Button fx:id="btnUpdate" mnemonicParsing="false" text="Update" />
-                        <Button fx:id="btnDrop" mnemonicParsing="false" text="Drop" />
+                        <Button fx:id="btnUpdate" disable="true" mnemonicParsing="false" text="Update" />
+                        <Button fx:id="btnDrop" disable="true" mnemonicParsing="false" text="Drop" />
                       </children>
                       <cursor>
                         <Cursor fx:constant="HAND" />

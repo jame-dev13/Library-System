@@ -61,11 +61,11 @@ public class Schema implements IDoSchema {
                 uuid CHAR(36) NOT NULL,
                 title VARCHAR(80) NOT NULL,
                 author VARCHAR(80) NOT NULL,
-                editorial VARCHAR(15) NOT NULL,
+                editorial VARCHAR(50) NOT NULL,
                 ISBN CHAR(13) UNIQUE NOT NULL,
                 publication_date DATE NOT NULL,
                 pages SMALLINT NOT NULL,
-                genre VARCHAR(20) NOT NULL,
+                genre VARCHAR(50) NOT NULL,
                 language CHAR(3) NOT NULL
             );
             """;
