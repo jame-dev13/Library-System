@@ -7,10 +7,12 @@ import jame.dev.service.BookService;
 import jame.dev.utils.CustomAlert;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -97,6 +99,9 @@ public class Books {
       this.btnSave.setOnAction(this::handleSave);
       this.btnUpdate.setOnAction(this::handleUpdate);
       this.btnDrop.setOnAction(this::handleDelete);
+      //filter actions
+      FilteredList<BookEntity> filteredData = new FilteredList<>(this.tableBooks.getItems(), p -> true);
+      this.txtSearch.setOnKeyTyped(k -> this.handleTextChange(k, filteredData));
    }
 
    @FXML
@@ -162,7 +167,7 @@ public class Books {
          CustomAlert.getInstance()
                  .buildAlert(Alert.AlertType.ERROR,
                          "ERROR",
-                         "Can't have any empty field")
+                         "Can't have empty fields.")
                  .showAndWait();
          throw new RuntimeException(ne);
       }
@@ -203,11 +208,14 @@ public class Books {
                     book.setGenre(txtGenre.getText().trim());
                     book.setLanguage(boxLanguages.getSelectionModel().getSelectedItem());
                     this.repo.update(book);
+                    booksE.set(selectedIndex, book);
+                    this.tableBooks.getItems().set(selectedIndex, book);
                     CustomAlert.getInstance()
                             .buildAlert(Alert.AlertType.INFORMATION,
                                     "UPDATED",
                                     String.format("Record with identifier [%s] Updated!", book.getUuid()))
                             .showAndWait();
+                    this.btnClear.fire();
                  } else {
                     CustomAlert.getInstance()
                             .buildAlert(Alert.AlertType.ERROR,
@@ -236,5 +244,26 @@ public class Books {
                     } else return;
                  });
       });
+   }
+
+   @FXML
+   private void handleTextChange(KeyEvent e, FilteredList<BookEntity> filteredData){
+      String text = txtSearch.getText().trim();
+      filteredData.setPredicate(book -> {
+            if(text.isEmpty()) return true;
+            try{
+               return (book.getUuid().toString().contains(text)) ||
+                       (book.getTitle().contains(text)) ||
+                       (book.getAuthor().contains(text)) ||
+                       (book.getISBN().contains(text)) ||
+                       (book.getPubDate().toString().contains(text)) ||
+                       (String.valueOf(book.getNumPages()).contains(text))||
+                       (book.getGenre().contains(text)) ||
+                       (book.getLanguage() == ELanguage.valueOf(text.toUpperCase()));
+            }catch (IllegalArgumentException ex){
+               return false;
+            }
+      });
+      this.tableBooks.setItems(filteredData);
    }
 }

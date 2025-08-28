@@ -94,7 +94,7 @@ public class BookService implements CRUDRepo<BookEntity> {
                 book.getTitle(), book.getAuthor(),
                 book.getEditorial(), book.getISBN(),
                 book.getPubDate(), book.getNumPages(),
-                book.getGenre(), book.getLanguage(), book.getUuid().toString()
+                book.getGenre(), book.getLanguage().name(), book.getUuid().toString()
         };
         try{
             DMLActions.update(sql, params);
