@@ -2,10 +2,7 @@ package jame.dev.models.entitys;
 
 
 import jame.dev.models.enums.EStatusLoan;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -16,10 +13,10 @@ import java.util.UUID;
 @Builder
 public class LoanEntity {
     private Integer id;
-    private UUID uuid;
-    private int idUser;
-    private int idCopy;
-    private LocalDate loanDate;
-    private LocalDate returnDate;
-    private EStatusLoan statusLoan;
+    @NonNull private UUID uuid;
+    @NonNull private int idUser;
+    @NonNull private int idCopy;
+    @NonNull private LocalDate loanDate;
+    @NonNull private LocalDate returnDate;
+    @NonNull private EStatusLoan statusLoan;
 }

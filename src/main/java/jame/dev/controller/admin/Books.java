@@ -128,16 +128,16 @@ public class Books {
                  .ifPresent(selection -> {
                     this.selectedUuid = selection.getUuid();
                     this.selectedIndex = this.tableBooks.getSelectionModel().getSelectedIndex();
-                    BookEntity book = this.tableBooks.getSelectionModel().getSelectedItem();
+                    //BookEntity book = this.tableBooks.getSelectionModel().getSelectedItem();
                     //set fields with the object 'book' values.
-                    txtTitle.setText(book.getTitle());
-                    txtAuthor.setText(book.getAuthor());
-                    txtIsbn.setText(book.getISBN());
-                    txtEditorial.setText(book.getEditorial());
-                    pickerPubDate.setValue(book.getPubDate());
-                    txtPages.setText(String.valueOf(book.getNumPages()));
-                    txtGenre.setText(book.getGenre());
-                    boxLanguages.setValue(book.getLanguage());
+                    txtTitle.setText(selection.getTitle());
+                    txtAuthor.setText(selection.getAuthor());
+                    txtIsbn.setText(selection.getISBN());
+                    txtEditorial.setText(selection.getEditorial());
+                    pickerPubDate.setValue(selection.getPubDate());
+                    txtPages.setText(String.valueOf(selection.getNumPages()));
+                    txtGenre.setText(selection.getGenre());
+                    boxLanguages.setValue(selection.getLanguage());
                  });
          this.btnUpdate.setDisable(false);
          this.btnDrop.setDisable(false);
@@ -241,7 +241,7 @@ public class Books {
                        this.tableBooks.getItems().remove(selectedIndex);
                        booksE.remove(selectedIndex);
                        this.tableBooks.refresh();
-                    } else return;
+                    } return;
                  });
       });
    }

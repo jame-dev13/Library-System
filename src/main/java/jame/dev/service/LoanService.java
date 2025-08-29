@@ -37,7 +37,7 @@ public class LoanService implements CRUDRepo<LoanEntity> {
                 VALUES (?,?,?,?,?,?);
                 """;
         Object[] params = {
-                loanEntity.getUuid(), loanEntity.getIdUser(),
+                loanEntity.getUuid().toString(), loanEntity.getIdUser(),
                 loanEntity.getIdUser(), loanEntity.getStatusLoan().name(),
                 loanEntity.getLoanDate(), loanEntity.getReturnDate()
         };
@@ -61,7 +61,7 @@ public class LoanService implements CRUDRepo<LoanEntity> {
                                 .loanDate(rs.getDate(6).toLocalDate())
                                 .returnDate(rs.getDate(7).toLocalDate())
                                 .build()
-                ,uuid).getFirst();
+                ,uuid.toString()).getFirst();
         return Optional.of(result);
     }
 
@@ -74,7 +74,7 @@ public class LoanService implements CRUDRepo<LoanEntity> {
         Object[] params = {
                 loanEntity.getIdUser(), loanEntity.getIdCopy(),
                 loanEntity.getStatusLoan().name(), loanEntity.getLoanDate(),
-                loanEntity.getReturnDate(), loanEntity.getUuid()
+                loanEntity.getReturnDate(), loanEntity.getUuid().toString()
         };
 
         try {
@@ -88,7 +88,7 @@ public class LoanService implements CRUDRepo<LoanEntity> {
     public void deleteByUuid(UUID uuid) {
         String sql = "DELETE FROM loans WHERE uuid = ?";
         try {
-            DMLActions.delete(sql, uuid);
+            DMLActions.delete(sql, uuid.toString());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
