@@ -1,6 +1,6 @@
 package jame.dev.models.enums;
 
-public enum ECategory {
+public enum EGenre {
    FICTION,
    NON_FICTION,
    SCIENCE,

@@ -60,6 +60,7 @@ public class Fines {
    private int idUserSelected;
    private UUID uuidSelected;
    private int indexSelected;
+   private FilteredList<?> filteredListFines;
 
    @FXML private void initialize(){
       //services
@@ -69,20 +70,29 @@ public class Fines {
       fines = this.fineRepo.getAll();
       //table Fines
       tableFinesConfig();
-      //filtered data, txtFilter listener
-      FilteredList<?> filteredListFines;
-      if(checkFines.isSelected()){
-         this.checkState.setSelected(false);
-         this.txtFilter.setDisable(false);
-         filteredListFines = new FilteredList<FineEntity>(this.tableFines.getItems(), p -> true);
-      } else if (checkState.isSelected()) {
-         this.checkFines.setSelected(false);
-         this.txtFilter.setDisable(false);
-         filteredListFines = new FilteredList<LoanEntity>(this.tableStateUser.getItems(), p -> true);
-      } else {
-         if(!this.txtFilter.isDisabled()) this.txtFilter.setDisable(true);
-         filteredListFines = null;
-      }
+      //set filtered data, check and txtFilter listeners
+      checkFines.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+         if (isNowSelected) {
+            checkState.setSelected(false);
+            txtFilter.setDisable(false);
+            filteredListFines = new FilteredList<>(tableFines.getItems(), p -> true);
+         } else if (!checkState.isSelected()) {
+            txtFilter.setDisable(true);
+            filteredListFines = null;
+         }
+      });
+
+      checkState.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+         if (isNowSelected) {
+            checkFines.setSelected(false);
+            txtFilter.setDisable(false);
+            filteredListFines = new FilteredList<>(tableStateUser.getItems(), p -> true);
+         } else if (!checkFines.isSelected()) {
+            txtFilter.setDisable(true);
+            filteredListFines = null;
+         }
+      });
+
       this.txtFilter.setOnKeyTyped(key -> this.handleFilter(key, filteredListFines));
 
       //buton listeners

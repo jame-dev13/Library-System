@@ -1,7 +1,7 @@
 package jame.dev.service;
 
 import jame.dev.models.entitys.BookEntity;
-import jame.dev.models.enums.ECategory;
+import jame.dev.models.enums.EGenre;
 import jame.dev.models.enums.ELanguage;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.utils.DMLActions;
@@ -26,16 +26,16 @@ public class BookService implements CRUDRepo<BookEntity> {
         return DQLActions.select(sql,
                 rs-> BookEntity
                         .builder()
-                        .uuid(UUID.fromString(rs.getString("uuid")))
-                        .title(rs.getString("title"))
-                        .author(rs.getString("author"))
-                        .editorial(rs.getString("editorial"))
-                        .category(ECategory.valueOf(rs.getString("category")))
-                        .ISBN(rs.getString("ISBN"))
-                        .pubDate(rs.getDate("publication_date").toLocalDate())
-                        .numPages(rs.getInt("pages"))
-                        .genre(rs.getString("genre"))
-                        .language(ELanguage.valueOf(rs.getString("language")))
+                        .id(rs.getInt(1))
+                        .uuid(UUID.fromString(rs.getString(2)))
+                        .title(rs.getString(3))
+                        .author(rs.getString(4))
+                        .editorial(rs.getString(5))
+                        .ISBN(rs.getString(6))
+                        .pubDate(rs.getDate(7).toLocalDate())
+                        .numPages(rs.getInt(8))
+                        .genre(EGenre.valueOf(rs.getString(9)))
+                        .language(ELanguage.valueOf(rs.getString(10)))
                         .build()
         );
     }
@@ -47,13 +47,12 @@ public class BookService implements CRUDRepo<BookEntity> {
                 bookEntity.getTitle(), bookEntity.getAuthor(),
                 bookEntity.getEditorial(), bookEntity.getISBN(),
                 bookEntity.getPubDate(), bookEntity.getNumPages(),
-                bookEntity.getGenre(), bookEntity.getLanguage().name(),
-                bookEntity.getCategory().name(),
+                bookEntity.getGenre().name(), bookEntity.getLanguage().name(),
         };
         String sql = """
                 INSERT INTO books
-                (uuid, title, author, editorial, ISBN, publication_date, pages, genre, language, category)
-                VALUES (?,?,?,?,?,?,?,?,?,?);
+                (uuid, title, author, editorial, ISBN, publication_date, pages, genre, language)
+                VALUES (?,?,?,?,?,?,?,?,?);
                 """;
         try{
             DMLActions.insert(sql, params);
@@ -69,16 +68,16 @@ public class BookService implements CRUDRepo<BookEntity> {
                 """;
         List<BookEntity> books = DQLActions.selectWhere(sql, rs-> BookEntity
                 .builder()
-                .uuid(UUID.fromString(rs.getString("uuid")))
-                .title(rs.getString("title"))
-                .author(rs.getString("author"))
-                .editorial(rs.getString("editorial"))
-                .category(ECategory.valueOf("category"))
-                .ISBN(rs.getString("ISBN"))
-                .pubDate(rs.getDate("publication_date").toLocalDate())
-                .numPages(rs.getInt("pages"))
-                .genre(rs.getString("genre"))
-                .language(ELanguage.valueOf(rs.getString("language")))
+                .id(rs.getInt(1))
+                .uuid(UUID.fromString(rs.getString(2)))
+                .title(rs.getString(3))
+                .author(rs.getString(4))
+                .editorial(rs.getString(5))
+                .ISBN(rs.getString(6))
+                .pubDate(rs.getDate(7).toLocalDate())
+                .numPages(rs.getInt(9))
+                .genre(EGenre.valueOf(rs.getString(10)))
+                .language(ELanguage.valueOf(rs.getString(11)))
                 .build(),
                 uuid.toString());
         return Optional.of(books.getFirst());
@@ -92,13 +91,13 @@ public class BookService implements CRUDRepo<BookEntity> {
                 editorial = ?, ISBN = ?,
                 publication_date = ?,
                 pages = ?, genre = ?,
-                language = ?, category = ? WHERE uuid = ?
+                language = ? WHERE uuid = ?
                 """;
         Object[] params = {
                 book.getTitle(), book.getAuthor(),
                 book.getEditorial(), book.getISBN(),
                 book.getPubDate(), book.getNumPages(),
-                book.getGenre(), book.getLanguage().name(), book.getCategory().name(),
+                book.getGenre().name(), book.getLanguage().name(),
                 book.getUuid().toString()
         };
         try{
