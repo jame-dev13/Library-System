@@ -7,10 +7,12 @@ import jame.dev.service.LoanService;
 import jame.dev.utils.CustomAlert;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -35,6 +37,8 @@ public class Loans {
    //Date Pickers
    @FXML private DatePicker dateLoan;
    @FXML private DatePicker dateReturn;
+   //Fields
+   @FXML private TextField txtFilter;
 
    private CRUDRepo<LoanEntity> repo;
    private static List<LoanEntity> loans;
@@ -51,6 +55,17 @@ public class Loans {
       btnClear.setOnAction(this::handleClear);
       btnSet.setOnAction(this::handleSet);
       btnDelete.setOnAction(this::handleDelete);
+
+      //txtFilter listener
+      FilteredList<LoanEntity> filteredList = new FilteredList<>(this.tableLoans.getItems(), p -> true);
+      txtFilter.setOnKeyTyped(key -> this.handleFilter(key, filteredList));
+
+      //update status loan on expired date.
+      if(!loans.isEmpty()){
+         loans.stream()
+                 .filter(loan -> LocalDate.now().isAfter(loan.getReturnDate()))
+                 .forEach(loan -> loan.setStatusLoan(EStatusLoan.RUN_OUT));
+      }
    }
 
    @FXML private void tableConfig(){
@@ -123,8 +138,22 @@ public class Loans {
                                loans.remove(indexSelected);
                                this.tableLoans.getItems().remove(indexSelected);
                             }
-                            return;
                          });
               });
+   }
+
+   @FXML private void handleFilter(KeyEvent event, FilteredList<LoanEntity> filteredList){
+      try{
+         String text = txtFilter.getText();
+         filteredList.setPredicate(loan -> {
+            if(text.isEmpty()) return true;
+            return loan.getUuid().toString().contains(text) ||
+                    loan.getLoanDate().toString().contains(text) ||
+                    loan.getReturnDate().toString().contains(text) ||
+                    loan.getStatusLoan() == EStatusLoan.valueOf(text.toUpperCase());
+         });
+      }catch (IllegalArgumentException e){
+         throw new RuntimeException(e);
+      }
    }
 }

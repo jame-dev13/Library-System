@@ -13,7 +13,6 @@ import java.util.UUID;
 
 public class LoanService implements CRUDRepo<LoanEntity> {
 
-
     @Override
     public List<LoanEntity> getAll() {
         String sql = "SELECT * FROM loans";
@@ -93,4 +92,5 @@ public class LoanService implements CRUDRepo<LoanEntity> {
             throw new RuntimeException(e);
         }
     }
+
 }

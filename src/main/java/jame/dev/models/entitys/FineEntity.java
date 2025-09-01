@@ -1,12 +1,9 @@
 package jame.dev.models.entitys;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -14,9 +11,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class FineEntity {
-    private Integer id;
-    private UUID uuid;
-    private int idUser;
-    private String cause;
-    private Date expiration;
+    @NonNull private Integer id;
+    @NonNull private UUID uuid;
+    @NonNull private int idUser;
+    @NonNull private String cause;
+    @NonNull private LocalDate expiration;
 }

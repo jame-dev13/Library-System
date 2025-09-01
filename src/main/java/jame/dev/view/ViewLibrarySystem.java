@@ -13,7 +13,7 @@ public class ViewLibrarySystem extends Application {
     @Override
     public void init() throws Exception {
         Runnable r = Schema::new;
-        new Thread(r).start();
+        Thread.ofVirtual().start(r);
     }
 
     @Override

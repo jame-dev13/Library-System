@@ -172,8 +172,7 @@ public class Users {
         this.users.add(user);
 
         Runnable r = () -> EmailSender.mailToWPassword(user.getEmail(), txtPassword.getText());
-        Thread t = new Thread(r);
-        t.start();
+        Thread.ofVirtual().start(r);
 
         this.tableAdmins.getItems().add(user);
         this.btnClear.fire();

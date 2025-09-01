@@ -20,7 +20,7 @@ public class FineService implements CRUDRepo<FineEntity> {
                         .uuid(UUID.fromString(rs.getString(2)))
                         .idUser(rs.getInt(3))
                         .cause(rs.getString(4))
-                        .expiration(rs.getDate(5))
+                        .expiration(rs.getDate(5).toLocalDate())
                         .build());
     }
 
@@ -30,7 +30,7 @@ public class FineService implements CRUDRepo<FineEntity> {
                 INSERT INTO fines (uuid, id_user, cause, expiration) VALUES (?,?,?,?);
                 """;
         Object[] params = {
-                fineEntity.getUuid(),
+                fineEntity.getUuid().toString(),
                 fineEntity.getIdUser(),
                 fineEntity.getCause(),
                 fineEntity.getExpiration()
@@ -52,9 +52,9 @@ public class FineService implements CRUDRepo<FineEntity> {
                                 .uuid(UUID.fromString(rs.getString(2)))
                                 .idUser(rs.getInt(3))
                                 .cause(rs.getString(4))
-                                .expiration(rs.getDate(5))
+                                .expiration(rs.getDate(5).toLocalDate())
                                 .build()
-                ,uuid).getFirst();
+                ,uuid.toString()).getFirst();
         return Optional.of(result);
     }
 
@@ -63,7 +63,7 @@ public class FineService implements CRUDRepo<FineEntity> {
         String sql = """
                 UPDATE fines SET id_user = ?, cause = ?, expiration = ? WHERE uuid = ?
                 """;
-        Object[] params = {t.getIdUser(), t.getCause(), t.getExpiration(), t.getUuid()};
+        Object[] params = {t.getIdUser(), t.getCause(), t.getExpiration(), t.getUuid().toString()};
         try {
             DMLActions.update(sql, params);
         } catch (SQLException e) {
@@ -75,7 +75,7 @@ public class FineService implements CRUDRepo<FineEntity> {
     public void deleteByUuid(UUID uuid) {
         String sql = "DELETE FROM fines WHERE uuid = ?";
         try {
-            DMLActions.delete(sql, uuid);
+            DMLActions.delete(sql, uuid.toString());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

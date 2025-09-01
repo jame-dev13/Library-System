@@ -66,7 +66,7 @@ public class SignUp {
                 .build();
         this.token = this.user.getToken();
         Runnable r = () -> EmailSender.mailTo(this.user.getEmail(), this.token);
-        new Thread(r).start();
+        Thread.ofVirtual().start(r);
         checkVerification(this.token);
     }
 
