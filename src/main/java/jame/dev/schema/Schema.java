@@ -62,6 +62,7 @@ public class Schema implements IDoSchema {
                 title VARCHAR(80) NOT NULL,
                 author VARCHAR(80) NOT NULL,
                 editorial VARCHAR(50) NOT NULL,
+                category VARCHAR(50) NOT NULL,
                 ISBN CHAR(13) UNIQUE NOT NULL,
                 publication_date DATE NOT NULL,
                 pages SMALLINT NOT NULL,

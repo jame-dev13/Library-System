@@ -1,6 +1,7 @@
 package jame.dev.service;
 
 import jame.dev.models.entitys.BookEntity;
+import jame.dev.models.enums.ECategory;
 import jame.dev.models.enums.ELanguage;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.utils.DMLActions;
@@ -29,6 +30,7 @@ public class BookService implements CRUDRepo<BookEntity> {
                         .title(rs.getString("title"))
                         .author(rs.getString("author"))
                         .editorial(rs.getString("editorial"))
+                        .category(ECategory.valueOf(rs.getString("category")))
                         .ISBN(rs.getString("ISBN"))
                         .pubDate(rs.getDate("publication_date").toLocalDate())
                         .numPages(rs.getInt("pages"))
@@ -45,12 +47,13 @@ public class BookService implements CRUDRepo<BookEntity> {
                 bookEntity.getTitle(), bookEntity.getAuthor(),
                 bookEntity.getEditorial(), bookEntity.getISBN(),
                 bookEntity.getPubDate(), bookEntity.getNumPages(),
-                bookEntity.getGenre(), bookEntity.getLanguage().name()
+                bookEntity.getGenre(), bookEntity.getLanguage().name(),
+                bookEntity.getCategory().name(),
         };
         String sql = """
                 INSERT INTO books
-                (uuid, title, author, editorial, ISBN, publication_date, pages, genre, language)
-                VALUES (?,?,?,?,?,?,?,?,?);
+                (uuid, title, author, editorial, ISBN, publication_date, pages, genre, language, category)
+                VALUES (?,?,?,?,?,?,?,?,?,?);
                 """;
         try{
             DMLActions.insert(sql, params);
@@ -70,6 +73,7 @@ public class BookService implements CRUDRepo<BookEntity> {
                 .title(rs.getString("title"))
                 .author(rs.getString("author"))
                 .editorial(rs.getString("editorial"))
+                .category(ECategory.valueOf("category"))
                 .ISBN(rs.getString("ISBN"))
                 .pubDate(rs.getDate("publication_date").toLocalDate())
                 .numPages(rs.getInt("pages"))
@@ -88,13 +92,14 @@ public class BookService implements CRUDRepo<BookEntity> {
                 editorial = ?, ISBN = ?,
                 publication_date = ?,
                 pages = ?, genre = ?,
-                language = ? WHERE uuid = ?
+                language = ?, category = ? WHERE uuid = ?
                 """;
         Object[] params = {
                 book.getTitle(), book.getAuthor(),
                 book.getEditorial(), book.getISBN(),
                 book.getPubDate(), book.getNumPages(),
-                book.getGenre(), book.getLanguage().name(), book.getUuid().toString()
+                book.getGenre(), book.getLanguage().name(), book.getCategory().name(),
+                book.getUuid().toString()
         };
         try{
             DMLActions.update(sql, params);

@@ -1,5 +1,6 @@
 package jame.dev.models.entitys;
 
+import jame.dev.models.enums.ECategory;
 import jame.dev.models.enums.ELanguage;
 import lombok.*;
 
@@ -16,6 +17,7 @@ public class BookEntity {
     @NonNull private String title;
     @NonNull private String author;
     @NonNull private String editorial;
+    @NonNull private ECategory category;
     @NonNull private String ISBN;
     @NonNull private LocalDate pubDate;
     @NonNull private int numPages;

@@ -1,6 +1,7 @@
 package jame.dev.controller.admin;
 
 import jame.dev.models.entitys.BookEntity;
+import jame.dev.models.enums.ECategory;
 import jame.dev.models.enums.ELanguage;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.BookService;
@@ -30,6 +31,8 @@ public class Books {
    @FXML
    private TextField txtEditorial;
    @FXML
+   private ComboBox<ECategory> boxCat;
+   @FXML
    private DatePicker pickerPubDate;
    @FXML
    private TextField txtPages;
@@ -50,15 +53,6 @@ public class Books {
    @FXML
    private Button btnDrop;
 
-   //Toggle Buttons
-   @FXML
-   private ToggleButton togId;
-   @FXML
-   private ToggleButton togTitle;
-   @FXML
-   private ToggleButton togIsbn;
-   @FXML
-   private ToggleButton togDate;
    //Table
    @FXML
    private TableView<BookEntity> tableBooks;
@@ -66,6 +60,8 @@ public class Books {
    private TableColumn<BookEntity, String> colAuthor;
    @FXML
    private TableColumn<BookEntity, String> colEditorial;
+   @FXML
+   private TableColumn<BookEntity, ECategory> colCat;
    @FXML
    private TableColumn<BookEntity, String> colIsbn;
    @FXML
@@ -94,6 +90,7 @@ public class Books {
       booksE = this.repo.getAll();
       this.tableConfig();
       this.boxLanguages.setItems(FXCollections.observableArrayList(ELanguage.values()));
+      this.boxCat.setItems(FXCollections.observableArrayList(ECategory.values()));
       //button actions
       this.btnClear.setOnAction(this::handleClear);
       this.btnSave.setOnAction(this::handleSave);
@@ -111,6 +108,7 @@ public class Books {
       colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
       colAuthor.setCellValueFactory(new PropertyValueFactory<>("author"));
       colEditorial.setCellValueFactory(new PropertyValueFactory<>("editorial"));
+      colCat.setCellValueFactory(new PropertyValueFactory<>("category"));
       colIsbn.setCellValueFactory(new PropertyValueFactory<>("ISBN"));
       colPubDate.setCellValueFactory(new PropertyValueFactory<>("pubDate"));
       colPages.setCellValueFactory(new PropertyValueFactory<>("numPages"));
@@ -134,6 +132,7 @@ public class Books {
                     txtAuthor.setText(selection.getAuthor());
                     txtIsbn.setText(selection.getISBN());
                     txtEditorial.setText(selection.getEditorial());
+                    boxCat.setValue(selection.getCategory());
                     pickerPubDate.setValue(selection.getPubDate());
                     txtPages.setText(String.valueOf(selection.getNumPages()));
                     txtGenre.setText(selection.getGenre());
@@ -153,6 +152,7 @@ public class Books {
                          .title(txtTitle.getText().trim())
                          .author(txtAuthor.getText().trim())
                          .editorial(txtEditorial.getText().trim())
+                         .category(boxCat.getSelectionModel().getSelectedItem())
                          .ISBN(txtIsbn.getText().trim())
                          .pubDate(pickerPubDate.getValue())
                          .numPages(Integer.parseInt(txtPages.getText().trim()))
@@ -179,6 +179,7 @@ public class Books {
       txtAuthor.clear();
       txtIsbn.clear();
       txtEditorial.clear();
+      boxCat.getSelectionModel().clearSelection();
       txtPages.clear();
       txtGenre.clear();
       txtSearch.clear();
@@ -202,6 +203,7 @@ public class Books {
                     book.setTitle(txtTitle.getText().trim());
                     book.setAuthor(txtAuthor.getText().trim());
                     book.setEditorial(txtEditorial.getText().trim());
+                    book.setCategory(boxCat.getSelectionModel().getSelectedItem());
                     book.setISBN(txtIsbn.getText().trim());
                     book.setPubDate(pickerPubDate.getValue());
                     book.setNumPages(Integer.parseInt(txtPages.getText().trim()));
@@ -255,6 +257,7 @@ public class Books {
                return (book.getUuid().toString().contains(text)) ||
                        (book.getTitle().contains(text)) ||
                        (book.getAuthor().contains(text)) ||
+                       (book.getCategory() == ECategory.valueOf(text.toUpperCase())) ||
                        (book.getISBN().contains(text)) ||
                        (book.getPubDate().toString().contains(text)) ||
                        (String.valueOf(book.getNumPages()).contains(text))||
