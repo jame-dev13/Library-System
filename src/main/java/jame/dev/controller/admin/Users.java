@@ -16,191 +16,226 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.VBox;
+import javafx.scene.input.KeyEvent;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Users {
 
-    @FXML
-    private ToggleButton togUuid, togName, togEmail, togRole;
+   @FXML
+   private ToggleButton togUuid, togName, togEmail, togRole;
 
-    @FXML
-    private TextField txtName, txtSearch, txtEmail;
+   @FXML
+   private TextField txtName, txtSearch, txtEmail;
 
-    @FXML
-    private PasswordField txtPassword;
+   @FXML
+   private PasswordField txtPassword;
 
-    @FXML
-    private TableView<UserEntity> tableAdmins;
-    @FXML
-    private TableColumn<UserEntity, UUID> colUuid;
-    @FXML
-    private TableColumn<UserEntity, String> colName;
-    @FXML
-    private TableColumn<UserEntity, String> colEmail;
-    @FXML
-    private TableColumn<UserEntity, String> colRole;
+   @FXML
+   private TableView<UserEntity> tableAdmins;
+   @FXML
+   private TableColumn<UserEntity, UUID> colUuid;
+   @FXML
+   private TableColumn<UserEntity, String> colName;
+   @FXML
+   private TableColumn<UserEntity, String> colEmail;
+   @FXML
+   private TableColumn<UserEntity, String> colRole;
 
-    @FXML
-    private Button btnSave, btnClear, btnDrop;
-
-    @FXML
-    private VBox boxSearch;
-
-    private CRUDRepo<UserEntity> repo;
-
-    private List<UserEntity> users;
-
-    private UUID uuidSelected;
-    private int index;
-
-    @FXML
-    public void initialize() {
-        this.repo = new UserService();
-        colUuid.setCellValueFactory(new PropertyValueFactory<>("uuid"));
-        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
-        colRole.setCellValueFactory(data ->
-                new SimpleStringProperty(data.getValue().getRole().name()));
-        this.users = this.repo.getAll();
-        initTable();
-
-        //buttons
-        this.btnClear.setOnAction(this::handleClear);
-        this.btnSave.setOnAction(this::handleSave);
-        this.btnDrop.setOnAction(this::handleDelete);
-        //Field
-
-        FilteredList<UserEntity> filteredData =
-                new FilteredList<>(this.tableAdmins.getItems(), p -> true);
-        this.txtSearch.setOnKeyTyped(_ -> {
-            String text = txtSearch.getText().trim();
-
-            filteredData.setPredicate(u -> {
-                if (text.isEmpty()) return true; //show everything
-
-                if (this.togUuid.isSelected()) {
-                    return u.getUuid().toString().contains(text);
-                } else if (this.togName.isSelected()) {
-                    return u.getName().toLowerCase().contains(text.toLowerCase());
-                } else if (this.togEmail.isSelected()) {
-                    return u.getEmail().toLowerCase().contains(text.toLowerCase());
-                } else {
-                    try {
-                        return u.getRole() == ERole.valueOf(text.toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        return false;
-                    }
-                }
-            });
-            this.tableAdmins.setItems(filteredData);
-        });
-    }
-
-    /**
-     * This method defines the background configuration for the TableView
-     * witch includes data, selection and listeners options.
-     */
-    @FXML
-    private void initTable() {
-        this.tableAdmins.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        ObservableList<UserEntity> users = FXCollections.observableArrayList(
-                this.users.stream()
-                        .filter(u -> u.getRole() == ERole.ADMIN)
-                        .toList()
-        );
-        tableAdmins.setItems(users);
-        this.tableAdmins.setOnMouseClicked(l -> {
-                    Optional.ofNullable(this.tableAdmins.getSelectionModel().getSelectedItem())
-                            .ifPresent(selected -> {
-                                this.uuidSelected = selected.getUuid();
-                                this.index = this.tableAdmins.getSelectionModel().getSelectedIndex();
-                            });
-                }
-        );
-    }
-
-    /**
-     * This method is the manager for clean things in the view like:
-     * text, selections and/or enable/disable buttons.
-     */
-    @FXML
-    private void handleClear(ActionEvent e) {
-        txtName.setText("");
-        txtEmail.setText("");
-        txtPassword.setText("");
-        txtSearch.setText("");
-        this.tableAdmins.getSelectionModel().clearSelection();
-        this.togUuid.setSelected(false);
-        this.togName.setSelected(false);
-        this.togEmail.setSelected(false);
-        this.togRole.setSelected(false);
-    }
-
-    /***
-     * This method is the manager to build the data witch is going to be saved
-     * by the repository, also it updates the local ArrayList and sends a communication email
-     * to the new user, finally fire the clear button and show an Alert.
-     */
-
-    @FXML
-    private void handleSave(ActionEvent e) {
-        UserEntity user = UserEntity.builder()
-                .uuid(UUID.randomUUID())
-                .name(txtName.getText().trim())
-                .email(txtEmail.getText().trim())
-                .password(BCrypt.hashpw(txtPassword.getText().trim(), BCrypt.gensalt(12)))
-                .role(ERole.ADMIN)
-                .token(TokenGenerator.genToken())
-                .verified(true)
-                .build();
-
-        boolean isEmailIn = this.users.stream()
-                .anyMatch(u -> u.getEmail().equals(user.getEmail()));
-
-        if (isEmailIn) {
-            CustomAlert.getInstance()
-                    .buildAlert(Alert.AlertType.WARNING, "WARNING", "Email duplicated!")
-                    .showAndWait();
-            return;
-        }
-        this.repo.save(user);
-        this.users.add(user);
-
-        Runnable r = () -> EmailSender.mailToWPassword(user.getEmail(), txtPassword.getText());
-        Thread.ofVirtual().start(r);
-
-        this.tableAdmins.getItems().add(user);
-        this.btnClear.fire();
-        CustomAlert.getInstance()
-                .buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS!", "Admin added!")
-                .showAndWait();
-    }
+   @FXML
+   private Button btnSave, btnClear, btnDrop;
 
 
-    /**
-     * this method manages the delete logic for a user in the view
-     * based on the selected uuid and index and checks that the selected
-     * row info doesn't match with the session data.
-     */
-    @FXML
-    private void handleDelete(ActionEvent e) {
-        String usernameSession = SessionManager.getInstance().getUsername();
-        String usernameSelected = this.tableAdmins.getSelectionModel().getSelectedItem().getEmail();
-        if (usernameSession.equals(usernameSelected)) {
-            CustomAlert.getInstance()
-                    .buildAlert(Alert.AlertType.WARNING, "WARNING", "You can´t delete you here.")
-                    .showAndWait();
-            return;
-        }
-        this.repo.deleteByUuid(this.uuidSelected);
-        this.tableAdmins.refresh();
-        uuidSelected = null;
-        this.users.remove(this.index);
-        this.index = -1;
-    }
+   private CRUDRepo<UserEntity> repo;
+
+   private List<UserEntity> users;
+
+   private UUID uuidSelected;
+   private int index;
+
+   /**
+    * initializes components, global data and listeners, everything of that
+    * stuff must be in this method.
+    */
+   @FXML
+   public void initialize() {
+      //repository
+      this.repo = new UserService();
+      //data
+      this.users = this.repo.getAll();
+      //table config
+      initTable();
+
+      //buttons
+      this.btnClear.setOnAction(this::handleClear);
+      this.btnSave.setOnAction(this::handleSave);
+      this.btnDrop.setOnAction(this::handleDelete);
+      //filter listener
+      FilteredList<UserEntity> filteredData =
+              new FilteredList<>(this.tableAdmins.getItems(), p -> true);
+      this.txtSearch.setOnKeyTyped(key -> this.handleFilter(key, filteredData));
+   }
+
+   /**
+    * This method defines the background configuration for the TableView
+    * witch includes data, selection and listeners options.
+    */
+   @FXML
+   private void initTable() {
+      //columns
+      this.colUuid.setCellValueFactory(new PropertyValueFactory<>("uuid"));
+      this.colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+      this.colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+      this.colRole.setCellValueFactory(data ->
+              new SimpleStringProperty(data.getValue().getRole().name()));
+      //selection
+      this.tableAdmins.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+      //set data
+      ObservableList<UserEntity> users = FXCollections.observableArrayList(
+              this.users.stream()
+                      .filter(u -> u.getRole() == ERole.ADMIN)
+                      .collect(Collectors.toList())
+      );
+      tableAdmins.setItems(users);
+
+      //listener
+      this.tableAdmins.setOnMouseClicked(_ ->
+              Optional.ofNullable(this.tableAdmins.getSelectionModel().getSelectedItem())
+                      .ifPresent(selected -> {
+                         this.uuidSelected = selected.getUuid();
+                         this.index = this.tableAdmins.getSelectionModel().getSelectedIndex();
+                      })
+      );
+   }
+
+   /**
+    * Manages the clean data for the view like:
+    * text, selections and/or enable/disable buttons.
+    */
+   @FXML
+   private void handleClear(ActionEvent e) {
+      //fields
+      txtName.setText("");
+      txtEmail.setText("");
+      txtPassword.setText("");
+      txtSearch.setText("");
+      //selections
+      this.tableAdmins.getSelectionModel().clearSelection();
+      //toggle buttons
+      this.togUuid.setSelected(false);
+      this.togName.setSelected(false);
+      this.togEmail.setSelected(false);
+      this.togRole.setSelected(false);
+
+      //reset globals
+      this.uuidSelected = null;
+      this.index = -1;
+   }
+
+   /***
+    * Manages the build of data witch is going to be saved
+    * by the repository, also it updates the local ArrayList and sends a communication email
+    * to the new user, finally fire the clear button and shows an {@link CustomAlert}
+    * for confirmation or error.
+    */
+   @FXML
+   private void handleSave(ActionEvent e) {
+      UserEntity user = UserEntity.builder()
+              .uuid(UUID.randomUUID())
+              .name(txtName.getText().trim())
+              .email(txtEmail.getText().trim())
+              .password(BCrypt.hashpw(txtPassword.getText().trim(), BCrypt.gensalt(12)))
+              .role(ERole.ADMIN)
+              .token(TokenGenerator.genToken())
+              .verified(true)
+              .build();
+      //check if it's a duplicate email in the table
+      boolean isEmailIn = this.users.stream()
+              .anyMatch(u -> u.getEmail().equals(user.getEmail()));
+
+      if (isEmailIn) {
+         CustomAlert.getInstance()
+                 .buildAlert(Alert.AlertType.WARNING, "WARNING", "Email duplicated!")
+                 .showAndWait();
+         this.btnClear.fire();
+         return;
+      }
+      //add the new user
+      this.repo.save(user);
+      this.users.add(user);
+      this.tableAdmins.getItems().add(user);
+
+      //send email with his credentials
+      Runnable r = () -> EmailSender.mailToWPassword(user.getEmail(), txtPassword.getText());
+      Thread.ofVirtual().start(r);
+
+      //notify
+      CustomAlert.getInstance()
+              .buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS!", "Admin added!")
+              .showAndWait();
+      this.btnClear.fire();
+   }
+
+
+   /**
+    * Manages the delete logic for a user in the view and the background
+    * based on the selected uuid and index, checks if the selected
+    * row info doesn't match with the session data then, it applies
+    * the deletion logic.
+    *
+    * @param e ActionEvent
+    */
+   @FXML
+   private void handleDelete(ActionEvent e) {
+      String usernameSession = SessionManager.getInstance().getUsername();
+      String usernameSelected = this.tableAdmins.getSelectionModel().getSelectedItem().getEmail();
+      if (usernameSession.equals(usernameSelected)) {
+         CustomAlert.getInstance()
+                 .buildAlert(Alert.AlertType.WARNING, "WARNING", "You can´t delete you here.")
+                 .showAndWait();
+         return;
+      }
+      CustomAlert.getInstance()
+              .buildAlert(Alert.AlertType.WARNING, "DELETE",
+                      "¿Do you want delete this fine?")
+              .showAndWait()
+              .ifPresent(confirmation -> {
+                 if (confirmation == ButtonType.OK) {
+                    this.repo.deleteByUuid(this.uuidSelected);
+                    this.tableAdmins.refresh();
+                    this.users.remove(this.index);
+                 }
+              });
+      this.btnClear.fire();
+   }
+
+   /**
+    * Sets a predicate in the filteredList witch is used for set the
+    * data items to view in the table.
+    *
+    * @param key          KeyEvent
+    * @param filteredList FilteredList<UserEntity>
+    * @throws IllegalArgumentException if the text is not part
+    *                                  of the enum {@link ERole}
+    */
+   @FXML
+   private void handleFilter(KeyEvent key, FilteredList<UserEntity> filteredList) {
+      String text = txtSearch.getText().trim();
+      try {
+         filteredList.setPredicate(user -> {
+            if (text.isEmpty()) return true;
+            return user.getUuid().toString().contains(text) ||
+                    user.getName().contains(text) ||
+                    user.getEmail().contains(text) ||
+                    user.getRole() == ERole.valueOf(text.toUpperCase());
+         });
+         this.tableAdmins.setItems(filteredList);
+      } catch (IllegalArgumentException e) {
+         throw new RuntimeException(e);
+      }
+   }
 }

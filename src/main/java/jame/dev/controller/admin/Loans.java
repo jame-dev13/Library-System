@@ -46,9 +46,13 @@ public class Loans {
    private int indexSelected;
 
    @FXML private void initialize(){
+      //repo
       repo = new LoanService();
+      //label date
       this.labelDateToday.setText(LocalDate.now().toString());
+      //loan data
       loans = repo.getAll();
+      //table
       tableConfig();
 
       //buttons listeners
@@ -83,7 +87,7 @@ public class Loans {
       this.tableLoans.setItems(observableList);
 
       //listeners
-      this.tableLoans.setOnMouseClicked(e -> {
+      this.tableLoans.setOnMouseClicked(e ->
          Optional.ofNullable(this.tableLoans.getSelectionModel().getSelectedItem())
                  .ifPresent(selection -> {
                     this.uuidSelected = selection.getUuid();
@@ -92,20 +96,24 @@ public class Loans {
                     this.dateReturn.setValue(selection.getReturnDate());
                     this.btnSet.setDisable(false);
                     this.btnDelete.setDisable(false);
-                 });
-      });
+                 })
+      );
    }
 
    @FXML private void handleClear(ActionEvent event){
+      //fields
       this.dateLoan.setValue(null);
       this.dateReturn.setValue(null);
-      this.uuidSelected = null;
-      this.indexSelected = -1;
+      //selection
       this.tableLoans.getSelectionModel().clearSelection();
+      //disable buttons
       if(!btnDelete.isDisabled() && !btnSet.isDisabled()){
          this.btnDelete.setDisable(true);
          this.btnSet.setDisable(true);
       }
+      //reset globals
+      this.uuidSelected = null;
+      this.indexSelected = -1;
    }
 
    @FXML private void handleSet(ActionEvent event){
@@ -118,9 +126,9 @@ public class Loans {
                  loans.set(indexSelected, loan);
                  CustomAlert.getInstance()
                          .buildAlert(Alert.AlertType.INFORMATION, "UPDATED", "Record updated!")
-                         .showAndWait()
-                         .ifPresent(_ -> this.btnClear.fire());
+                         .showAndWait();
               });
+      this.btnClear.fire();
    }
 
    @FXML private void handleDelete(ActionEvent event){
@@ -140,6 +148,7 @@ public class Loans {
                             }
                          });
               });
+      this.btnClear.fire();
    }
 
    @FXML private void handleFilter(KeyEvent event, FilteredList<LoanEntity> filteredList){

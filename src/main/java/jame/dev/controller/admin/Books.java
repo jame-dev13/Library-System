@@ -122,7 +122,6 @@ public class Books {
                  .ifPresent(selection -> {
                     this.selectedUuid = selection.getUuid();
                     this.selectedIndex = this.tableBooks.getSelectionModel().getSelectedIndex();
-                    //BookEntity book = this.tableBooks.getSelectionModel().getSelectedItem();
                     //set fields with the object 'book' values.
                     txtTitle.setText(selection.getTitle());
                     txtAuthor.setText(selection.getAuthor());
@@ -136,6 +135,30 @@ public class Books {
          this.btnUpdate.setDisable(false);
          this.btnDrop.setDisable(false);
       });
+   }
+
+   @FXML
+   private void handleClear(ActionEvent e) {
+      //fields
+      txtTitle.clear();
+      txtAuthor.clear();
+      txtIsbn.clear();
+      txtEditorial.clear();
+      txtPages.clear();
+      boxGenre.getSelectionModel().clearSelection();
+      txtSearch.clear();
+      pickerPubDate.setValue(null);
+      boxLanguages.getSelectionModel().clearSelection();
+      //selection
+      this.tableBooks.getSelectionModel().clearSelection();
+      //disable buttons
+      if (!this.btnDrop.isDisabled() || !this.btnUpdate.isDisabled()) {
+         this.btnUpdate.setDisable(true);
+         this.btnDrop.setDisable(true);
+      }
+      //reset global
+      this.selectedUuid = null;
+      this.selectedIndex = -1;
    }
 
    @FXML
@@ -164,27 +187,9 @@ public class Books {
                          "Can't have empty fields.")
                  .showAndWait();
          throw new RuntimeException(ne);
+      }finally {
+         this.btnClear.fire();
       }
-   }
-
-   @FXML
-   private void handleClear(ActionEvent e) {
-      txtTitle.clear();
-      txtAuthor.clear();
-      txtIsbn.clear();
-      txtEditorial.clear();
-      txtPages.clear();
-      boxGenre.getSelectionModel().clearSelection();
-      txtSearch.clear();
-      pickerPubDate.setValue(null);
-      boxLanguages.getSelectionModel().clearSelection();
-      this.tableBooks.getSelectionModel().clearSelection();
-      if (!this.btnDrop.isDisabled() || !this.btnUpdate.isDisabled()) {
-         this.btnUpdate.setDisable(true);
-         this.btnDrop.setDisable(true);
-      }
-      this.selectedUuid = null;
-      this.selectedIndex = -1;
    }
 
    @FXML
@@ -209,7 +214,6 @@ public class Books {
                                     "UPDATED",
                                     String.format("Record with identifier [%s] Updated!", book.getUuid()))
                             .showAndWait();
-                    this.btnClear.fire();
                  } else {
                     CustomAlert.getInstance()
                             .buildAlert(Alert.AlertType.ERROR,
@@ -218,6 +222,7 @@ public class Books {
                             .showAndWait();
                  }
               });
+      this.btnClear.fire();
    }
 
    @FXML
@@ -235,9 +240,10 @@ public class Books {
                        this.tableBooks.getItems().remove(selectedIndex);
                        booksE.remove(selectedIndex);
                        this.tableBooks.refresh();
-                    } return;
+                    }
                  });
       });
+      this.btnClear.fire();
    }
 
    @FXML
