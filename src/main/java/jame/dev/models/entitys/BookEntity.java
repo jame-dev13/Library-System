@@ -1,7 +1,6 @@
 package jame.dev.models.entitys;
 
 import jame.dev.models.enums.EGenre;
-import jame.dev.models.enums.ELanguage;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -21,5 +20,4 @@ public class BookEntity {
     @NonNull private LocalDate pubDate;
     @NonNull private int numPages;
     @NonNull private EGenre genre;
-    @NonNull private ELanguage language;
 }

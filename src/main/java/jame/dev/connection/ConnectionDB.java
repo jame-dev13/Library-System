@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 /**
  * This is a singleton class which provides methods to
- * connect to the database, close and get the current connection if exists
+ * connect to the database, get and close the current connection if exists
  * you must use getInstance to create an object of this class.
  */
 @Log
@@ -37,6 +37,11 @@ public class ConnectionDB {
         return instance;
     }
 
+   /**
+    * Makes a connection to the DB using the credentials and turns off the
+    * autocommit for be able to work with transactions.
+    * @return a connection cursor for db operation.
+    */
     private Connection connect(){
         try {
             Connection connection = DriverManager.getConnection(URL, USER, PWD);
@@ -49,11 +54,18 @@ public class ConnectionDB {
         }
     }
 
+
+   /**
+    * Gets the current connection if exists, is not closed or is valid, otherwise
+    * it creates a new connection.
+    * @return a SQL connection.
+    */
     public Connection getConnection(){
         try{
             if(this.connection == null || this.connection.isClosed() || !this.connection.isValid(3)){
                 return this.connect();
             }
+            log.info("getConnection() executed!");
         }catch (SQLException e){
             log.warning("Error validating connection!\n");
             return null;
@@ -61,10 +73,14 @@ public class ConnectionDB {
         return this.connection;
     }
 
-    public void close(){
+   /**
+    * Closes the current instance of the class
+    */
+   public void close(){
         try{
             if(this.connection != null && !this.connection.isClosed()){
                 this.connection.close();
+                this.connection = null;
             }
         }catch (SQLException e){
             log.warning("Error trying to close the connection.\n");

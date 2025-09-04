@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +46,11 @@ public class Loans {
    private UUID uuidSelected;
    private int indexSelected;
 
-   @FXML private void initialize(){
+   /**
+    * Initializes components, global data and listeners, everything of that
+    * type must be in this method.
+    */
+   @FXML private void initialize() throws IOException {
       //repo
       repo = new LoanService();
       //label date

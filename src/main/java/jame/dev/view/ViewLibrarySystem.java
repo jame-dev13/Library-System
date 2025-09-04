@@ -10,25 +10,24 @@ import javafx.stage.Stage;
 
 public class ViewLibrarySystem extends Application {
 
-    @Override
-    public void init() throws Exception {
-        Runnable r = Schema::new;
-        Thread.ofVirtual().start(r);
-    }
+   @Override
+   public void init() throws Exception {
+      new Schema();
+   }
 
-    @Override
-    public void start(Stage stage) throws Exception {
-        FXMLLoader loader =
-                new FXMLLoader(Main.class.getResource("/templates/adminView.fxml"));
-        Scene scene = new Scene(loader.load());
-        stage.setScene(scene);
-        stage.setTitle("Library System");
-        stage.show();
-    }
+   @Override
+   public void start(Stage stage) throws Exception {
+      FXMLLoader loader =
+              new FXMLLoader(Main.class.getResource("/templates/adminView.fxml"));
+      Scene scene = new Scene(loader.load());
+      stage.setScene(scene);
+      stage.setTitle("Library System");
+      stage.show();
+   }
 
-    @Override
-    public void stop() throws Exception {
-        ConnectionDB.getInstance().close();
-        System.gc();
-    }
+   @Override
+   public void stop() throws Exception {
+      ConnectionDB.getInstance().close();
+      System.gc();
+   }
 }

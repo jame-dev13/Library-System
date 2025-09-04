@@ -16,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -53,10 +54,13 @@ public class Fines {
    @FXML private TableColumn<LoanEntity, Integer> colId;
    @FXML private TableColumn<LoanEntity, EStatusLoan> colStatus;
 
+   //repositories
    private CRUDRepo<FineEntity> fineRepo;
    private CRUDRepo<LoanEntity> loanRepo;
+   //local list
    private static List<FineEntity> fines;
    private static List<LoanEntity> loans;
+   //aux
    private int idUserSelected;
    private UUID uuidSelected;
    private int indexSelected;
@@ -64,9 +68,9 @@ public class Fines {
 
    /**
     * Initializes components, global data and listeners, everything of that
-    * stuff must be in this method.
+    * type must be in this method.
     */
-   @FXML private void initialize(){
+   @FXML private void initialize() throws IOException {
       //services
       this.fineRepo = new FineService();
       this.loanRepo = new LoanService();
@@ -76,8 +80,8 @@ public class Fines {
       //table Fines
       tableFinesConfig();
       tableStateLoanConfig();
-      //set filtered data, check and txtFilter listeners
-      checkFines.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+      //checkBox listener
+      checkFines.selectedProperty().addListener((_,_, isNowSelected) -> {
          if (isNowSelected) {
             checkState.setSelected(false);
             txtFilter.setDisable(false);
@@ -88,7 +92,7 @@ public class Fines {
          }
       });
 
-      checkState.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+      checkState.selectedProperty().addListener((_,_, isNowSelected) -> {
          if (isNowSelected) {
             checkFines.setSelected(false);
             txtFilter.setDisable(false);
@@ -99,6 +103,7 @@ public class Fines {
          }
       });
 
+      //txtFilter listener
       this.txtFilter.setOnKeyTyped(key -> this.handleFilter(key, filteredListFines));
 
       //buton listeners

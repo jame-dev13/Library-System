@@ -1,10 +1,8 @@
 package jame.dev.models.entitys;
 
+import jame.dev.models.enums.ELanguage;
 import jame.dev.models.enums.EStatusCopy;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -14,9 +12,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class CopyEntity {
-    private Integer id;
-    private UUID uuid;
-    private int idBook;
-    private int copyNum;
-    private EStatusCopy statusCopy;
+    @NonNull private Integer id;
+    @NonNull private UUID uuid;
+    @NonNull private int idBook;
+    @NonNull private int copyNum;
+    @NonNull private EStatusCopy statusCopy;
+    @NonNull private ELanguage language;
 }

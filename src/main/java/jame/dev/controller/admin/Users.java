@@ -19,6 +19,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -58,11 +59,11 @@ public class Users {
    private int index;
 
    /**
-    * initializes components, global data and listeners, everything of that
-    * stuff must be in this method.
+    * Initializes components, global data and listeners, everything of that
+    * type must be in this method.
     */
    @FXML
-   public void initialize() {
+   public void initialize() throws IOException {
       //repository
       this.repo = new UserService();
       //data
@@ -180,13 +181,9 @@ public class Users {
       this.btnClear.fire();
    }
 
-
    /**
-    * Manages the delete logic for a user in the view and the background
-    * based on the selected uuid and index, checks if the selected
-    * row info doesn't match with the session data then, it applies
-    * the deletion logic.
-    *
+    * Handles the deletions for an object of {@link UserEntity} if the user is not the
+    * same as the current session.
     * @param e ActionEvent
     */
    @FXML

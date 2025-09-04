@@ -8,6 +8,9 @@ import javafx.scene.control.Tab;
 
 import java.io.IOException;
 
+/**
+ * Controller class for the view of admins
+ */
 public class Admin {
 
     @FXML
@@ -22,6 +25,10 @@ public class Admin {
     @FXML
     private Tab tabFines;
 
+   /**
+    * It loads the different Tabs to use.
+    * @throws IOException
+    */
     @FXML
     public void initialize() throws IOException {
         Parent users = FXMLLoader.load(Main.class.getResource("/templates/adminPanes/Users.fxml"));

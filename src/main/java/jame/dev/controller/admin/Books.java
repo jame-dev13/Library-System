@@ -1,8 +1,8 @@
 package jame.dev.controller.admin;
 
+import jame.dev.Main;
 import jame.dev.models.entitys.BookEntity;
 import jame.dev.models.enums.EGenre;
-import jame.dev.models.enums.ELanguage;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.BookService;
 import jame.dev.utils.CustomAlert;
@@ -11,15 +11,26 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+
+/**
+ * Controller class for a specific pane that manages CRUD operations
+ * for books.
+ */
 public class Books {
    //Fields
    @FXML
@@ -37,8 +48,6 @@ public class Books {
    private TextField txtPages;
    @FXML
    private ComboBox<EGenre> boxGenre;
-   @FXML
-   private ComboBox<ELanguage> boxLanguages;
    @FXML
    private TextField txtSearch;
 
@@ -68,25 +77,28 @@ public class Books {
    @FXML
    private TableColumn<BookEntity, EGenre> colGenre;
    @FXML
-   private TableColumn<BookEntity, ELanguage> colLang;
-   @FXML
    private TableColumn<BookEntity, UUID> colUuid;
    @FXML
    private TableColumn<BookEntity, String> colTitle;
+
+   @FXML private Tooltip toolTip;
 
    private CRUDRepo<BookEntity> repo;
    private UUID selectedUuid;
    private int selectedIndex;
    private static List<BookEntity> booksE;
 
+   /**
+    * Initializes components, global data and listeners, everything of that type
+    * must be in this method.
+    */
    @FXML
-   private void initialize() {
+   private void initialize() throws IOException {
       //Service
       this.repo = new BookService();
       //Data
       booksE = this.repo.getAll();
       this.tableConfig();
-      this.boxLanguages.setItems(FXCollections.observableArrayList(ELanguage.values()));
       this.boxGenre.setItems(FXCollections.observableArrayList(EGenre.values()));
       //button actions
       this.btnClear.setOnAction(this::handleClear);
@@ -98,6 +110,9 @@ public class Books {
       this.txtSearch.setOnKeyTyped(k -> this.handleTextChange(k, filteredData));
    }
 
+   /**
+    * Configuration for the table, column type, selection, data and listeners
+    */
    @FXML
    private void tableConfig() {
       //columns
@@ -109,7 +124,6 @@ public class Books {
       colPubDate.setCellValueFactory(new PropertyValueFactory<>("pubDate"));
       colPages.setCellValueFactory(new PropertyValueFactory<>("numPages"));
       colGenre.setCellValueFactory(new PropertyValueFactory<>("genre"));
-      colLang.setCellValueFactory(new PropertyValueFactory<>("language"));
       //table
       this.tableBooks.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
       ObservableList<BookEntity> observable = FXCollections.observableArrayList(booksE);
@@ -130,13 +144,21 @@ public class Books {
                     pickerPubDate.setValue(selection.getPubDate());
                     txtPages.setText(String.valueOf(selection.getNumPages()));
                     boxGenre.setValue(selection.getGenre());
-                    boxLanguages.setValue(selection.getLanguage());
                  });
          this.btnUpdate.setDisable(false);
          this.btnDrop.setDisable(false);
+
+         if(l.getClickCount() == 2){
+            this.loadPopOver(this.tableBooks.getSelectionModel().getSelectedItem());
+         }
       });
    }
 
+   /**
+    * Handles the cleaning for the different types of fields in the view, includes
+    * selections, and aux variables.
+    * @param e the ActionEvent
+    */
    @FXML
    private void handleClear(ActionEvent e) {
       //fields
@@ -148,7 +170,6 @@ public class Books {
       boxGenre.getSelectionModel().clearSelection();
       txtSearch.clear();
       pickerPubDate.setValue(null);
-      boxLanguages.getSelectionModel().clearSelection();
       //selection
       this.tableBooks.getSelectionModel().clearSelection();
       //disable buttons
@@ -161,25 +182,31 @@ public class Books {
       this.selectedIndex = -1;
    }
 
+   /**
+    * Do an insertion through the repository, it maps the data and Build an
+    * {@link BookEntity}
+    * @param e The ActionEvent
+    */
    @FXML
    private void handleSave(ActionEvent e) {
       try {
-         this.repo.save(
-                 BookEntity.builder()
-                         .uuid(UUID.randomUUID())
-                         .title(txtTitle.getText().trim())
-                         .author(txtAuthor.getText().trim())
-                         .editorial(txtEditorial.getText().trim())
-                         .ISBN(txtIsbn.getText().trim())
-                         .pubDate(pickerPubDate.getValue())
-                         .numPages(Integer.parseInt(txtPages.getText().trim()))
-                         .genre(boxGenre.getSelectionModel().getSelectedItem())
-                         .language(boxLanguages.getSelectionModel().getSelectedItem())
-                         .build());
+         BookEntity book = BookEntity.builder()
+                 .uuid(UUID.randomUUID())
+                 .title(txtTitle.getText().trim())
+                 .author(txtAuthor.getText().trim())
+                 .editorial(txtEditorial.getText().trim())
+                 .ISBN(txtIsbn.getText().trim())
+                 .pubDate(pickerPubDate.getValue())
+                 .numPages(Integer.parseInt(txtPages.getText().trim()))
+                 .genre(boxGenre.getSelectionModel().getSelectedItem())
+                 .build();
+         this.repo.save(book);
          CustomAlert.getInstance()
                  .buildAlert(Alert.AlertType.INFORMATION,
                          "SUCCESS",
-                         "Book added!");
+                         "Book added!").showAndWait();
+         booksE.add(book);
+         this.tableBooks.getItems().add(book);
       } catch (NullPointerException ne) {
          CustomAlert.getInstance()
                  .buildAlert(Alert.AlertType.ERROR,
@@ -192,6 +219,10 @@ public class Books {
       }
    }
 
+   /**
+    * Handles the update of the {@link BookEntity} object if it is present.
+    * @param e The ActionEvent
+    */
    @FXML
    private void handleUpdate(ActionEvent e) {
       Optional.ofNullable(selectedUuid)
@@ -205,10 +236,11 @@ public class Books {
                     book.setPubDate(pickerPubDate.getValue());
                     book.setNumPages(Integer.parseInt(txtPages.getText().trim()));
                     book.setGenre(boxGenre.getSelectionModel().getSelectedItem());
-                    book.setLanguage(boxLanguages.getSelectionModel().getSelectedItem());
+                    //save changes
                     this.repo.update(book);
                     booksE.set(selectedIndex, book);
                     this.tableBooks.getItems().set(selectedIndex, book);
+                    //confirmation
                     CustomAlert.getInstance()
                             .buildAlert(Alert.AlertType.INFORMATION,
                                     "UPDATED",
@@ -225,6 +257,11 @@ public class Books {
       this.btnClear.fire();
    }
 
+   /**
+    * Handles the deletion of an object {@link BookEntity} if the
+    * user wants to.
+    * @param e The ActionEvent
+    */
    @FXML
    private void handleDelete(ActionEvent e) {
       Optional.ofNullable(selectedUuid).ifPresent(uuid -> {
@@ -246,6 +283,11 @@ public class Books {
       this.btnClear.fire();
    }
 
+   /**
+    * Handles the way to filter the table data using a {@link FilteredList}
+    * @param e The KeyEvent
+    * @param filteredData The Data List
+    */
    @FXML
    private void handleTextChange(KeyEvent e, FilteredList<BookEntity> filteredData){
       String text = txtSearch.getText().trim();
@@ -258,12 +300,31 @@ public class Books {
                        (book.getISBN().contains(text)) ||
                        (book.getPubDate().toString().contains(text)) ||
                        (String.valueOf(book.getNumPages()).contains(text))||
-                       (book.getGenre() == EGenre.valueOf(text.toUpperCase())) ||
-                       (book.getLanguage() == ELanguage.valueOf(text.toUpperCase()));
+                       (book.getGenre() == EGenre.valueOf(text.toUpperCase()));
             }catch (IllegalArgumentException ex){
                return false;
             }
       });
       this.tableBooks.setItems(filteredData);
+   }
+
+   @FXML private void loadPopOver(BookEntity book){
+      try{
+         FXMLLoader loader = new FXMLLoader((Main.class.getResource("/templates/adminPanes/copies.fxml")));
+         Parent root = loader.load();
+
+         Copies controller = loader.getController();
+
+         controller.setIdBook(book);
+
+         Stage stage = new Stage();
+         stage.setTitle("Copies");
+         stage.setScene(new Scene(root));
+         stage.setResizable(false);
+         stage.initModality(Modality.APPLICATION_MODAL);
+         stage.showAndWait();
+      }catch(IOException e){
+          throw new RuntimeException(e);
+      }
    }
 }

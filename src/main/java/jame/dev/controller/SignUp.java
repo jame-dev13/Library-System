@@ -5,6 +5,7 @@ import jame.dev.models.entitys.UserEntity;
 import jame.dev.models.enums.ERole;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.UserService;
+import jame.dev.utils.CustomAlert;
 import jame.dev.utils.EmailSender;
 import jame.dev.utils.TokenGenerator;
 import javafx.event.ActionEvent;
@@ -22,6 +23,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Simple way to registration logic.
+ */
 public class SignUp {
 
     @FXML
@@ -43,6 +47,11 @@ public class SignUp {
     private UserEntity user;
     private String token;
 
+   /**
+    * Initializes components, global data and listeners, everything of that type
+    * must be in this method.
+    * @throws IOException
+    */
     @FXML
     private void initialize() throws IOException{
         this.repo = new UserService();
@@ -50,6 +59,12 @@ public class SignUp {
         btnToSignIn.setOnAction(this::handleReturnToSignIn);
     }
 
+   /**
+    * Handles the registration logic for a user with the ROLE of USER.
+    * It builds the Entity, sends an email verification and checks it for
+    * doing the insertion successfully.
+    * @param event The ActionEvent
+    */
     @FXML
     private void handleSignUp(ActionEvent event){
         String name = txtName.getText();
@@ -65,12 +80,19 @@ public class SignUp {
                 .verified(false)
                 .build();
         this.token = this.user.getToken();
+        //Sends verification email to the user.
         Runnable r = () -> EmailSender.mailTo(this.user.getEmail(), this.token);
         Thread.ofVirtual().start(r);
+        //checks the verification for the insertion.
         checkVerification(this.token);
     }
 
-    private void checkVerification(String token){
+   /**
+    * Checks if the user input is equals to the token that has been sent
+    * and updates the state of verification from the user
+    * @param token a random secure token.
+    */
+   private void checkVerification(String token){
         boolean isValid = false;
         TextInputDialog input = new TextInputDialog();
         input.setTitle("Verification code");
@@ -82,20 +104,26 @@ public class SignUp {
             if(inputPresent.isPresent()){
                 String value = inputPresent.get();
                 if(value.equals(token)){
-                    showAlert(Alert.AlertType.INFORMATION, "Verification Success :)")
-                            .show();
+                   CustomAlert.getInstance()
+                           .buildAlert(Alert.AlertType.INFORMATION,"INFO", "Verification successfully.")
+                           .show();
                     this.user.setVerified(true);
                     this.repo.save(this.user);
                     isValid = true;
                     this.token = null;
                     this.user = null;
                     this.btnToSignIn.fire();
-                }else showAlert(Alert.AlertType.ERROR, "Token invalid!")
-                        .showAndWait();
+                }else CustomAlert.getInstance()
+                        .buildAlert(Alert.AlertType.WARNING, "WARNING", "Verification failed.")
+                        .show();
             }
         }
     }
 
+   /**
+    * Handles the return to the view of login
+    * @param event The ActionEvent
+    */
     @FXML
     private void handleReturnToSignIn(ActionEvent event){
         try{
@@ -109,15 +137,7 @@ public class SignUp {
             stage.setScene(newScene);
             stage.show();
         }catch (IOException e){
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-    }
-
-    private Alert showAlert(Alert.AlertType type, String context){
-        Alert alert = new Alert(type);
-        alert.setTitle("ALERT!");
-        alert.setHeaderText("Verification!");
-        alert.setContentText(context);
-        return alert;
     }
 }

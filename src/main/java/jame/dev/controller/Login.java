@@ -5,6 +5,7 @@ import jame.dev.dtos.UserDto;
 import jame.dev.models.enums.ERole;
 import jame.dev.repositorys.IAuthRepo;
 import jame.dev.service.AuthService;
+import jame.dev.utils.CustomAlert;
 import jame.dev.utils.SessionManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,15 +13,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * Represents a simple Login controller.
+ */
 public class Login{
 
     @FXML
@@ -37,6 +38,11 @@ public class Login{
 
     private IAuthRepo repo;
 
+   /**
+    * Initializes components, global data and listeners, everything of that type
+    * must be in this method.
+    * @throws IOException
+    */
     @FXML
     public void initialize() throws IOException {
         this.repo = new AuthService();
@@ -44,6 +50,10 @@ public class Login{
         btnToSignUp.setOnAction(this::handleClickGoToSignUp);
     }
 
+   /**
+    * Handles the authentications for a User and redirect it to a view depends on his role.
+    * @param actionEvent the ActionEvent
+    */
     @FXML
     private void handleClickLogin(ActionEvent actionEvent) {
         UserDto user = UserDto.builder()
@@ -56,18 +66,29 @@ public class Login{
         session.login(user.username());
 
         switch (role){
-            case USER -> redirectTo(actionEvent, "/templates/userView.fxml");
-            case ADMIN -> redirectTo(actionEvent, "/templates/adminView.fxml");
-            default -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Credentials");
-                alert.setContentText("Bad Credentials!");
-                alert.showAndWait();
-            }
+            case USER -> CustomAlert.getInstance()
+                    .buildAlert(Alert.AlertType.INFORMATION, "INFO", "Login successfully.")
+                       .showAndWait().ifPresent(confirmation -> {
+                          if(confirmation == ButtonType.OK)
+                             redirectTo(actionEvent, "/templates/userView.fxml");
+                    });
+           case ADMIN -> CustomAlert.getInstance()
+                   .buildAlert(Alert.AlertType.INFORMATION, "INFO", "Login successfully.")
+                   .showAndWait().ifPresent(confirmation -> {
+                      if(confirmation == ButtonType.OK)
+                         redirectTo(actionEvent, "/templates/adminView.fxml");
+                   });
+           default ->
+               CustomAlert.getInstance()
+                       .buildAlert(Alert.AlertType.ERROR, "ERROR", "Authentication failed.")
+                       .showAndWait();
         }
     }
 
+   /**
+    * Handles the click for go to other view
+    * @param actionEvent The ActionEvent
+    */
     @FXML
     private void handleClickGoToSignUp(ActionEvent actionEvent) {
         try {
@@ -85,7 +106,12 @@ public class Login{
         }
     }
 
-    private void redirectTo(ActionEvent event, String view) {
+   /**
+    * Redirects to the scene if that exists.
+    * @param event The ActionEvent
+    * @param view The path of the view
+    */
+    @FXML private void redirectTo(ActionEvent event, String view) {
         try{
             FXMLLoader loader = new FXMLLoader(Main.class.getResource(view));
             Parent root = loader.load();

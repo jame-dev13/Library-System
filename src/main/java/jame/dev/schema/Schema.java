@@ -9,14 +9,23 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Defines The creation of the SQl Table Scheme.
+ */
 @Log
 public class Schema implements IDoSchema {
 
+   /**
+    * Build the schema
+    */
     public Schema(){
         init();
     }
 
-    private void init(){
+   /**
+    * Executes the creation of tables in order with his query
+    */
+   private void init(){
         Map<String, String> tables = new LinkedHashMap<>();
         tables.put("users", this.queryUsers());
         tables.put("books", this.queryBooks());
@@ -39,6 +48,10 @@ public class Schema implements IDoSchema {
         }
     }
 
+   /**
+    * Query to build the table users.
+    * @return an sql query
+    */
     private String queryUsers() {
         return """
             CREATE TABLE IF NOT EXISTS users (
@@ -54,6 +67,10 @@ public class Schema implements IDoSchema {
             """;
     }
 
+    /**
+    * Query to build the table books.
+    * @return an sql query
+    */
     private String queryBooks(){
         return """
             CREATE TABLE IF NOT EXISTS books (
@@ -65,12 +82,15 @@ public class Schema implements IDoSchema {
                 ISBN CHAR(13) UNIQUE NOT NULL,
                 publication_date DATE NOT NULL,
                 pages SMALLINT NOT NULL,
-                genre VARCHAR(50) NOT NULL,
-                language CHAR(3) NOT NULL
+                genre VARCHAR(50) NOT NULL
             );
             """;
     }
 
+    /**
+    * Query to build the table fines.
+    * @return an sql query
+    */
     private String queryFines(){
         return """
             CREATE TABLE IF NOT EXISTS fines(
@@ -87,6 +107,10 @@ public class Schema implements IDoSchema {
             """;
     }
 
+    /**
+    * Query to build the table copies.
+    * @return an sql query
+    */
     private String queryCopies(){
         return """
             CREATE TABLE IF NOT EXISTS copies(
@@ -95,6 +119,7 @@ public class Schema implements IDoSchema {
                 id_book INT NOT NULL,
                 copy_num INT NOT NULL,
                 status CHAR(10) NOT NULL,
+                language CHAR(3) NOT NULL,
                 CONSTRAINT fk_copies_book FOREIGN KEY (id_book)
                 REFERENCES books(id)
                 ON DELETE CASCADE
@@ -103,6 +128,10 @@ public class Schema implements IDoSchema {
             """;
     }
 
+    /**
+    * Query to build the table loans.
+    * @return an sql query
+    */
     private String queryLoans(){
         return """
             CREATE TABLE IF NOT EXISTS loans(
@@ -125,6 +154,10 @@ public class Schema implements IDoSchema {
             """;
     }
 
+    /**
+    * Query to build the table history_loans.
+    * @return an sql query
+    */
     private String queryHistoryLoans(){
         return """
             CREATE TABLE IF NOT EXISTS history_loans(
