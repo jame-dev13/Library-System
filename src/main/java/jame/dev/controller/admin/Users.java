@@ -161,7 +161,7 @@ public class Users {
       if (isEmailIn) {
          CustomAlert.getInstance()
                  .buildAlert(Alert.AlertType.WARNING, "WARNING", "Email duplicated!")
-                 .showAndWait();
+                 .show();
          this.btnClear.fire();
          return;
       }
@@ -177,7 +177,7 @@ public class Users {
       //notify
       CustomAlert.getInstance()
               .buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS!", "Admin added!")
-              .showAndWait();
+              .show();
       this.btnClear.fire();
    }
 
@@ -193,7 +193,7 @@ public class Users {
       if (usernameSession.equals(usernameSelected)) {
          CustomAlert.getInstance()
                  .buildAlert(Alert.AlertType.WARNING, "WARNING", "You can´t delete you here.")
-                 .showAndWait();
+                 .show();
          return;
       }
       CustomAlert.getInstance()

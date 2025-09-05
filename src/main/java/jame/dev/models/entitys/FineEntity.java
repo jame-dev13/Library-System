@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class FineEntity {
-    @NonNull private Integer id;
+     private Integer id;
     @NonNull private UUID uuid;
     @NonNull private int idUser;
     @NonNull private String cause;

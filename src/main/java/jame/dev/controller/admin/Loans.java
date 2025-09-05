@@ -131,7 +131,7 @@ public class Loans {
                  loans.set(indexSelected, loan);
                  CustomAlert.getInstance()
                          .buildAlert(Alert.AlertType.INFORMATION, "UPDATED", "Record updated!")
-                         .showAndWait();
+                         .show();
               });
       this.btnClear.fire();
    }

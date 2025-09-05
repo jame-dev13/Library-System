@@ -2,10 +2,7 @@ package jame.dev.models.entitys;
 
 
 import jame.dev.models.enums.ERole;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -15,11 +12,11 @@ import java.util.UUID;
 @Builder
 public class UserEntity {
     private Integer id;
-    private UUID uuid;
-    private String name;
-    private String email;
-    private String password;
-    private ERole role;
-    private String token;
-    private boolean verified;
+    @NonNull private UUID uuid;
+    @NonNull private String name;
+    @NonNull private String email;
+    @NonNull private String password;
+    @NonNull private ERole role;
+    @NonNull private String token;
+    @NonNull private boolean verified;
 }

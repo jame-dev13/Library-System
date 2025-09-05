@@ -48,9 +48,9 @@
                         <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" HBox.hgrow="ALWAYS">
                            <children>
                               <Label text="Id_Book:" />
-                              <TextField fx:id="txtIdUser" alignment="CENTER" disable="true" prefHeight="42.0" prefWidth="184.0" promptText="ID_BOOK" />
+                              <TextField fx:id="txtIdBook" alignment="CENTER" disable="true" prefHeight="42.0" prefWidth="184.0" promptText="ID_BOOK" />
                               <Label text="Copy_Num:" />
-                              <TextField fx:id="txtCopyNum" promptText="COPY_NUM" />
+                              <TextField fx:id="txtCopyNum" promptText="COPY_NUM" disable="true"/>
                               <Label text="Status:" />
                               <ComboBox fx:id="boxStatus" prefWidth="150.0" promptText="STATUS" />
                               <Label text="Language:" />

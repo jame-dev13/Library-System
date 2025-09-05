@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class CopyEntity {
-    @NonNull private Integer id;
+    private Integer id;
     @NonNull private UUID uuid;
     @NonNull private int idBook;
     @NonNull private int copyNum;

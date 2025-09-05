@@ -204,7 +204,7 @@ public class Books {
          CustomAlert.getInstance()
                  .buildAlert(Alert.AlertType.INFORMATION,
                          "SUCCESS",
-                         "Book added!").showAndWait();
+                         "Book added!").show();
          booksE.add(book);
          this.tableBooks.getItems().add(book);
       } catch (NullPointerException ne) {
@@ -212,7 +212,7 @@ public class Books {
                  .buildAlert(Alert.AlertType.ERROR,
                          "ERROR",
                          "Can't have empty fields.")
-                 .showAndWait();
+                 .show();
          throw new RuntimeException(ne);
       }finally {
          this.btnClear.fire();
@@ -245,13 +245,13 @@ public class Books {
                             .buildAlert(Alert.AlertType.INFORMATION,
                                     "UPDATED",
                                     String.format("Record with identifier [%s] Updated!", book.getUuid()))
-                            .showAndWait();
+                            .show();
                  } else {
                     CustomAlert.getInstance()
                             .buildAlert(Alert.AlertType.ERROR,
                                     "ERROR",
                                     "Not Found!")
-                            .showAndWait();
+                            .show();
                  }
               });
       this.btnClear.fire();
@@ -320,7 +320,7 @@ public class Books {
          Stage stage = new Stage();
          stage.setTitle("Copies");
          stage.setScene(new Scene(root));
-         stage.setResizable(false);
+         stage.resizableProperty().set(false);
          stage.initModality(Modality.APPLICATION_MODAL);
          stage.showAndWait();
       }catch(IOException e){
