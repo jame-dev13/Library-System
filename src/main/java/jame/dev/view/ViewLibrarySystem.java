@@ -18,7 +18,7 @@ public class ViewLibrarySystem extends Application {
    @Override
    public void start(Stage stage) throws Exception {
       FXMLLoader loader =
-              new FXMLLoader(Main.class.getResource("/templates/adminView.fxml"));
+              new FXMLLoader(Main.class.getResource("/templates/userView.fxml"));
       Scene scene = new Scene(loader.load());
       stage.setScene(scene);
       stage.setTitle("Library System");
