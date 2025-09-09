@@ -188,7 +188,7 @@ public class Users {
     */
    @FXML
    private void handleDelete(ActionEvent e) {
-      String usernameSession = SessionManager.getInstance().getUsername();
+      String usernameSession = SessionManager.getInstance().getSessionDto().email();
       String usernameSelected = this.tableAdmins.getSelectionModel().getSelectedItem().getEmail();
       if (usernameSession.equals(usernameSelected)) {
          CustomAlert.getInstance()

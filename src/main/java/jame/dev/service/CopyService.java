@@ -1,9 +1,12 @@
 package jame.dev.service;
 
+import jame.dev.dtos.CopyDetailsDto;
 import jame.dev.models.entitys.CopyEntity;
+import jame.dev.models.enums.EGenre;
 import jame.dev.models.enums.ELanguage;
 import jame.dev.models.enums.EStatusCopy;
 import jame.dev.repositorys.CRUDRepo;
+import jame.dev.repositorys.IMultiQuery;
 import jame.dev.utils.DMLActions;
 import jame.dev.utils.DQLActions;
 
@@ -12,7 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class CopyService implements CRUDRepo<CopyEntity>{
+public class CopyService implements CRUDRepo<CopyEntity>, IMultiQuery<CopyDetailsDto>
+{
 
     @Override
     public List<CopyEntity> getAll() {
@@ -88,4 +92,26 @@ public class CopyService implements CRUDRepo<CopyEntity>{
             throw new RuntimeException(e);
         }
     }
+
+   @Override
+   public List<CopyDetailsDto> getJoinsAll() {
+       String sql = """
+               SELECT c.id AS ID, c.copy_num AS COPY_N,
+               b.title AS TITLE, b.genre AS GENRE,
+               c.status AS STATUS, c.language AS LANGUAGE
+               FROM copies c INNER JOIN
+               books b ON b.id = c.id_book
+               WHERE c.copy_num > 1
+               """;
+          return DQLActions.select(sql, rs ->
+                  CopyDetailsDto.builder()
+                          .idCopy(rs.getInt("ID"))
+                          .copyNum(rs.getInt("COPY_N"))
+                          .bookName(rs.getString("TITLE"))
+                          .genre(EGenre.valueOf(rs.getString("GENRE")))
+                          .status(EStatusCopy.valueOf(rs.getString("STATUS")))
+                          .language(ELanguage.valueOf(rs.getString("LANGUAGE")))
+                          .build()
+          );
+   }
 }

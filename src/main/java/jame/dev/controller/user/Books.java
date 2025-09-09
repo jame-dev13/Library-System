@@ -1,6 +1,7 @@
 package jame.dev.controller.user;
 
 import jame.dev.Main;
+import jame.dev.controller.user.modal.ModalBookCopies;
 import jame.dev.dtos.BooksDto;
 import jame.dev.models.enums.EGenre;
 import jame.dev.service.BookService;
@@ -87,7 +88,10 @@ public class Books {
       //listener
       this.tableBooks.setOnMouseClicked(mouse -> {
          int clicks = mouse.getClickCount();
-         if(clicks == 2) this.loadModal(MODAL_BOOK_COPIES);
+         if(clicks == 2) {
+            BooksDto dto  = this.tableBooks.getSelectionModel().getSelectedItem();
+            this.loadModal(dto);
+         }
          this.tableBooks.getSelectionModel().clearSelection();
       });
    }
@@ -113,6 +117,26 @@ public class Books {
          URL url = Main.class.getResource(route);
          FXMLLoader loader = new FXMLLoader(url);
          Parent root = loader.load();
+
+         Stage stage = new Stage();
+         stage.setTitle("Copies");
+         stage.setScene(new Scene(root));
+         stage.initModality(Modality.APPLICATION_MODAL);
+         stage.showAndWait();
+      }catch (IOException e){
+         throw new RuntimeException("Can´t load the resource view: ", e);
+      }
+   }
+
+   @FXML private void loadModal(BooksDto booksDto){
+      try{
+         URL url = Main.class.getResource(Books.MODAL_BOOK_COPIES);
+         FXMLLoader loader = new FXMLLoader(url);
+
+         Parent root = loader.load();
+
+         ModalBookCopies controller = loader.getController();
+         controller.setIdBook(booksDto);
 
          Stage stage = new Stage();
          stage.setTitle("Copies");

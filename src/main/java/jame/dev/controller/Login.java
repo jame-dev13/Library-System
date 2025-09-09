@@ -1,8 +1,8 @@
 package jame.dev.controller;
 
 import jame.dev.Main;
+import jame.dev.dtos.SessionDto;
 import jame.dev.dtos.UserDto;
-import jame.dev.models.enums.ERole;
 import jame.dev.repositorys.IAuthRepo;
 import jame.dev.service.AuthService;
 import jame.dev.utils.CustomAlert;
@@ -13,7 +13,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -59,30 +62,21 @@ public class Login{
         UserDto user = UserDto.builder()
                 .username(txtUsername.getText())
                 .password(txtPassword.getText())
-                .role(ERole.UNDEFINED)
                 .build();
-        ERole role = this.repo.signIn(user);
-        SessionManager session = SessionManager.getInstance();
-        session.login(user.username());
-
-        switch (role){
-            case USER -> CustomAlert.getInstance()
-                    .buildAlert(Alert.AlertType.INFORMATION, "INFO", "Login successfully.")
-                       .showAndWait().ifPresent(confirmation -> {
-                          if(confirmation == ButtonType.OK)
-                             redirectTo(actionEvent, "/templates/userView.fxml");
-                    });
-           case ADMIN -> CustomAlert.getInstance()
-                   .buildAlert(Alert.AlertType.INFORMATION, "INFO", "Login successfully.")
-                   .showAndWait().ifPresent(confirmation -> {
-                      if(confirmation == ButtonType.OK)
-                         redirectTo(actionEvent, "/templates/adminView.fxml");
-                   });
-           default ->
-               CustomAlert.getInstance()
-                       .buildAlert(Alert.AlertType.ERROR, "ERROR", "Authentication failed.")
-                       .showAndWait();
-        }
+       SessionDto sessionDto = this.repo.signIn(user);
+       if(sessionDto != null){
+          SessionManager.getInstance().login(sessionDto);
+          CustomAlert.getInstance()
+                  .buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS", "Login Successfully.")
+                  .show();
+          switch (sessionDto.role()){
+             case USER -> redirectTo(actionEvent, "/templates/userView.fxml");
+             case ADMIN -> redirectTo(actionEvent, "/templates/adminView.fxml");
+             default -> CustomAlert.getInstance()
+                     .buildAlert(Alert.AlertType.ERROR, "ERROR","Login failed.")
+                     .show();
+          }
+       }
     }
 
    /**

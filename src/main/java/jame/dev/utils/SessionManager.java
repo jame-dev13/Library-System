@@ -1,28 +1,27 @@
 package jame.dev.utils;
 
+import jame.dev.dtos.SessionDto;
 import lombok.Getter;
 
 @Getter
 public class SessionManager {
-    private static volatile SessionManager session;
-    private String username;
+    private static SessionManager session;
+    private SessionDto sessionDto;
     private SessionManager(){}
 
-    public static SessionManager getInstance(){
+    public synchronized static SessionManager getInstance(){
         if(session == null){
-            synchronized (SessionManager.class){
-                if(session == null) session = new SessionManager();
-            }
+            session = new SessionManager();
         }
         return session;
     }
 
-    public void login(String username){
-        this.username = username;
+    public void login(SessionDto sessionDto){
+        this.sessionDto = sessionDto;
     }
 
     public void logout(){
-        this.username = null;
+        this.sessionDto = null;
         session = null;
     }
 }

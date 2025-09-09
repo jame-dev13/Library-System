@@ -1,27 +1,57 @@
 package jame.dev.service;
 
+import jame.dev.dtos.SessionDto;
 import jame.dev.dtos.UserDto;
 import jame.dev.models.enums.ERole;
 import jame.dev.repositorys.IAuthRepo;
 import jame.dev.utils.DQLActions;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.NoSuchElementException;
 
-public class AuthService implements IAuthRepo  {
-    @Override
-    public ERole signIn(UserDto user) {
-        String sql = "SELECT email, password, role FROM users WHERE email = ? AND verified = 1";
-        try{
-            UserDto dto = DQLActions.selectWhere(sql, rs ->
-                            UserDto.builder()
-                                    .username(rs.getString(1))
-                                    .password(rs.getString(2))
-                                    .role(ERole.valueOf(rs.getString(3)))
-                                    .build(), user.username())
-                    .getFirst();
-            return dto.role();
-        } catch (NoSuchElementException e){
-            return ERole.UNDEFINED;
-        }
-    }
+public class AuthService implements IAuthRepo {
+   @Override
+   public SessionDto signIn(UserDto user) {
+      final String SQL_VERIFICATION = """
+            SELECT email, password
+            FROM users
+            WHERE email = ? AND verified = 1
+            """;
+
+      final String SQL_SESSION = """
+            SELECT id, email, role
+            FROM users
+            WHERE email = ?
+            """;
+
+      try {
+         UserDto userDb = DQLActions.selectWhere(
+                 SQL_VERIFICATION,
+                 rs -> UserDto.builder()
+                         .username(rs.getString("email"))
+                         .password(rs.getString("password"))
+                         .build(),
+                 user.username()
+         ).getFirst();
+
+         boolean validPassword = BCrypt.checkpw(user.password(), userDb.password());
+         if (!validPassword) {
+            return null;
+         }
+
+         return DQLActions.selectWhere(
+                 SQL_SESSION,
+                 rs -> SessionDto.builder()
+                         .id(rs.getInt("id"))
+                         .email(rs.getString("email"))
+                         .role(ERole.valueOf(rs.getString("role")))
+                         .build(),
+                 user.username()
+         ).getFirst();
+
+      } catch (NoSuchElementException e) {
+         return null;
+      }
+   }
+
 }
