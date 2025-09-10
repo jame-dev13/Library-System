@@ -1,42 +1,30 @@
 package jame.dev.controller;
 
-import jame.dev.Main;
+import jame.dev.utils.ExecutorTabLoaderUtil;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 
 /**
- * Controller for the User no admin view
+ * Controller for build the User Client view.
  */
 public class User {
-   @FXML private Tab tabMyLoans;
-   @FXML private Tab tabFines;
-   @FXML private Tab tabBooks;
-   @FXML private Tab tabStats;
-   @FXML private Tab tabInfo;
+   @FXML
+   private TabPane tabPane;
+   @FXML
+   private Tab tabFines;
+   @FXML
+   private Tab tabBooks;
+   @FXML
+   private Tab tabInfo;
 
    /**
-    * Loads the tab panes for the view.
+    * Loads the content for the user Tabs in a lazy way using {@link ExecutorTabLoaderUtil} class.
     */
-   @FXML private void initialize(){
-      try{
-         Parent loans = FXMLLoader.load(Main.class.getResource("/templates/userPanes/myLoans.fxml"));
-         this.tabMyLoans.setContent(loans);
-
-         Parent fines = FXMLLoader.load(Main.class.getResource("/templates/userPanes/fines.fxml"));
-         this.tabFines.setContent(fines);
-
-         Parent books = FXMLLoader.load(Main.class.getResource("/templates/userPanes/books.fxml"));
-         this.tabBooks.setContent(books);
-
-         Parent stats = FXMLLoader.load(Main.class.getResource("/templates/userPanes/stats.fxml"));
-         this.tabStats.setContent(stats);
-
-         Parent info = FXMLLoader.load(Main.class.getResource("/templates/userPanes/info.fxml"));
-         this.tabInfo.setContent(info);
-      }catch(Exception e){
-          throw new RuntimeException(e);
-      }
+   @FXML
+   private void initialize() {
+      ExecutorTabLoaderUtil.loadTab("/templates/userPanes/info.fxml", this.tabInfo);
+      ExecutorTabLoaderUtil.loadTab("/templates/userPanes/books.fxml", this.tabBooks);
+      ExecutorTabLoaderUtil.loadTab("/templates/userPanes/fines.fxml", this.tabFines);
    }
 }
