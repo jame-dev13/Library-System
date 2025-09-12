@@ -9,7 +9,7 @@ import lombok.extern.java.Log;
 
 import java.util.Properties;
 @Log
-public class EmailSender {
+public final class EmailSender {
     private static final Dotenv env = Dotenv.load();
     private static final String FROM = env.get("MAIL_FROM");
     private static final String PWD = env.get("PWD_APP");

@@ -315,7 +315,7 @@ public class Books {
 
          Copies controller = loader.getController();
 
-         controller.setIdBook(book);
+         controller.setBookInfo(book);
 
          Stage stage = new Stage();
          stage.setTitle("Copies");

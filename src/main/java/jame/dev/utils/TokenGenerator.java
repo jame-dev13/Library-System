@@ -3,7 +3,7 @@ package jame.dev.utils;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-public class TokenGenerator {
+public final class TokenGenerator {
 
     public static String genToken(){
         byte[] bytes = new byte[8];

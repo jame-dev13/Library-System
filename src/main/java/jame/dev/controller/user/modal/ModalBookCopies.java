@@ -68,7 +68,7 @@ public class ModalBookCopies {
    }
 
    @FXML
-   public void setIdBook(BooksDto booksDto) {
+   public void setBookInfo(BooksDto booksDto) {
       this.idBook = booksDto.id();
       this.labelBookName.setText("%s %s".formatted(labelBookName.getText(), booksDto
               .title()));

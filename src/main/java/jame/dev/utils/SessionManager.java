@@ -4,7 +4,7 @@ import jame.dev.dtos.SessionDto;
 import lombok.Getter;
 
 @Getter
-public class SessionManager {
+public final class SessionManager {
     private static SessionManager session;
     private SessionDto sessionDto;
     private SessionManager(){}

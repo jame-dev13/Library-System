@@ -15,7 +15,7 @@ import java.util.function.BiConsumer;
 /**
  * This class provides methods for doing database queries like SELECT.
  */
-public class DQLActions {
+public final class DQLActions {
 
     public static <T> List<T> select(String sql, ResultMapper<T> mapper) {
         Objects.requireNonNull(sql);

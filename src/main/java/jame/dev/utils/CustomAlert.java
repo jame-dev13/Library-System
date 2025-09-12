@@ -6,7 +6,7 @@ import javafx.scene.control.Alert.AlertType;
 /**
  * Singleton class for communicates things to the client.
  */
-public class CustomAlert {
+public final class CustomAlert {
     private static CustomAlert instance;
     private CustomAlert(){}
 

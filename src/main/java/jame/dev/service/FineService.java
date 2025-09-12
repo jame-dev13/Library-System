@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FineService implements CRUDRepo<FineEntity> {
+public final class FineService implements CRUDRepo<FineEntity> {
     @Override
     public List<FineEntity> getAll() {
         String sql = "SELECT * FROM fines";

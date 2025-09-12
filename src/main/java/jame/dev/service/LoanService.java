@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class LoanService implements CRUDRepo<LoanEntity> {
+public final class LoanService implements CRUDRepo<LoanEntity> {
 
     @Override
     public List<LoanEntity> getAll() {

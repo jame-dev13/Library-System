@@ -9,7 +9,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.NoSuchElementException;
 
-public class AuthService implements IAuthRepo {
+public final class AuthService implements IAuthRepo {
    @Override
    public SessionDto signIn(UserDto user) {
       final String SQL_VERIFICATION = """

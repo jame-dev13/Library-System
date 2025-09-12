@@ -16,7 +16,7 @@ import java.util.UUID;
  * Provides implementations to perform simple CRUD actions on DB and return
  * his object representation.
  */
-public class BookService implements CRUDRepo<BookEntity> {
+public final class BookService implements CRUDRepo<BookEntity> {
     @Override
     public List<BookEntity> getAll() {
         String sql = """
@@ -73,8 +73,8 @@ public class BookService implements CRUDRepo<BookEntity> {
                 .editorial(rs.getString(5))
                 .ISBN(rs.getString(6))
                 .pubDate(rs.getDate(7).toLocalDate())
-                .numPages(rs.getInt(9))
-                .genre(EGenre.valueOf(rs.getString(10)))
+                .numPages(rs.getInt(8))
+                .genre(EGenre.valueOf(rs.getString(9)))
                 .build(),
                 uuid.toString());
         return Optional.of(books.getFirst());

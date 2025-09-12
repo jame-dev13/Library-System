@@ -136,7 +136,7 @@ public class Books {
          Parent root = loader.load();
 
          ModalBookCopies controller = loader.getController();
-         controller.setIdBook(booksDto);
+         controller.setBookInfo(booksDto);
 
          Stage stage = new Stage();
          stage.setTitle("Copies");

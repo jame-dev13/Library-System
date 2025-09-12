@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author jame-dev13
@@ -51,13 +52,9 @@ public class Copies {
     */
    @FXML private void initialize() throws IOException {
       this.repo = new CopyService();
-      Optional.ofNullable(this.repo.getAll())
-              .ifPresent(list -> copies = list);
       //fields
       this.boxStatus.setItems(FXCollections.observableArrayList(EStatusCopy.values()));
       this.boxLanguage.setItems(FXCollections.observableArrayList(ELanguage.values()));
-      //table config
-      configTable();
       //buttons
       this.btnClear.setOnAction(this::handleClear);
       this.btnSave.setOnAction(this::handleSave);
@@ -101,17 +98,21 @@ public class Copies {
       });
    }
 
-   @FXML public void setIdBook(BookEntity book){
+   @FXML public void setBookInfo(BookEntity book){
+      Optional.ofNullable(this.repo.getAll())
+              .ifPresent(list -> copies = list
+                      .stream()
+                      .filter(copy -> copy.getIdBook() == book.getId())
+                      .collect(Collectors.toList()));
       this.txtIdBook.setText(String.valueOf(book.getId()));
-      long count = copies.stream().filter(copy ->
-                      copy.getIdBook() == Integer.parseInt(txtIdBook.getText()))
-              .count();
-      txtCopyNum.setText(String.valueOf(count + 1));
+
+      txtCopyNum.setText(String.valueOf(copies.size() + 1));
+
+      this.configTable();
    }
 
    @FXML private void handleClear(ActionEvent event){
-      this.txtIdBook.clear();
-      this.txtCopyNum.clear();
+      this.txtCopyNum.setText(String.valueOf(copies.size() +1));
       this.boxStatus.setValue(null);
       this.boxLanguage.setValue(null);
 
@@ -121,6 +122,7 @@ public class Copies {
          this.btnUpdate.setDisable(true);
          this.btnDelete.setDisable(true);
       }
+      if(this.btnSave.isDisabled()) this.btnSave.setDisable(false);
 
       this.uuidSelected = null;
       this.indexSelected = -1;
@@ -156,7 +158,6 @@ public class Copies {
    @FXML private void handleUpdate(ActionEvent event){
       this.repo.findByUuid(this.uuidSelected)
            .ifPresentOrElse(copy -> {
-              copy.setCopyNum(Integer.parseInt(txtCopyNum.getText().trim()));
               copy.setStatusCopy(boxStatus.getSelectionModel().getSelectedItem());
               copy.setLanguage(boxLanguage.getSelectionModel().getSelectedItem());
               CustomAlert.getInstance()

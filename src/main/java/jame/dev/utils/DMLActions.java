@@ -31,7 +31,7 @@ import java.util.function.BiConsumer;
  * @author jame-dev13
  */
 @Log
-public class DMLActions {
+public final class DMLActions {
 
    /**
     * Return a {@link BiConsumer} encargado de asignar valores a un
@@ -46,7 +46,7 @@ public class DMLActions {
                try {
                   ps.setObject(i + 1, params[i]);
                } catch (SQLException e) {
-                  throw new RuntimeException("Error al establecer parámetro en índice: " + (i + 1) + ':', e);
+                  throw new RuntimeException("Error setting param at index: " + (i + 1) + ':', e);
                }
             }
          }

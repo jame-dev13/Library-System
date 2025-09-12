@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class UserService implements CRUDRepo<UserEntity> {
+public final class UserService implements CRUDRepo<UserEntity> {
     @Override
     public List<UserEntity> getAll() {
         String sql = """
