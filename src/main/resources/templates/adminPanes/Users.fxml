@@ -41,9 +41,9 @@
             
                         <!-- Botones -->
                   <VBox alignment="CENTER" minWidth="110.0" prefWidth="120" spacing="15">
-                    <Button fx:id="btnSave" mnemonicParsing="false" text="Save" />
-                    <Button fx:id="btnClear" mnemonicParsing="false" text="Clear" />
-                    <Button fx:id="btnDrop" mnemonicParsing="false" text="Drop" />
+                    <Button fx:id="btnSave" mnemonicParsing="false" text="Save" styleClass="save"/>
+                    <Button fx:id="btnClear" mnemonicParsing="false" text="Clear" styleClass="clear"/>
+                    <Button fx:id="btnDrop" mnemonicParsing="false" text="Drop" styleClass="delete"/>
                     <padding>
                       <Insets bottom="5" left="5" right="5" top="5" />
                     </padding>
@@ -52,8 +52,8 @@
                     </cursor>
                   </VBox>
             
-                        <!-- Filtros y búsqueda -->
-                  <VBox fx:id="boxSearch" alignment="CENTER" minWidth="230.0" spacing="15">
+                        <!-- Filters & search -->
+                  <VBox alignment="CENTER" minWidth="230.0" spacing="15">
                     <HBox alignment="CENTER" spacing="5">
                       <ToggleButton fx:id="togUuid" mnemonicParsing="false" text="UUID" />
                       <ToggleButton fx:id="togName" mnemonicParsing="false" text="Name" />

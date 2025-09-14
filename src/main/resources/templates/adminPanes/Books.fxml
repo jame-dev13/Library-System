@@ -37,12 +37,12 @@
                   <TextField fx:id="txtEditorial" alignment="CENTER" promptText="Editorial" />
                               <Label text="ISBN" />
                   <TextField fx:id="txtIsbn" alignment="CENTER" promptText="ISBN" />
-                    <HBox alignment="CENTER" minWidth="300.0" prefHeight="131.0" prefWidth="313.0" spacing="10.0">
+                    <HBox alignment="CENTER" minWidth="300.0" prefHeight="131.0" prefWidth="313.0" spacing="5.0">
                       <children>
-                        <Button fx:id="btnUpdate" disable="true" mnemonicParsing="false" text="Update" />
-                        <Button fx:id="btnSave" mnemonicParsing="false" text="Save" />
-                        <Button fx:id="btnClear" mnemonicParsing="false" text="Clear" />
-                        <Button fx:id="btnDrop" disable="true" mnemonicParsing="false" text="Drop" />
+                        <Button fx:id="btnUpdate" disable="true" mnemonicParsing="false" prefHeight="34.0" prefWidth="89.0" styleClass="update" text="Update" />
+                        <Button fx:id="btnSave" mnemonicParsing="false" prefHeight="34.0" prefWidth="73.0" styleClass="save" text="Save" />
+                        <Button fx:id="btnClear" mnemonicParsing="false" prefHeight="34.0" prefWidth="78.0" styleClass="clear" text="Clear" />
+                        <Button fx:id="btnDrop" disable="true" mnemonicParsing="false" prefHeight="34.0" prefWidth="80.0" styleClass="delete" text="Drop" />
                       </children>
                       <cursor>
                         <Cursor fx:constant="HAND" />

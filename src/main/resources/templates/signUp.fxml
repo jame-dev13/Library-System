@@ -46,12 +46,12 @@
             </GridPane>
             <HBox alignment="CENTER" prefHeight="70.0" prefWidth="308.0">
                <children>
-                  <Button fx:id="btnReg" mnemonicParsing="false" text="SignUp">
+                  <Button fx:id="btnReg" mnemonicParsing="false" text="SignUp" styleClass="save">
                      <HBox.margin>
                         <Insets right="15.0" />
                      </HBox.margin>
                   </Button>
-                  <Button fx:id="btnToSignIn" mnemonicParsing="false" text="To SignIn" />
+                  <Button fx:id="btnToSignIn" mnemonicParsing="false" text="To SignIn" styleClass="link"/>
                </children>
                <cursor>
                   <Cursor fx:constant="HAND" />

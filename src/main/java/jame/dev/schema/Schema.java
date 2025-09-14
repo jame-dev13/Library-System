@@ -13,7 +13,7 @@ import java.util.Map;
  * Defines The creation of the SQl Table Scheme.
  */
 @Log
-public class Schema implements IDoSchema {
+public final class Schema implements IDoSchema {
 
    /**
     * Build the schema

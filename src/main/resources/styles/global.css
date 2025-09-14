@@ -13,13 +13,14 @@
 }
 
 .button{
-    -fx-background-color: -fx--bg-components;
     -fx-text-fill: white;
-    -fx-border-color: rgb(76, 25, 218); 
-    -fx-border-width: 2px; 
-    -fx-border-radius: 10px; 
-    -fx-background-radius: 10px; 
-    -fx-padding: 5px 5px 5px 5px;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-background-radius: 10;
+    -fx-border-radius: 8;
+    -fx-border-width: 3;
+    -fx-border-color: blue;
+    -fx-padding: 5 15 5 15;
 }
 
 .button:hover{
@@ -32,7 +33,7 @@
     -fx-text-fill: white;
     -fx-background-radius: 5px; 
     -fx-border-color: rgb(76, 25, 218); 
-    -fx-border-width: 2px; 
+    -fx-border-width: 2px;
     -fx-border-radius: 5px; 
     -fx-padding: 10px; 
 }
@@ -51,4 +52,46 @@
 
 .split-pane{
     -fx-background-color: -fx--bg-color;
+}
+
+.logout{
+    -fx-background-color: #4A102A;
+}
+.save{
+    -fx-background-color: #19183B;
+}
+
+.update{
+    -fx-background-color: #7A85C1;
+}
+
+.delete{
+    -fx-background-color: #8A0000;
+}
+
+.clear{
+    -fx-background-color: #03A6A1;
+}
+
+.link{
+    -fx-background-color: #22A699;
+}
+
+.show{
+    -fx-background-color: #4FB7B3;
+}
+
+.text-area{
+    -fx-text-fill: white;
+    -fx-background-radius: 5px;
+    -fx-background-color: -fx--bg-components;
+    -fx-border-color: rgb(76, 25, 218);
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-padding: 5;
+}
+
+.text-area .content{
+    -fx-background-color: -fx--bg-components;
+    -fx-border-color: blue;
 }

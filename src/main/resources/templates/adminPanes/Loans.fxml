@@ -32,9 +32,9 @@
                         </VBox>
                         <VBox alignment="CENTER" minWidth="-Infinity" spacing="10.0">
                            <children>
-                              <Button fx:id="btnSet" disable="true" mnemonicParsing="false" text="Set" />
-                              <Button fx:id="btnDelete" disable="true" mnemonicParsing="false" text="Delete" />
-                              <Button fx:id="btnClear" mnemonicParsing="false" text="Clear" />
+                              <Button fx:id="btnSet" disable="true" mnemonicParsing="false" text="Set" styleClass="update"/>
+                              <Button fx:id="btnDelete" disable="true" mnemonicParsing="false" text="Delete" styleClass="delete" />
+                              <Button fx:id="btnClear" mnemonicParsing="false" text="Clear" styleClass="clear" />
                            </children>
                            <padding>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

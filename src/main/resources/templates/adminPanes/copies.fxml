@@ -62,10 +62,10 @@
                         </VBox>
                         <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Button fx:id="btnClear" mnemonicParsing="false" text="Clear" />
-                              <Button fx:id="btnSave" mnemonicParsing="false" text="Save" />
-                              <Button fx:id="btnUpdate" disable="true" mnemonicParsing="false" text="Update" />
-                              <Button fx:id="btnDelete" disable="true" mnemonicParsing="false" text="Delete" />
+                              <Button styleClass="clear" fx:id="btnClear" mnemonicParsing="false" text="Clear"  />
+                              <Button styleClass="save" fx:id="btnSave" mnemonicParsing="false" text="Save" />
+                              <Button styleClass="update" fx:id="btnUpdate" disable="true" mnemonicParsing="false" text="Update" />
+                              <Button styleClass="delete" fx:id="btnDelete" disable="true" mnemonicParsing="false" text="Delete" />
                            </children>
                         </VBox>
                      </children>

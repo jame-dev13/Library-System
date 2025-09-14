@@ -39,8 +39,8 @@
             </GridPane>
             <HBox alignment="CENTER" prefHeight="46.0" prefWidth="230.0" spacing="20.0">
                <children>
-                  <Button fx:id="btnLogin" mnemonicParsing="false" text="SignIn" />
-                  <Button fx:id="btnToSignUp" mnemonicParsing="false" text="To SignUp" />
+                  <Button fx:id="btnLogin" mnemonicParsing="false" text="SignIn" styleClass="save"/>
+                  <Button fx:id="btnToSignUp" mnemonicParsing="false" text="To SignUp" styleClass="link" />
                </children>
             </HBox>
          </children>
