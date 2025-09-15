@@ -22,6 +22,5 @@ public final class SessionManager {
 
     public void logout(){
         this.sessionDto = null;
-        session = null;
     }
 }

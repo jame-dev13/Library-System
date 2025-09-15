@@ -1,7 +1,6 @@
 package jame.dev.view;
 
 import jame.dev.Main;
-import jame.dev.connection.ConnectionDB;
 import jame.dev.schema.Schema;
 import jame.dev.utils.ExecutorTabLoaderUtil;
 import javafx.application.Application;
@@ -28,7 +27,6 @@ public class ViewLibrarySystem extends Application {
 
    @Override
    public void stop() throws Exception {
-      ConnectionDB.getInstance().close();
       ExecutorTabLoaderUtil.shutDownExecutor();
       System.gc();
    }

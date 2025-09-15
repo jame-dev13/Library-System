@@ -7,6 +7,7 @@ import jame.dev.repositorys.IAuthRepo;
 import jame.dev.service.AuthService;
 import jame.dev.utils.CustomAlert;
 import jame.dev.utils.SessionManager;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,104 +19,113 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.extern.java.Log;
 
 import java.io.IOException;
-import java.util.Objects;
 
 /**
  * Represents a simple Login controller.
  */
-public class Login{
+@Log
+public class Login {
 
-    @FXML
-    private Button btnLogin;
+   @FXML
+   private Button btnLogin;
 
-    @FXML
-    private Button btnToSignUp;
+   @FXML
+   private Button btnToSignUp;
 
-    @FXML
-    private TextField txtUsername;
+   @FXML
+   private TextField txtUsername;
 
-    @FXML
-    private PasswordField txtPassword;
+   @FXML
+   private PasswordField txtPassword;
 
-    private IAuthRepo repo;
+   private IAuthRepo repo;
+   private static final CustomAlert alert = CustomAlert.getInstance();
 
    /**
     * Initializes components, global data and listeners, everything of that type
     * must be in this method.
+    *
     * @throws IOException
     */
-    @FXML
-    public void initialize() throws IOException {
-        this.repo = new AuthService();
-        btnLogin.setOnAction(this::handleClickLogin);
-        btnToSignUp.setOnAction(this::handleClickGoToSignUp);
-    }
+   @FXML
+   public void initialize() throws IOException {
+      this.repo = new AuthService();
+      btnLogin.setOnAction(this::handleClickLogin);
+      btnToSignUp.setOnAction(this::handleClickGoToSignUp);
+   }
 
    /**
     * Handles the authentications for a User and redirect it to a view depends on his role.
+    *
     * @param actionEvent the ActionEvent
     */
-    @FXML
-    private void handleClickLogin(ActionEvent actionEvent) {
-        UserDto user = UserDto.builder()
-                .username(txtUsername.getText())
-                .password(txtPassword.getText())
-                .build();
-       SessionDto sessionDto = this.repo.signIn(user);
-       if(sessionDto != null){
-          SessionManager.getInstance().login(sessionDto);
-          CustomAlert.getInstance()
-                  .buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS", "Login Successfully.")
-                  .show();
-          switch (sessionDto.role()){
-             case USER -> redirectTo(actionEvent, "/templates/userView.fxml");
-             case ADMIN -> redirectTo(actionEvent, "/templates/adminView.fxml");
-             default -> CustomAlert.getInstance()
-                     .buildAlert(Alert.AlertType.ERROR, "ERROR","Login failed.")
-                     .show();
-          }
-       }
-    }
+   @FXML
+   private void handleClickLogin(ActionEvent actionEvent) {
+      UserDto user = UserDto.builder()
+              .username(txtUsername.getText())
+              .password(txtPassword.getText())
+              .build();
+      SessionDto sessionDto = this.repo.signIn(user);
+      if (sessionDto != null) {
+         SessionManager.getInstance().login(sessionDto);
+         alert.buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS", "Login Successfully.")
+                 .show();
+         switch (sessionDto.role()) {
+            case USER -> redirectTo(actionEvent, "/templates/userView.fxml");
+            case ADMIN -> redirectTo(actionEvent, "/templates/adminView.fxml");
+            default -> alert
+                    .buildAlert(Alert.AlertType.ERROR, "ERROR", "Login failed.")
+                    .show();
+         }
+      }
+   }
 
    /**
     * Handles the click for go to other view
+    *
     * @param actionEvent The ActionEvent
     */
-    @FXML
-    private void handleClickGoToSignUp(ActionEvent actionEvent) {
-        try {
-            Parent root = FXMLLoader
-                    .load(Objects.requireNonNull(
-                            Main.class.getResource("/templates/signUp.fxml")
-                    ));
-            Scene scene = new Scene(root);
+   @FXML
+   private void handleClickGoToSignUp(ActionEvent actionEvent) {
+      try {
+         FXMLLoader loader = new FXMLLoader(getClass().getResource("/templates/signUp.fxml"));
+         Parent root = loader.load();
+         Scene scene = new Scene(root);
 
-            Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+         Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+         stage.setScene(scene);
+         stage.show();
+      } catch (IOException e) {
+         Platform.runLater(() ->
+                 alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Can't load SignUp page."));
+         log.severe("Resource loading went wrong" + e);
+      }
+   }
 
    /**
     * Redirects to the scene if that exists.
+    *
     * @param event The ActionEvent
-    * @param view The path of the view
+    * @param view  The path of the view
     */
-    @FXML private void redirectTo(ActionEvent event, String view) {
-        try{
-            FXMLLoader loader = new FXMLLoader(Main.class.getResource(view));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
+   @FXML
+   private void redirectTo(ActionEvent event, String view) {
+      try {
+         FXMLLoader loader = new FXMLLoader(Main.class.getResource(view));
+         Parent root = loader.load();
+         Scene scene = new Scene(root);
 
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
-        }catch(IOException e){
-            throw new RuntimeException(e);
-        }
-    }
+         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+         stage.setScene(scene);
+         stage.show();
+      } catch (IOException e) {
+         Platform.runLater(() ->
+                 alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Redirection failed")
+                         .show());
+         log.severe("Resource loading went wrong: " + e);
+      }
+   }
 }

@@ -14,7 +14,7 @@ public final class CustomAlert {
     * creates the Instance and maintains it.
     * @return the instance of this class.
     */
-    public static CustomAlert getInstance(){
+    public synchronized static CustomAlert getInstance(){
         if(instance == null){
             instance = new CustomAlert();
         }
