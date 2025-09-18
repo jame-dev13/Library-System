@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,6 +50,7 @@ public class SessionManagerTests {
    public void logout(){
       SessionDto sessionDto = SessionDto.builder()
               .id(1)
+              .uuid(UUID.randomUUID())
               .email("test1@example.com")
               .role(ERole.ADMIN)
               .build();

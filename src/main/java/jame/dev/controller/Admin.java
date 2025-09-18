@@ -15,12 +15,14 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.stage.Stage;
+import lombok.extern.java.Log;
 
 import java.io.IOException;
 
 /**
  * Controller class for build the Admin view.
  */
+@Log
 public class Admin {
 
    @FXML
@@ -36,6 +38,8 @@ public class Admin {
 
    @FXML
    private Tab tabFines;
+   @FXML
+   private Tab tabMe;
 
    /**
     * Loads the content for the Admin Tabs in a lazy way using {@link ExecutorTabLoaderUtil} class.
@@ -47,6 +51,7 @@ public class Admin {
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Books.fxml", this.tabBooks);
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Loans.fxml", this.tabLoans);
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Fines.fxml", this.tabFines);
+      ExecutorTabLoaderUtil.loadTab("/templates/commons/Me.fxml", this.tabMe);
    }
 
    @FXML
@@ -56,7 +61,8 @@ public class Admin {
       if (dto != null) {
          manager.logout();
          try {
-            Parent root = FXMLLoader.load(getClass().getResource("/templates/login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/templates/login.fxml"));
+            Parent root = loader.load();
             Scene scene = new Scene(root);
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(scene);
@@ -66,7 +72,7 @@ public class Admin {
                     CustomAlert.getInstance()
                             .buildAlert(Alert.AlertType.ERROR, "ERROR", "Error loading the view.")
                             .show());
-            e.printStackTrace();
+            log.severe("Error loading the resource: " + e);
          }
       } else {
          Platform.runLater(() ->

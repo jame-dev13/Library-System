@@ -1,5 +1,6 @@
 package jame.dev.controller;
 
+import jame.dev.dtos.InfoUserDto;
 import jame.dev.models.entitys.UserEntity;
 import jame.dev.models.enums.ERole;
 import jame.dev.repositorys.CRUDRepo;
@@ -18,7 +19,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.extern.java.Log;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -83,12 +83,16 @@ public class SignUp {
          );
          return;
       }
-
-      this.user = UserEntity.builder()
-              .uuid(UUID.randomUUID())
+      InfoUserDto userDto = InfoUserDto.builder()
               .name(name)
               .email(email)
-              .password(BCrypt.hashpw(password, BCrypt.gensalt(12)))
+              .password(password)
+              .build();
+      this.user = UserEntity.builder()
+              .uuid(UUID.randomUUID())
+              .name(userDto.name())
+              .email(userDto.email())
+              .password(userDto.password())
               .role(ERole.USER)
               .token(TokenGenerator.genToken())
               .verified(false)

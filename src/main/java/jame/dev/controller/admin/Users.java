@@ -1,5 +1,6 @@
 package jame.dev.controller.admin;
 
+import jame.dev.dtos.InfoUserDto;
 import jame.dev.models.entitys.UserEntity;
 import jame.dev.models.enums.ERole;
 import jame.dev.repositorys.CRUDRepo;
@@ -17,7 +18,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.util.List;
@@ -145,11 +145,16 @@ public class Users {
     */
    @FXML
    private void handleSave(ActionEvent e) {
-      UserEntity user = UserEntity.builder()
-              .uuid(UUID.randomUUID())
+      InfoUserDto userDto = InfoUserDto.builder()
               .name(txtName.getText().trim())
               .email(txtEmail.getText().trim())
-              .password(BCrypt.hashpw(txtPassword.getText().trim(), BCrypt.gensalt(12)))
+              .password(txtPassword.getText().trim())
+              .build();
+      UserEntity user = UserEntity.builder()
+              .uuid(UUID.randomUUID())
+              .name(userDto.name())
+              .email(userDto.email())
+              .password(userDto.password())
               .role(ERole.ADMIN)
               .token(TokenGenerator.genToken())
               .verified(true)

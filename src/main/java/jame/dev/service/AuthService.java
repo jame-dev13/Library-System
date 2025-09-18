@@ -8,21 +8,22 @@ import jame.dev.utils.DQLActions;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 public final class AuthService implements IAuthRepo {
    @Override
    public SessionDto signIn(UserDto user) {
       final String SQL_VERIFICATION = """
-            SELECT email, password
-            FROM users
-            WHERE email = ? AND verified = 1
-            """;
+              SELECT email, password
+              FROM users
+              WHERE email = ? AND verified = 1
+              """;
 
       final String SQL_SESSION = """
-            SELECT id, email, role
-            FROM users
-            WHERE email = ?
-            """;
+              SELECT id, uuid, email, role
+              FROM users
+              WHERE email = ?
+              """;
 
       try {
          UserDto userDb = DQLActions.selectWhere(
@@ -43,6 +44,7 @@ public final class AuthService implements IAuthRepo {
                  SQL_SESSION,
                  rs -> SessionDto.builder()
                          .id(rs.getInt("id"))
+                         .uuid(UUID.fromString(rs.getString("uuid")))
                          .email(rs.getString("email"))
                          .role(ERole.valueOf(rs.getString("role")))
                          .build(),

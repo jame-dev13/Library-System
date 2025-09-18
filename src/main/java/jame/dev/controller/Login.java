@@ -64,23 +64,17 @@ public class Login {
     */
    @FXML
    private void handleClickLogin(ActionEvent actionEvent) {
-      UserDto user = UserDto.builder()
-              .username(txtUsername.getText())
-              .password(txtPassword.getText())
-              .build();
+      UserDto user = UserDto.builder().username(txtUsername.getText().trim()).password(txtPassword.getText().trim()).build();
       SessionDto sessionDto = this.repo.signIn(user);
       if (sessionDto != null) {
          SessionManager.getInstance().login(sessionDto);
-         alert.buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS", "Login Successfully.")
-                 .show();
+         alert.buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS", "Login Successfully.").show();
          switch (sessionDto.role()) {
             case USER -> redirectTo(actionEvent, "/templates/userView.fxml");
             case ADMIN -> redirectTo(actionEvent, "/templates/adminView.fxml");
-            default -> alert
-                    .buildAlert(Alert.AlertType.ERROR, "ERROR", "Login failed.")
-                    .show();
+            default -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Login failed.").show();
          }
-      }
+      } else alert.buildAlert(Alert.AlertType.WARNING, "WARNING", "Login attempt failed.").show();
    }
 
    /**
@@ -99,8 +93,7 @@ public class Login {
          stage.setScene(scene);
          stage.show();
       } catch (IOException e) {
-         Platform.runLater(() ->
-                 alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Can't load SignUp page."));
+         Platform.runLater(() -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Can't load SignUp page."));
          log.severe("Resource loading went wrong" + e);
       }
    }
@@ -122,9 +115,7 @@ public class Login {
          stage.setScene(scene);
          stage.show();
       } catch (IOException e) {
-         Platform.runLater(() ->
-                 alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Redirection failed")
-                         .show());
+         Platform.runLater(() -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Redirection failed").show());
          log.severe("Resource loading went wrong: " + e);
       }
    }
