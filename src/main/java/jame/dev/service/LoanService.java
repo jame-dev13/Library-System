@@ -1,8 +1,11 @@
 package jame.dev.service;
 
+import jame.dev.dtos.BorrowedBookDto;
 import jame.dev.models.entitys.LoanEntity;
+import jame.dev.models.enums.EGenre;
 import jame.dev.models.enums.EStatusLoan;
 import jame.dev.repositorys.CRUDRepo;
+import jame.dev.repositorys.IMultiQuery;
 import jame.dev.utils.DMLActions;
 import jame.dev.utils.DQLActions;
 
@@ -11,86 +14,107 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public final class LoanService implements CRUDRepo<LoanEntity> {
+public final class LoanService implements CRUDRepo<LoanEntity>, IMultiQuery<BorrowedBookDto> {
 
-    @Override
-    public List<LoanEntity> getAll() {
-        String sql = "SELECT * FROM loans";
-        return DQLActions.select(sql, rs ->
-                LoanEntity.builder()
-                        .id(rs.getInt(1))
-                        .uuid(UUID.fromString(rs.getString(2)))
-                        .idUser(rs.getInt(3))
-                        .idCopy(rs.getInt(4))
-                        .loanDate(rs.getDate(5).toLocalDate())
-                        .returnDate(rs.getDate(6).toLocalDate())
-                        .statusLoan(EStatusLoan.valueOf(rs.getString(7)))
-                        .build());
-    }
+   @Override
+   public List<LoanEntity> getAll() {
+      String sql = "SELECT * FROM loans";
+      return DQLActions.select(sql, rs ->
+              LoanEntity.builder()
+                      .id(rs.getInt(1))
+                      .uuid(UUID.fromString(rs.getString(2)))
+                      .idUser(rs.getInt(3))
+                      .idCopy(rs.getInt(4))
+                      .statusLoan(EStatusLoan.valueOf(rs.getString(5)))
+                      .loanDate(rs.getDate(6).toLocalDate())
+                      .returnDate(rs.getDate(7).toLocalDate())
+                      .build());
+   }
 
-    @Override
-    public void save(LoanEntity loanEntity) {
-        String sql = """
-                INSERT INTO loans (uuid, id_user, id_copy, status,
-                date_loan, date_expiration)
-                VALUES (?,?,?,?,?,?);
-                """;
-        Object[] params = {
-                loanEntity.getUuid().toString(), loanEntity.getIdUser(),
-                loanEntity.getIdUser(), loanEntity.getStatusLoan().name(),
-                loanEntity.getLoanDate(), loanEntity.getReturnDate()
-        };
-        try {
-            DMLActions.insert(sql, params);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+   @Override
+   public void save(LoanEntity loanEntity) {
+      String sql = """
+              INSERT INTO loans (uuid, id_user, id_copy, status,
+              date_loan, date_expiration)
+              VALUES (?,?,?,?,?,?);
+              """;
+      Object[] params = {
+              loanEntity.getUuid().toString(), loanEntity.getIdUser(),
+              loanEntity.getIdCopy(), loanEntity.getStatusLoan().name(),
+              loanEntity.getLoanDate(), loanEntity.getReturnDate()
+      };
+      try {
+         DMLActions.insert(sql, params);
+      } catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+   }
 
-    @Override
-    public Optional<LoanEntity> findByUuid(UUID uuid) {
-        String sql = "SELECT * FROM loans WHERE uuid = ?";
-        LoanEntity result = DQLActions.selectWhere(sql, rs->
-                        LoanEntity.builder()
-                                .id(rs.getInt(1))
-                                .uuid(UUID.fromString(rs.getString(2)))
-                                .idUser(rs.getInt(3))
-                                .idCopy(rs.getInt(4))
-                                .statusLoan(EStatusLoan.valueOf(rs.getString(5)))
-                                .loanDate(rs.getDate(6).toLocalDate())
-                                .returnDate(rs.getDate(7).toLocalDate())
-                                .build()
-                ,uuid.toString()).getFirst();
-        return Optional.of(result);
-    }
+   @Override
+   public Optional<LoanEntity> findByUuid(UUID uuid) {
+      String sql = "SELECT * FROM loans WHERE uuid = ?";
+      LoanEntity result = DQLActions.selectWhere(sql, rs ->
+                      LoanEntity.builder()
+                              .id(rs.getInt(1))
+                              .uuid(UUID.fromString(rs.getString(2)))
+                              .idUser(rs.getInt(3))
+                              .idCopy(rs.getInt(4))
+                              .statusLoan(EStatusLoan.valueOf(rs.getString(5)))
+                              .loanDate(rs.getDate(6).toLocalDate())
+                              .returnDate(rs.getDate(7).toLocalDate())
+                              .build()
+              , uuid.toString()).getFirst();
+      return Optional.of(result);
+   }
 
-    @Override
-    public void update(LoanEntity loanEntity) {
-        String sql = """
-                UPDATE loans SET id_user = ?, id_copy = ?, status = ?,
-                date_loan = ?, date_expiration = ? WHERE uuid = ?
-                """;
-        Object[] params = {
-                loanEntity.getIdUser(), loanEntity.getIdCopy(),
-                loanEntity.getStatusLoan().name(), loanEntity.getLoanDate(),
-                loanEntity.getReturnDate(), loanEntity.getUuid().toString()
-        };
+   @Override
+   public void update(LoanEntity loanEntity) {
+      String sql = """
+              UPDATE loans SET id_user = ?, id_copy = ?, status = ?,
+              date_loan = ?, date_expiration = ? WHERE uuid = ?
+              """;
+      Object[] params = {
+              loanEntity.getIdUser(), loanEntity.getIdCopy(),
+              loanEntity.getStatusLoan().name(), loanEntity.getLoanDate(),
+              loanEntity.getReturnDate(), loanEntity.getUuid().toString()
+      };
 
-        try {
-            DMLActions.insert(sql, params);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+      try {
+         DMLActions.insert(sql, params);
+      } catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+   }
 
-    @Override
-    public void deleteByUuid(UUID uuid) {
-        String sql = "DELETE FROM loans WHERE uuid = ?";
-        try {
-            DMLActions.delete(sql, uuid.toString());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+   @Override
+   public void deleteByUuid(UUID uuid) {
+      String sql = "DELETE FROM loans WHERE uuid = ?";
+      try {
+         DMLActions.delete(sql, uuid.toString());
+      } catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+   }
 
+   @Override
+   public List<BorrowedBookDto> getJoinsAll() {
+      final String QUERY = """
+              SELECT b.id AS ID_BOOK, b.genre AS GENRE
+              FROM loans l
+              INNER JOIN users u
+              ON u.id = l.id_user
+              INNER JOIN copies c
+              ON c.id = l.id_copy
+              INNER JOIN books b
+              ON b.id = c.id_book;
+              """;
+
+      return DQLActions.select(QUERY, rs ->
+              BorrowedBookDto.builder()
+                      .id_book(rs.getInt("ID_BOOK"))
+                      .genre(EGenre.valueOf(rs.getString("GENRE")))
+                      .build()
+      );
+
+   }
 }

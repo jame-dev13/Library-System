@@ -132,6 +132,7 @@ public class ModalBookCopies {
                       () -> CustomAlert.getInstance()
                               .buildAlert(Alert.AlertType.ERROR, "ERROR", "No value present.")
                               .show());
+      this.btnClear.fire();
    }
 
    @FXML private void handleClear(ActionEvent event){
@@ -139,5 +140,6 @@ public class ModalBookCopies {
       this.textUuid.clear();
       this.textDateNow.clear();
       this.textDaysLoan.clear();
+      this.copySelected = null;
    }
 }

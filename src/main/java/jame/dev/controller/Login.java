@@ -1,6 +1,5 @@
 package jame.dev.controller;
 
-import jame.dev.Main;
 import jame.dev.dtos.SessionDto;
 import jame.dev.dtos.UserDto;
 import jame.dev.repositorys.IAuthRepo;
@@ -107,7 +106,7 @@ public class Login {
    @FXML
    private void redirectTo(ActionEvent event, String view) {
       try {
-         FXMLLoader loader = new FXMLLoader(Main.class.getResource(view));
+         FXMLLoader loader = new FXMLLoader(getClass().getResource(view));
          Parent root = loader.load();
          Scene scene = new Scene(root);
 

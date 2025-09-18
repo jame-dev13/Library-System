@@ -37,7 +37,9 @@ public final class CopyService implements CRUDRepo<CopyEntity>, IMultiQuery<Copy
    @Override
    public void save(CopyEntity copyEntity) {
       String sql = """
-              INSERT INTO copies (uuid, id_book, copy_num, status, language) VALUES (?,?,?,?,?);
+              INSERT INTO copies
+              (uuid, id_book, copy_num, status, language)
+              VALUES (?,?,?,?,?);
               """;
       Object[] params = {
               copyEntity.getUuid().toString(),

@@ -6,7 +6,7 @@ import lombok.extern.java.Log;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 /**
@@ -39,17 +39,20 @@ public final class DMLActions {
     *
     * @return un {@link BiConsumer} que recibe el PreparedStatement y un arreglo de parámetros.
     */
+   private static final ConnectionDB connectionDB = ConnectionDB.getInstance();
+
    private static BiConsumer<PreparedStatement, Object[]> setParams() {
       return (ps, params) -> {
-         if (params != null) {
-            for (int i = 0; i < params.length; i++) {
-               try {
-                  ps.setObject(i + 1, params[i]);
-               } catch (SQLException e) {
-                  throw new RuntimeException("Error setting param at index: " + (i + 1) + ':', e);
-               }
-            }
-         }
+         Optional.ofNullable(params)
+                 .ifPresentOrElse(objects -> {
+                    for (int i = 0; i < objects.length; i++) {
+                       try {
+                          ps.setObject((i + 1), objects[i]);
+                       } catch (SQLException e) {
+                          throw new RuntimeException("Error setting params at index: " + (i + 1) + ": " + e);
+                       }
+                    }
+                 }, () -> log.severe("Params are null."));
       };
    }
 
@@ -60,39 +63,35 @@ public final class DMLActions {
     * prepara la sentencia con los parámetros recibidos, la ejecuta
     * y realiza commit si fue exitosa. En caso de error se hace rollback.</p>
     *
-    * @param sql sentencia SQL a ejecutar (no debe ser nula).
+    * @param sql    sentencia SQL a ejecutar (no debe ser nula).
     * @param params parámetros opcionales para la sentencia SQL.
-    * @throws SQLException si ocurre un error al ejecutar la sentencia o gestionar la conexión.
+    * @throws SQLException     si ocurre un error al ejecutar la sentencia o gestionar la conexión.
     * @throws RuntimeException si falla el establecimiento de parámetros o la ejecución.
     */
    private static void execute(String sql, Object... params) throws SQLException {
-      Objects.requireNonNull(sql, "La consulta no puede ser nula.");
-      Connection connection = null;
+      Connection connection = connectionDB.getConnection();
+      Optional.ofNullable(connection).orElseThrow(SQLException::new);
+      Optional.ofNullable(sql).orElseThrow(NullPointerException::new);
       try {
-         connection = ConnectionDB.getInstance().getConnection();
          try (PreparedStatement st = connection.prepareStatement(sql)) {
             setParams().accept(st, params);
             int rows = st.executeUpdate();
-            log.info((rows > 0) ? rows + " filas afectadas.\n" : "0 filas afectadas.\n");
+            log.info((rows > 0) ? rows + " rows affected.\n" : "0 rows affected.\n");
          }
          connection.commit();
       } catch (SQLException e) {
-         if (connection != null) {
-            connection.rollback();
-         }
-         throw new RuntimeException("Error al ejecutar la consulta. \n", e);
+         connection.rollback();
+         throw new RuntimeException("Connection Error \n", e);
       } finally {
-         if (connection != null) {
-            connection.setAutoCommit(true);
-            connection.close();
-         }
+         connection.setAutoCommit(true);
+         connection.close();
       }
    }
 
    /**
     * Ejecuta una sentencia {@code INSERT} en la base de datos.
     *
-    * @param sql sentencia SQL de inserción.
+    * @param sql    sentencia SQL de inserción.
     * @param params parámetros opcionales a insertar.
     * @throws SQLException si ocurre un error durante la operación.
     */
@@ -103,7 +102,7 @@ public final class DMLActions {
    /**
     * Ejecuta una sentencia {@code UPDATE} en la base de datos.
     *
-    * @param sql sentencia SQL de actualización.
+    * @param sql    sentencia SQL de actualización.
     * @param params parámetros opcionales a actualizar.
     * @throws SQLException si ocurre un error durante la operación.
     */
@@ -114,7 +113,7 @@ public final class DMLActions {
    /**
     * Ejecuta una sentencia {@code DELETE} en la base de datos.
     *
-    * @param sql sentencia SQL de eliminación.
+    * @param sql    sentencia SQL de eliminación.
     * @param params parámetros opcionales para la eliminación.
     * @throws SQLException si ocurre un error durante la operación.
     */
