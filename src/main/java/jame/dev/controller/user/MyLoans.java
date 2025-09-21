@@ -1,4 +1,4 @@
 package jame.dev.controller.user;
 
-public class Loans {
+public class MyLoans {
 }

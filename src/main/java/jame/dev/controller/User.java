@@ -25,13 +25,17 @@ import java.io.IOException;
 @Log
 public class User {
    @FXML
+   private Tab tabMyLoans;
+   @FXML
+   private Tab tabResume;
+   @FXML
    private Button btnLogout;
    @FXML
    private Tab tabFines;
    @FXML
    private Tab tabBooks;
    @FXML
-   private Tab tabInfo;
+   private Tab tabMe;
 
    /**
     * Loads the content for the user Tabs in a lazy way using {@link ExecutorTabLoaderUtil} class.
@@ -39,36 +43,38 @@ public class User {
    @FXML
    private void initialize() {
       this.btnLogout.setOnAction(this::handleLogout);
-      ExecutorTabLoaderUtil.loadTab("/templates/commons/Me.fxml", this.tabInfo);
+      ExecutorTabLoaderUtil.loadTab("/templates/commons/Me.fxml", this.tabMe);
       ExecutorTabLoaderUtil.loadTab("/templates/userPanes/books.fxml", this.tabBooks);
       ExecutorTabLoaderUtil.loadTab("/templates/userPanes/fines.fxml", this.tabFines);
+      ExecutorTabLoaderUtil.loadTab("/templates/userPanes/resume.fxml", this.tabResume);
+      ExecutorTabLoaderUtil.loadTab("/templates/userPanes/myLoans.fxml", this.tabMyLoans);
    }
+
    @FXML
-   private void handleLogout(ActionEvent event){
+   private void handleLogout(ActionEvent event) {
       SessionManager manager = SessionManager.getInstance();
       SessionDto dto = manager.getSessionDto();
-      if(dto != null){
+      if (dto != null) {
          manager.logout();
-         try{
+         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/templates/login.fxml"));
             Parent root = loader.load();
             Scene scene = new Scene(root);
-            Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(scene);
             stage.show();
-         }catch(IOException e){
+         } catch (IOException e) {
             Platform.runLater(() ->
                     CustomAlert.getInstance()
                             .buildAlert(Alert.AlertType.ERROR, "ERROR", "Error loading the view.")
                             .show());
             log.severe("Error loading the resource: " + e);
          }
-      }
-      else{
+      } else {
          Platform.runLater(() ->
-            CustomAlert.getInstance()
-                    .buildAlert(Alert.AlertType.ERROR, "ERROR", "No Session active")
-                    .show());
+                 CustomAlert.getInstance()
+                         .buildAlert(Alert.AlertType.ERROR, "ERROR", "No Session active")
+                         .show());
       }
    }
 }

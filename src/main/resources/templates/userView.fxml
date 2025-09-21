@@ -51,7 +51,17 @@
           </Tab>
 
           <!-- TAB INFO -->
-          <Tab fx:id="tabInfo" text="Me">
+          <Tab fx:id="tabMe" text="Me">
+            <content>
+
+            </content>
+          </Tab>
+          <Tab fx:id="tabResume" text="Resume">
+            <content>
+
+            </content>
+          </Tab>
+          <Tab fx:id="tabMyLoans" text="MyLoans">
             <content>
 
             </content>

@@ -5,11 +5,13 @@ services:
     environment:
       - 'MYSQL_DATABASE=${DB_NAME}'
       - 'MYSQL_USER=${DB_USER}'
-      - 'MYSQL_PASSWORD=${USER_PWD}'
+      - 'MYSQL_PASSWORD=${DB_PWD}'
       - 'MYSQL_ROOT_PASSWORD=${ROOT_PWD}'
     ports:
       - '${PORT_DB}'
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
 volumes:
   mysql_data:

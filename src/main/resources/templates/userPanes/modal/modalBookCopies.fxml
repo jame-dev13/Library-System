@@ -27,7 +27,7 @@
                                  <children>
                                     <Label fx:id="labelBookName" text="Copies of the book: " wrapText="true">
                                        <font>
-                                          <Font size="20.0" />
+                                          <Font size="18.0" />
                                        </font>
                                     </Label>
                                  </children>

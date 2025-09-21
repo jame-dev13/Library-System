@@ -20,18 +20,15 @@ public final class ConnectionDB {
    private static final String URL;
    private static final String USER;
    private static final String PWD;
-   //private static final Logger log = Logger.getLogger(ConnectionDB.class.getName());
 
    static {
       Dotenv dotenv = Dotenv.load();
       URL = dotenv.get("DB_URL");
       USER = dotenv.get("DB_USER");
-      PWD = dotenv.get("USER_PWD");
+      PWD = dotenv.get("DB_PWD");
    }
 
-   private ConnectionDB(){
-
-   }
+   private ConnectionDB(){}
 
    public static ConnectionDB getInstance() {
       if (instance == null) {
