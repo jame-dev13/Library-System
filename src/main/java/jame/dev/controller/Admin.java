@@ -1,5 +1,6 @@
 package jame.dev.controller;
 
+import jame.dev.Main;
 import jame.dev.dtos.SessionDto;
 import jame.dev.utils.CustomAlert;
 import jame.dev.utils.ExecutorTabLoaderUtil;
@@ -14,10 +15,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import lombok.extern.java.Log;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.Optional;
 
 /**
  * Controller class for build the Admin view.
@@ -25,6 +29,7 @@ import java.io.IOException;
 @Log
 public class Admin {
 
+   @FXML private TabPane tabPane;
    @FXML
    private Button btnLogout;
    @FXML
@@ -41,17 +46,33 @@ public class Admin {
    @FXML
    private Tab tabMe;
 
+   private static final URL URL_FINES = Main.class.getResource("/templates/adminPanes/Fines.fxml");
+
    /**
     * Loads the content for the Admin Tabs in a lazy way using {@link ExecutorTabLoaderUtil} class.
     */
    @FXML
    public void initialize() {
       this.btnLogout.setOnAction(this::handleLogout);
+      tabPane.getSelectionModel()
+              .selectedItemProperty()
+              .addListener((observableValue, oldTab, newTab) -> {
+                 if(newTab.equals(tabFines)) {
+                    try {
+                       Optional.ofNullable(URL_FINES).orElseThrow();
+                       Parent root = FXMLLoader.load(URL_FINES);
+                       tabFines.setContent(root);
+                    } catch (IOException e) {
+                       throw new RuntimeException(e);
+                    }
+                 }
+              });
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Users.fxml", this.tabUsers);
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Books.fxml", this.tabBooks);
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Loans.fxml", this.tabLoans);
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Fines.fxml", this.tabFines);
       ExecutorTabLoaderUtil.loadTab("/templates/commons/Me.fxml", this.tabMe);
+
    }
 
    @FXML

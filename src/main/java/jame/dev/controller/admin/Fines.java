@@ -25,34 +25,52 @@ import java.util.function.Predicate;
 
 public class Fines {
    //fields
-   @FXML private TextArea txtCause;
-   @FXML private TextField txtIdUser;
-   @FXML private TextField txtFilter;
-   @FXML private DatePicker dateExpiration;
+   @FXML
+   private TextArea txtCause;
+   @FXML
+   private TextField txtIdUser;
+   @FXML
+   private TextField txtFilter;
+   @FXML
+   private DatePicker dateExpiration;
 
    //buttons
-   @FXML private Button btnSave;
-   @FXML private Button btnClear;
-   @FXML private Button btnUpdate;
-   @FXML private Button btnDelete;
+   @FXML
+   private Button btnSave;
+   @FXML
+   private Button btnClear;
+   @FXML
+   private Button btnUpdate;
+   @FXML
+   private Button btnDelete;
 
    //check buttons
-   @FXML private CheckBox checkFines;
-   @FXML private CheckBox checkState;
+   @FXML
+   private CheckBox checkFines;
+   @FXML
+   private CheckBox checkState;
 
    //tables
-   @FXML private TableView<FineEntity> tableFines;
-   @FXML private TableView<LoanEntity> tableStateUser;
+   @FXML
+   private TableView<FineEntity> tableFines;
+   @FXML
+   private TableView<LoanEntity> tableStateUser;
 
    //columns table 'fines'
-   @FXML private TableColumn<FineEntity, UUID> colUuid;
-   @FXML private TableColumn<FineEntity, Integer> colIdUser;
-   @FXML private TableColumn<FineEntity, String> colCause;
-   @FXML private TableColumn<FineEntity, LocalDate> colExp;
+   @FXML
+   private TableColumn<FineEntity, UUID> colUuid;
+   @FXML
+   private TableColumn<FineEntity, Integer> colIdUser;
+   @FXML
+   private TableColumn<FineEntity, String> colCause;
+   @FXML
+   private TableColumn<FineEntity, LocalDate> colExp;
 
    //columns table 'state users'
-   @FXML private TableColumn<LoanEntity, Integer> colId;
-   @FXML private TableColumn<LoanEntity, EStatusLoan> colStatus;
+   @FXML
+   private TableColumn<LoanEntity, Integer> colId;
+   @FXML
+   private TableColumn<LoanEntity, EStatusLoan> colStatus;
 
    //repositories
    private CRUDRepo<FineEntity> fineRepo;
@@ -66,11 +84,14 @@ public class Fines {
    private int indexSelected;
    private FilteredList<?> filteredListFines;
 
+   private static final CustomAlert alert = CustomAlert.getInstance();
+
    /**
     * Initializes components, global data and listeners, everything of that
     * type must be in this method.
     */
-   @FXML private void initialize() throws IOException {
+   @FXML
+   private void initialize() throws IOException {
       //services
       this.fineRepo = new FineService();
       this.loanRepo = new LoanService();
@@ -81,7 +102,7 @@ public class Fines {
       tableFinesConfig();
       tableStateLoanConfig();
       //checkBox listener
-      checkFines.selectedProperty().addListener((_,_, isNowSelected) -> {
+      checkFines.selectedProperty().addListener((_, _, isNowSelected) -> {
          if (isNowSelected) {
             checkState.setSelected(false);
             txtFilter.setDisable(false);
@@ -92,7 +113,7 @@ public class Fines {
          }
       });
 
-      checkState.selectedProperty().addListener((_,_, isNowSelected) -> {
+      checkState.selectedProperty().addListener((_, _, isNowSelected) -> {
          if (isNowSelected) {
             checkFines.setSelected(false);
             txtFilter.setDisable(false);
@@ -117,7 +138,8 @@ public class Fines {
     * Defines the background configuration for the TableView
     * witch includes data, selection and listeners options.
     */
-   @FXML private void tableFinesConfig(){
+   @FXML
+   private void tableFinesConfig() {
       //columns
       this.colUuid.setCellValueFactory(new PropertyValueFactory<>("uuid"));
       this.colIdUser.setCellValueFactory(new PropertyValueFactory<>("idUser"));
@@ -130,15 +152,15 @@ public class Fines {
       this.tableFines.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
       //listeners
       this.tableFines.setOnMouseClicked(m ->
-         Optional.ofNullable(this.tableFines.getSelectionModel().getSelectedItem())
-                 .ifPresentOrElse(selection -> {
-                    this.uuidSelected = selection.getUuid();
-                    this.indexSelected = this.tableFines.getSelectionModel().getSelectedIndex();
-                    this.btnUpdate.setDisable(false);
-                    this.btnDelete.setDisable(false);
-                 }, () -> CustomAlert.getInstance()
-                         .buildAlert(Alert.AlertType.ERROR, "ERROR", "NULL value.")
-                         .show())
+              Optional.ofNullable(this.tableFines.getSelectionModel().getSelectedItem())
+                      .ifPresentOrElse(selection -> {
+                         this.uuidSelected = selection.getUuid();
+                         this.indexSelected = this.tableFines.getSelectionModel().getSelectedIndex();
+                         this.btnUpdate.setDisable(false);
+                         this.btnDelete.setDisable(false);
+                      }, () -> alert
+                              .buildAlert(Alert.AlertType.ERROR, "ERROR", "NULL value.")
+                              .show())
       );
    }
 
@@ -146,7 +168,8 @@ public class Fines {
     * Defines the background configuration for the TableView
     * witch includes data, selection and listeners options.
     */
-   @FXML private void tableStateLoanConfig(){
+   @FXML
+   private void tableStateLoanConfig() {
       //columns
       this.colId.setCellValueFactory(new PropertyValueFactory<>("idUser"));
       this.colStatus.setCellValueFactory(new PropertyValueFactory<>("statusLoan"));
@@ -157,13 +180,13 @@ public class Fines {
       this.tableStateUser.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
       //listener
       this.tableStateUser.setOnMouseClicked(m ->
-         Optional.ofNullable(this.tableStateUser.getSelectionModel().getSelectedItem())
-                 .ifPresentOrElse(selection ->
-                    this.txtIdUser.setText(String.valueOf(selection.getIdUser())),
-                         () -> CustomAlert.getInstance()
-                         .buildAlert(Alert.AlertType.ERROR, "ERROR", "NULL value.")
-                         .show()
-                 )
+              Optional.ofNullable(this.tableStateUser.getSelectionModel().getSelectedItem())
+                      .ifPresentOrElse(selection ->
+                                      this.txtIdUser.setText(String.valueOf(selection.getIdUser())),
+                              () -> alert
+                                      .buildAlert(Alert.AlertType.ERROR, "ERROR", "NULL value.")
+                                      .show()
+                      )
       );
    }
 
@@ -171,7 +194,8 @@ public class Fines {
     * Manages the clean data for the view like:
     * text, selections and/or enable/disable buttons.
     */
-   @FXML private void handleClear(ActionEvent event){
+   @FXML
+   private void handleClear(ActionEvent event) {
       //clear fields
       this.txtIdUser.clear();
       this.txtCause.clear();
@@ -181,12 +205,12 @@ public class Fines {
       this.tableFines.getSelectionModel().clearSelection();
       this.tableStateUser.getSelectionModel().clearSelection();
       //disable buttons
-      if(!btnDelete.isDisabled() && !btnUpdate.isDisabled()){
+      if (!btnDelete.isDisabled() && !btnUpdate.isDisabled()) {
          this.btnUpdate.setDisable(true);
          this.btnDelete.setDisable(true);
       }
       //disable checks
-      if(this.checkFines.isSelected() || this.checkState.isSelected()){
+      if (this.checkFines.isSelected() || this.checkState.isSelected()) {
          this.checkState.setSelected(false);
          this.checkFines.setSelected(false);
       }
@@ -201,7 +225,8 @@ public class Fines {
     * to the new user, finally fire the clear button and shows an {@link CustomAlert}
     * for confirmation or error.
     */
-   @FXML private void handleSaveFine(ActionEvent event){
+   @FXML
+   private void handleSaveFine(ActionEvent event) {
       try {
          FineEntity fine = FineEntity.builder()
                  .uuid(UUID.randomUUID())
@@ -212,25 +237,25 @@ public class Fines {
          this.fineRepo.save(fine);
          fines.add(fine);
          this.tableFines.getItems().add(fine);
-         CustomAlert.getInstance()
-                 .buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Fine saved!")
+         alert.buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Fine saved!")
                  .show();
-      }catch (NullPointerException e){
-         CustomAlert.getInstance()
-                 .buildAlert(Alert.AlertType.ERROR, "ERROR", "Fields Can´t contain null or empty values.")
+      } catch (NullPointerException e) {
+         alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Fields Can´t contain null or empty values.")
                  .show();
          throw new RuntimeException(e);
-      }finally {
+      } finally {
          this.btnClear.fire();
       }
    }
 
    /**
     * Handles the logic for do and update if and UUID value is present.
+    *
     * @param event event
     * @throws NullPointerException if some value from {@link FineEntity} is null
     */
-   @FXML private void handleUpdateFine(ActionEvent event){
+   @FXML
+   private void handleUpdateFine(ActionEvent event) {
       try {
          this.fineRepo.findByUuid(uuidSelected)
                  .ifPresent(fine -> {
@@ -243,15 +268,13 @@ public class Fines {
                     fines.set(indexSelected, fine);
                     this.tableFines.getItems().set(indexSelected, fine);
                  });
-         CustomAlert.getInstance()
-                 .buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Fine updated!")
+         alert.buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Fine updated!")
                  .show();
-      }catch (NullPointerException e){
-         CustomAlert.getInstance()
-                 .buildAlert(Alert.AlertType.ERROR, "ERROR", "Fields Can´t contain null or empty values.")
+      } catch (NullPointerException e) {
+         alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Fields Can´t contain null or empty values.")
                  .show();
          throw new RuntimeException(e);
-      }finally {
+      } finally {
          this.btnClear.fire();
       }
    }
@@ -264,34 +287,36 @@ public class Fines {
     *
     * @param event ActionEvent
     */
-   @FXML private void handleDeleteFine(ActionEvent event){
-        CustomAlert.getInstance()
-                .buildAlert(Alert.AlertType.WARNING, "DELETE",
-                        "¿Do you want delete this fine?")
-                .showAndWait()
-                .ifPresent(confirmation -> {
-                   if(confirmation == ButtonType.OK){
-                      this.fineRepo.deleteByUuid(uuidSelected);
-                      fines.remove(indexSelected);
-                      this.tableFines.getItems().remove(indexSelected);
-                   }
-                });
-        this.btnClear.fire();
+   @FXML
+   private void handleDeleteFine(ActionEvent event) {
+      alert.buildAlert(Alert.AlertType.WARNING, "DELETE",
+                      "¿Do you want delete this fine?")
+              .showAndWait()
+              .ifPresent(confirmation -> {
+                 if (confirmation == ButtonType.OK) {
+                    this.fineRepo.deleteByUuid(uuidSelected);
+                    fines.remove(indexSelected);
+                    this.tableFines.getItems().remove(indexSelected);
+                 }
+              });
+      this.btnClear.fire();
    }
 
    /**
     * Manages two predicates for the type of filter selected, and applies
     * it determining the type of the filtered list.
-    * @param keyEvent event
+    *
+    * @param keyEvent     event
     * @param filteredList list for do the filter
     * @throws IllegalArgumentException if the text value does not match with the value of {@link EStatusLoan}
-    * @throws NullPointerException if the list is null
+    * @throws NullPointerException     if the list is null
     */
 
-   @FXML private void handleFilter(KeyEvent keyEvent, FilteredList<?> filteredList){
+   @FXML
+   private void handleFilter(KeyEvent keyEvent, FilteredList<?> filteredList) {
       String text = txtFilter.getText().trim();
       Predicate<FineEntity> predicateFines = fine -> {
-         if(text.isEmpty()) return true;
+         if (text.isEmpty()) return true;
          return fine.getUuid().toString().contains(text) ||
                  String.valueOf(fine.getId()).contains(text) ||
                  fine.getCause().contains(text) ||
@@ -299,22 +324,29 @@ public class Fines {
       };
 
       Predicate<LoanEntity> predicateLoans = loan -> {
-        if(text.isEmpty()) return true;
-        return String.valueOf(loan.getIdUser()).contains(text) ||
-                loan.getStatusLoan() == EStatusLoan.valueOf(text.toUpperCase());
+         if (text.isEmpty()) return true;
+         return String.valueOf(loan.getIdUser()).contains(text) ||
+                 loan.getStatusLoan() == EStatusLoan.valueOf(text.toUpperCase());
       };
 
-      try{
+      try {
          //set predicate
          Optional.ofNullable(filteredList).ifPresentOrElse(list -> {
             list.setPredicate(type -> {
-               if(type instanceof FineEntity fine) return predicateFines.test(fine);
-               if(type instanceof LoanEntity loan) return predicateLoans.test(loan);
+               if (type instanceof FineEntity fine) return predicateFines.test(fine);
+               if (type instanceof LoanEntity loan) return predicateLoans.test(loan);
                return true;
             });
-         }, () -> {throw new NullPointerException("List is not present");});
-      }catch (IllegalArgumentException e){
-         throw new RuntimeException(e);
+         }, () -> {
+            throw new NullPointerException("List is not present");
+         });
+      } catch (IllegalArgumentException e) {
+         alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Value not defined.")
+                 .show();
       }
+   }
+
+   protected void showItems() {
+      System.out.println(this.tableStateUser.getItems());
    }
 }
