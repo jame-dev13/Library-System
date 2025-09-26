@@ -23,7 +23,7 @@
                      <children>
                         <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
                            <content>
-                              <TableView fx:id="tableCopies">
+                              <TableView fx:id="tableCopies" styleClass="table">
                                 <columns>
                                   <TableColumn fx:id="colUuid" prefWidth="75.0" text="UUID" />
                                   <TableColumn fx:id="colIdBook" prefWidth="75.0" text="ID_BOOK" />

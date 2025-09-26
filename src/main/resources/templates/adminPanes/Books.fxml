@@ -111,7 +111,7 @@
               <children>
                 <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                   <content>
-                    <TableView fx:id="tableBooks" minWidth="700.0" prefHeight="285.0" prefWidth="763.0">
+                    <TableView fx:id="tableBooks" minWidth="700.0" prefHeight="285.0" prefWidth="763.0" styleClass="table">
                       <columns>
                         <TableColumn fx:id="colUuid" prefWidth="48.0" text="UUID" />
                         <TableColumn fx:id="colTitle" editable="false" prefWidth="102.0" text="TITLE" />

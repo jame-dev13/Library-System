@@ -70,7 +70,7 @@
                      <children>
                         <ScrollPane fitToHeight="true" fitToWidth="true" maxWidth="300" minWidth="700.0" prefHeight="377.0" prefWidth="703.0" VBox.vgrow="ALWAYS">
                            <content>
-                              <TableView fx:id="tableLoans" minWidth="300.0" prefHeight="366.0">
+                              <TableView fx:id="tableLoans" minWidth="300.0" prefHeight="366.0" styleClass="table">
                                 <columns>
                                   <TableColumn fx:id="colUuid" editable="false" prefWidth="86.0" resizable="false" text="UUID" />
                                   <TableColumn fx:id="colIdUser" editable="false" prefWidth="81.0" resizable="false" text="ID_USER" />

@@ -89,7 +89,7 @@
                                  <children>
                                     <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="271.0" prefWidth="390.0" VBox.vgrow="ALWAYS">
                                        <content>
-                                          <TableView fx:id="tableFines" minWidth="-Infinity" prefHeight="226.0" prefWidth="388.0">
+                                          <TableView fx:id="tableFines" minWidth="-Infinity" prefHeight="226.0" prefWidth="388.0" styleClass="table">
                                             <columns>
                                               <TableColumn fx:id="colUuid" prefWidth="75.0" text="UUID" />
                                               <TableColumn fx:id="colIdUser" prefWidth="75.0" text="ID_USER" />
@@ -118,7 +118,7 @@
                                  <children>
                                     <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                        <content>
-                                          <TableView fx:id="tableStateUser" minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0">
+                                          <TableView fx:id="tableStateUser" minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0" styleClass="table">
                                             <columns>
                                               <TableColumn fx:id="colId" prefWidth="75.0" text="ID_USER" />
                                               <TableColumn fx:id="colStatus" prefWidth="75.0" text="LOAN_STATUS" />

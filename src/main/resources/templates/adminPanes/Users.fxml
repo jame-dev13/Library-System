@@ -81,7 +81,7 @@
                   <children>
                     <ScrollPane fitToHeight="true" fitToWidth="true" maxWidth="-Infinity" minWidth="600.0" prefHeight="282.0" prefWidth="702.0">
                       <content>
-                        <TableView fx:id="tableAdmins" minWidth="600.0" prefHeight="280.0" prefWidth="710.0">
+                        <TableView fx:id="tableAdmins" minWidth="600.0" prefHeight="280.0" prefWidth="710.0" styleClass="table">
                           <columns>
                             <TableColumn fx:id="colUuid" editable="false" minWidth="200.0" prefWidth="200.0" sortType="DESCENDING" text="UUID" />
                             <TableColumn fx:id="colName" editable="false" prefWidth="166.0" text="NAME" />

@@ -40,7 +40,7 @@
                                  <children>
                                     <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="346.0" prefWidth="384.0" VBox.vgrow="ALWAYS">
                                        <content>
-                                          <TableView fx:id="tableCopies" prefHeight="266.0" prefWidth="382.0">
+                                          <TableView fx:id="tableCopies" prefHeight="266.0" prefWidth="382.0" styleClass="table">
                                              <columns>
                                                 <TableColumn fx:id="colUuid" prefWidth="75.0" text="UUID" />
                                                 <TableColumn fx:id="colCopyNum" prefWidth="75.0" text="COPY_NUM" />
