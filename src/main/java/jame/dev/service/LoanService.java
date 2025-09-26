@@ -1,8 +1,7 @@
 package jame.dev.service;
 
-import jame.dev.dtos.BorrowedBookDto;
+import jame.dev.dtos.LoanDetailsDto;
 import jame.dev.models.entitys.LoanEntity;
-import jame.dev.models.enums.EGenre;
 import jame.dev.models.enums.EStatusLoan;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.repositorys.IMultiQuery;
@@ -14,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public final class LoanService implements CRUDRepo<LoanEntity>, IMultiQuery<BorrowedBookDto> {
+public final class LoanService implements CRUDRepo<LoanEntity>, IMultiQuery<LoanDetailsDto> {
 
    @Override
    public List<LoanEntity> getAll() {
@@ -97,24 +96,23 @@ public final class LoanService implements CRUDRepo<LoanEntity>, IMultiQuery<Borr
    }
 
    @Override
-   public List<BorrowedBookDto> getJoinsAll() {
-      final String QUERY = """
-              SELECT b.id AS ID_BOOK, b.genre AS GENRE
-              FROM loans l
-              INNER JOIN users u
-              ON u.id = l.id_user
-              INNER JOIN copies c
-              ON c.id = l.id_copy
-              INNER JOIN books b
-              ON b.id = c.id_book;
+   public List<LoanDetailsDto> getJoinsAll() {
+      final String sql = """
+              SELECT l.uuid AS UUID, b.title AS TITLE, b.author AS AUTHOR,
+              l.status AS STATUS,
+              DATEDIFF(l.date_expiration, CURDATE()) AS REMAINING_DAYS
+              FROM books b
+              INNER JOIN copies c ON c.id_book = b.id
+              INNER JOIN loans l ON l.id_copy = c.id
               """;
-
-      return DQLActions.select(QUERY, rs ->
-              BorrowedBookDto.builder()
-                      .id_book(rs.getInt("ID_BOOK"))
-                      .genre(EGenre.valueOf(rs.getString("GENRE")))
+      return DQLActions.select(sql, rs ->
+              LoanDetailsDto.builder()
+                      .uuid(UUID.fromString(rs.getString("UUID")))
+                      .title(rs.getString("TITLE"))
+                      .author(rs.getString("AUTHOR"))
+                      .statusLoan(EStatusLoan.valueOf(rs.getString("STATUS")))
+                      .remainingDays(rs.getInt("REMAINING_DAYS"))
                       .build()
       );
-
    }
 }

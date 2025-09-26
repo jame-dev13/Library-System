@@ -1,6 +1,5 @@
 package jame.dev.controller;
 
-import jame.dev.Main;
 import jame.dev.dtos.SessionDto;
 import jame.dev.utils.CustomAlert;
 import jame.dev.utils.ExecutorTabLoaderUtil;
@@ -20,8 +19,6 @@ import javafx.stage.Stage;
 import lombok.extern.java.Log;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.Optional;
 
 /**
  * Controller class for build the Admin view.
@@ -29,7 +26,8 @@ import java.util.Optional;
 @Log
 public class Admin {
 
-   @FXML private TabPane tabPane;
+   @FXML
+   private TabPane tabPane;
    @FXML
    private Button btnLogout;
    @FXML
@@ -46,27 +44,21 @@ public class Admin {
    @FXML
    private Tab tabMe;
 
-   private static final URL URL_FINES = Main.class.getResource("/templates/adminPanes/Fines.fxml");
-
    /**
     * Loads the content for the Admin Tabs in a lazy way using {@link ExecutorTabLoaderUtil} class.
     */
    @FXML
    public void initialize() {
       this.btnLogout.setOnAction(this::handleLogout);
-      tabPane.getSelectionModel()
+      Thread.ofVirtual().start(() -> tabPane.getSelectionModel()
               .selectedItemProperty()
-              .addListener((observableValue, oldTab, newTab) -> {
-                 if(newTab.equals(tabFines)) {
-                    try {
-                       Optional.ofNullable(URL_FINES).orElseThrow();
-                       Parent root = FXMLLoader.load(URL_FINES);
-                       tabFines.setContent(root);
-                    } catch (IOException e) {
-                       throw new RuntimeException(e);
-                    }
+              .addListener((_, _, newTab) -> {
+                 if (newTab.equals(this.tabFines)) {
+                    ExecutorTabLoaderUtil.reLoad("/templates/adminPanes/Fines.fxml", this.tabFines);
+                 } else if (newTab.equals(this.tabLoans)) {
+                    ExecutorTabLoaderUtil.reLoad("/templates/adminPanes/Loans.fxml", this.tabLoans);
                  }
-              });
+              }));
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Users.fxml", this.tabUsers);
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Books.fxml", this.tabBooks);
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Loans.fxml", this.tabLoans);

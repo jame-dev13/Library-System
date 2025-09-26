@@ -16,10 +16,9 @@ import java.util.concurrent.Executors;
 @Log
 public final class ExecutorTabLoaderUtil {
    private static final ExecutorService executorService =
-           Executors.newFixedThreadPool(8);
+           Executors.newFixedThreadPool(5);
 
    public static void loadTab (String fxmlPath, Tab tab){
-      if(tab.getContent() != null) return;
       executorService.submit(() -> {
          try{
             URL url = Main.class.getResource(fxmlPath);
@@ -35,5 +34,15 @@ public final class ExecutorTabLoaderUtil {
 
    public static void shutDownExecutor(){
       executorService.shutdown();
+   }
+   public static void reLoad(String path, Tab tab){
+      URL url = Main.class.getResource(path);
+      Optional.ofNullable(url).orElseThrow();
+      try {
+         Parent root = FXMLLoader.load(url);
+         tab.setContent(root);
+      } catch (IOException e) {
+         throw new RuntimeException(e);
+      }
    }
 }

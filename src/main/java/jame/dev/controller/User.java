@@ -14,16 +14,20 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import lombok.extern.java.Log;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Controller for build the User Client view.
  */
 @Log
 public class User {
+   @FXML
+   private TabPane tabPane;
    @FXML
    private Tab tabMyLoans;
    @FXML
@@ -37,12 +41,20 @@ public class User {
    @FXML
    private Tab tabMe;
 
+   private static final CustomAlert ALERT = CustomAlert.getInstance();
+
    /**
     * Loads the content for the user Tabs in a lazy way using {@link ExecutorTabLoaderUtil} class.
     */
    @FXML
    private void initialize() {
       this.btnLogout.setOnAction(this::handleLogout);
+      Thread.ofVirtual().start(() -> this.tabPane.getSelectionModel().selectedItemProperty()
+              .addListener((_, _, newTab) -> {
+                 if (newTab.equals(this.tabMyLoans))
+                    ExecutorTabLoaderUtil.reLoad("/templates/userPanes/myLoans.fxml", this.tabMyLoans);
+              }));
+
       ExecutorTabLoaderUtil.loadTab("/templates/commons/Me.fxml", this.tabMe);
       ExecutorTabLoaderUtil.loadTab("/templates/userPanes/books.fxml", this.tabBooks);
       ExecutorTabLoaderUtil.loadTab("/templates/userPanes/fines.fxml", this.tabFines);
@@ -54,27 +66,24 @@ public class User {
    private void handleLogout(ActionEvent event) {
       SessionManager manager = SessionManager.getInstance();
       SessionDto dto = manager.getSessionDto();
-      if (dto != null) {
-         manager.logout();
-         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/templates/login.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
-         } catch (IOException e) {
-            Platform.runLater(() ->
-                    CustomAlert.getInstance()
-                            .buildAlert(Alert.AlertType.ERROR, "ERROR", "Error loading the view.")
-                            .show());
-            log.severe("Error loading the resource: " + e);
-         }
-      } else {
-         Platform.runLater(() ->
-                 CustomAlert.getInstance()
-                         .buildAlert(Alert.AlertType.ERROR, "ERROR", "No Session active")
-                         .show());
-      }
+      Optional.ofNullable(dto)
+              .ifPresentOrElse(_ -> {
+                         manager.logout();
+                         try {
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("/templates/login.fxml"));
+                            Parent root = loader.load();
+                            Scene scene = new Scene(root);
+                            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                            stage.setScene(scene);
+                            stage.show();
+                         } catch (IOException e) {
+                            Platform.runLater(() ->
+                                    ALERT.buildAlert(Alert.AlertType.ERROR, "ERROR", "Error loading the view.")
+                                            .show());
+                            log.severe("Error loading the resource: " + e);
+                         }
+                      },
+                      () -> ALERT.buildAlert(Alert.AlertType.ERROR, "ERROR", "No Session active")
+                              .show());
    }
 }

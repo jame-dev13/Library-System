@@ -199,6 +199,7 @@ public class Users {
          CustomAlert.getInstance()
                  .buildAlert(Alert.AlertType.WARNING, "WARNING", "You can´t delete you here.")
                  .show();
+         this.btnClear.fire();
          return;
       }
       CustomAlert.getInstance()
