@@ -32,16 +32,14 @@ public class SignUp {
 
    @FXML
    private TextField txtName;
-
    @FXML
    private TextField txtEmail;
-
+   @FXML
+   private TextField txtUsername;
    @FXML
    private PasswordField txtPassword;
-
    @FXML
    private Button btnReg;
-
    @FXML
    private Button btnToSignIn;
 
@@ -54,7 +52,6 @@ public class SignUp {
     * Initializes components, global data and listeners, everything of that type
     * must be in this method.
     *
-    * @throws IOException
     */
    @FXML
    private void initialize() throws IOException {
@@ -65,7 +62,7 @@ public class SignUp {
 
    /**
     * Handles the registration logic for a user with the ROLE of USER.
-    * It builds the Entity, sends an email verification and checks it for
+    * It builds the Entity, sends an username verification and checks it for
     * doing the insertion successfully.
     *
     * @param event The ActionEvent
@@ -74,6 +71,7 @@ public class SignUp {
    private void handleSignUp(ActionEvent event) {
       String name = txtName.getText().trim();
       String email = txtEmail.getText().trim();
+      String username = txtUsername.getText().trim();
       String password = txtPassword.getText().trim();
 
       if (!ValidatorUtil.isValidString(name, email, password)) {
@@ -86,12 +84,14 @@ public class SignUp {
       InfoUserDto userDto = InfoUserDto.builder()
               .name(name)
               .email(email)
+              .username(username)
               .password(password)
               .build();
       this.user = UserEntity.builder()
               .uuid(UUID.randomUUID())
               .name(userDto.name())
               .email(userDto.email())
+              .username(userDto.username())
               .password(userDto.password())
               .role(ERole.USER)
               .token(TokenGenerator.genToken())
@@ -104,7 +104,6 @@ public class SignUp {
       Thread.ofVirtual().start(r);
 
       checkVerification(this.token);
-
    }
 
 
@@ -115,26 +114,25 @@ public class SignUp {
     * @param token a random secure token.
     */
    private void checkVerification(String token) {
-      boolean isValid = false;
       TextInputDialog input = new TextInputDialog();
       input.setTitle("Verification code");
-      input.setHeaderText("Enter the code that has sent to your email address: ");
+      input.setHeaderText("Enter the code that has sent to your username address: ");
       input.setContentText("Code: ");
       Optional<String> inputPresent = input.showAndWait();
-      while (!isValid && inputPresent.isPresent()) {
-         String value = inputPresent.get();
-         if (value.equals(token)) {
-            alert.buildAlert(Alert.AlertType.INFORMATION, "INFO", "Verification successfully.")
-                    .show();
-            this.user.setVerified(true);
-            this.repo.save(this.user);
-            isValid = true;
-            this.token = null;
-            this.user = null;
-            this.btnToSignIn.fire();
-         } else alert.buildAlert(Alert.AlertType.WARNING, "WARNING", "Verification failed.")
-                 .showAndWait();
+      while (inputPresent.isPresent() && !inputPresent.get().equals(token)) {
+         alert.buildAlert(Alert.AlertType.INFORMATION, "INFORMATION", "Values are not equals.")
+                 .show();
+         inputPresent = input.showAndWait();
       }
+
+      inputPresent.ifPresentOrElse(_ -> {
+         this.user.setVerified(true);
+         this.repo.save(this.user);
+         this.token = null;
+         this.user = null;
+         alert.buildAlert(Alert.AlertType.INFORMATION, "REGISTER", "Sign Up success, you can signIn now!").showAndWait();
+         this.btnToSignIn.fire();
+      }, () -> alert.buildAlert(Alert.AlertType.ERROR, "CANCEL", "Operation canceled, try again.").show());
    }
 
    /**

@@ -27,6 +27,8 @@ public class Me {
    @FXML
    private TextField txtEmail;
    @FXML
+   private TextField txtUsername;
+   @FXML
    private TextField txtPassword;
 
    private static final SessionManager session = SessionManager.getInstance();
@@ -48,28 +50,43 @@ public class Me {
 
    @FXML
    private void handleUpdate(ActionEvent event) {
-      InfoUserDto userDto = InfoUserDto.builder().name(txtName.getText().trim()).email(txtEmail.getText().trim()).password(txtPassword.getText().trim()).build();
-      alert.buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Do you want update your own info?").showAndWait().ifPresent(confirmation -> {
-         if (confirmation == ButtonType.OK) {
-            this.repo.findByUuid(session.getSessionDto().uuid()).ifPresentOrElse(userEntity -> {
-               userEntity.setName(userDto.name());
-               userEntity.setEmail(userDto.email());
-               userEntity.setPassword(userDto.password());
-               this.repo.update(userEntity);
-               session.logout();
-               session.login(SessionDto.builder().id(userEntity.getId()).uuid(userEntity.getUuid()).email(userEntity.getEmail()).role(userEntity.getRole()).build());
-               alert.buildAlert(Alert.AlertType.INFORMATION, "INFO", "Information updated successfully.").show();
-            }, () -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Information required not found.").show());
-         }
-      });
+      InfoUserDto userDto = InfoUserDto.builder()
+              .name(txtName.getText().trim())
+              .email(txtEmail.getText().trim())
+              .username(txtUsername.getText().trim())
+              .password(txtPassword.getText().trim())
+              .build();
+      alert.buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Do you want update your own info?")
+              .showAndWait()
+              .ifPresent(confirmation -> {
+                 if (confirmation == ButtonType.OK) {
+                    this.repo.findByUuid(session.getSessionDto().uuid())
+                            .ifPresentOrElse(userEntity -> {
+                               userEntity.setName(userDto.name());
+                               userEntity.setEmail(userDto.email());
+                               userEntity.setUsername(userDto.username());
+                               userEntity.setPassword(userDto.password());
+                               this.repo.update(userEntity);
+                               session.logout();
+                               session.login(SessionDto.builder()
+                                       .id(userEntity.getId())
+                                       .uuid(userEntity.getUuid())
+                                       .username(userEntity.getUsername())
+                                       .role(userEntity.getRole()).build());
+                               alert.buildAlert(Alert.AlertType.INFORMATION, "INFO", "Information updated successfully.").show();
+                            }, () -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Information required not found.").show());
+                 }
+              });
       this.btnClear.fire();
    }
 
    @FXML
    private void setInfo() {
-      this.repo.findByUuid(session.getSessionDto().uuid()).ifPresentOrElse(entity -> {
-         txtName.setText(entity.getName());
-         txtEmail.setText(entity.getEmail());
-      }, () -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "No information available!").show());
+      this.repo.findByUuid(session.getSessionDto().uuid())
+              .ifPresentOrElse(entity -> {
+                 txtName.setText(entity.getName());
+                 txtEmail.setText(entity.getEmail());
+                 txtUsername.setText(entity.getUsername());
+              }, () -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "No information available!").show());
    }
 }

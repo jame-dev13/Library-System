@@ -14,22 +14,22 @@ public final class AuthService implements IAuthRepo {
    @Override
    public SessionDto signIn(UserDto user) {
       final String SQL_VERIFICATION = """
-              SELECT email, password
+              SELECT username, password
               FROM users
-              WHERE email = ? AND verified = 1
+              WHERE username = ? AND verified = 1
               """;
 
       final String SQL_SESSION = """
-              SELECT id, uuid, email, role
+              SELECT id, uuid, username, role
               FROM users
-              WHERE email = ?
+              WHERE username = ?
               """;
 
       try {
          UserDto userDb = DQLActions.selectWhere(
                  SQL_VERIFICATION,
                  rs -> UserDto.builder()
-                         .username(rs.getString("email"))
+                         .username(rs.getString("username"))
                          .password(rs.getString("password"))
                          .build(),
                  user.username()
@@ -45,7 +45,7 @@ public final class AuthService implements IAuthRepo {
                  rs -> SessionDto.builder()
                          .id(rs.getInt("id"))
                          .uuid(UUID.fromString(rs.getString("uuid")))
-                         .email(rs.getString("email"))
+                         .username(rs.getString("username"))
                          .role(ERole.valueOf(rs.getString("role")))
                          .build(),
                  user.username()

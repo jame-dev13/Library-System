@@ -6,5 +6,5 @@ import lombok.Builder;
 import java.util.UUID;
 
 @Builder
-public record SessionDto(Integer id, UUID uuid, String email, ERole role) {
+public record SessionDto(Integer id, UUID uuid, String username, ERole role) {
 }

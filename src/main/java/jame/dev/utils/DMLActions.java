@@ -22,7 +22,7 @@ import java.util.function.BiConsumer;
  *
  * <p>Example:</p>
  * <pre>{@code
- *  String sql = "INSERT INTO users(name, email) VALUES(?, ?)";
+ *  String sql = "INSERT INTO users(name, username) VALUES(?, ?)";
  *  DMLActions.insert(sql, "Juan Pérez", "juan@example.com");
  * }</pre>
  *

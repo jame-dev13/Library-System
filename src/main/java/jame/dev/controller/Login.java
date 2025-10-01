@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import lombok.extern.java.Log;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Represents a simple Login controller.
@@ -42,12 +43,11 @@ public class Login {
 
    private IAuthRepo repo;
    private static final CustomAlert alert = CustomAlert.getInstance();
+   private static final SessionManager session = SessionManager.getInstance();
 
    /**
     * Initializes components, global data and listeners, everything of that type
     * must be in this method.
-    *
-    * @throws IOException
     */
    @FXML
    public void initialize() throws IOException {
@@ -63,17 +63,22 @@ public class Login {
     */
    @FXML
    private void handleClickLogin(ActionEvent actionEvent) {
-      UserDto user = UserDto.builder().username(txtUsername.getText().trim()).password(txtPassword.getText().trim()).build();
+      UserDto user = UserDto.builder()
+              .username(txtUsername.getText().trim())
+              .password(txtPassword.getText().trim())
+              .build();
       SessionDto sessionDto = this.repo.signIn(user);
-      if (sessionDto != null) {
-         SessionManager.getInstance().login(sessionDto);
-         alert.buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS", "Login Successfully.").show();
-         switch (sessionDto.role()) {
-            case USER -> redirectTo(actionEvent, "/templates/userView.fxml");
-            case ADMIN -> redirectTo(actionEvent, "/templates/adminView.fxml");
-            default -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Login failed.").show();
-         }
-      } else alert.buildAlert(Alert.AlertType.WARNING, "WARNING", "Login attempt failed.").show();
+      Optional.ofNullable(sessionDto)
+              .ifPresentOrElse(dto -> {
+                 session.login(dto);
+                 alert.buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS", "Login Successfully.")
+                         .show();
+                 switch (dto.role()) {
+                    case USER -> redirectTo(actionEvent, "/templates/userView.fxml");
+                    case ADMIN -> redirectTo(actionEvent, "/templates/adminView.fxml");
+                    default -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Login failed.").show();
+                 }
+              }, () -> alert.buildAlert(Alert.AlertType.WARNING, "WARNING", "Login attempt failed.").show());
    }
 
    /**

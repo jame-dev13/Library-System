@@ -64,6 +64,7 @@ public final class Schema {
                   uuid CHAR(36) NOT NULL,
                   name VARCHAR(60) NOT NULL,
                   email VARCHAR(50) UNIQUE NOT NULL,
+                  username VARCHAR(50) UNIQUE NOT NULL,
                   password VARCHAR(255) NOT NULL,
                   role CHAR(10) NOT NULL,
                   token VARCHAR(8) UNIQUE NOT NULL,

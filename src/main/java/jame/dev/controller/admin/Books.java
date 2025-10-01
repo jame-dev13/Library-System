@@ -20,12 +20,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import javax.security.auth.Refreshable;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 /**
@@ -82,23 +79,23 @@ public class Books {
    @FXML
    private TableColumn<BookEntity, String> colTitle;
 
-   @FXML private Tooltip toolTip;
+   @FXML
+   private Tooltip toolTip;
 
    private CRUDRepo<BookEntity> repo;
    private UUID selectedUuid;
    private int selectedIndex;
    private static List<BookEntity> booksE;
+   private static Set<String> bookNameSet = new HashSet<>();
+   private static final CustomAlert alert = CustomAlert.getInstance();
 
-   /**
-    * Initializes components, global data and listeners, everything of that type
-    * must be in this method.
-    */
    @FXML
    private void initialize() throws IOException {
       //Service
       this.repo = new BookService();
       //Data
       booksE = this.repo.getAll();
+      bookNameSet.addAll(booksE.stream().map(BookEntity::getTitle).toList());
       this.tableConfig();
       this.boxGenre.setItems(FXCollections.observableArrayList(EGenre.values()));
       //button actions
@@ -149,7 +146,7 @@ public class Books {
          this.btnUpdate.setDisable(false);
          this.btnDrop.setDisable(false);
 
-         if(l.getClickCount() == 2){
+         if (l.getClickCount() == 2) {
             this.loadPopOver(this.tableBooks.getSelectionModel().getSelectedItem());
          }
       });
@@ -158,6 +155,7 @@ public class Books {
    /**
     * Handles the cleaning for the different types of fields in the view, includes
     * selections, and aux variables.
+    *
     * @param e the ActionEvent
     */
    @FXML
@@ -174,10 +172,8 @@ public class Books {
       //selection
       this.tableBooks.getSelectionModel().clearSelection();
       //disable buttons
-      if (!this.btnDrop.isDisabled() || !this.btnUpdate.isDisabled()) {
-         this.btnUpdate.setDisable(true);
-         this.btnDrop.setDisable(true);
-      }
+      this.btnUpdate.setDisable(!this.btnUpdate.isDisabled());
+      this.btnDrop.setDisable(!this.btnDrop.isDisabled());
       //reset global
       this.selectedUuid = null;
       this.selectedIndex = -1;
@@ -186,6 +182,7 @@ public class Books {
    /**
     * Do an insertion through the repository, it maps the data and Build an
     * {@link BookEntity}
+    *
     * @param e The ActionEvent
     */
    @FXML
@@ -201,59 +198,58 @@ public class Books {
                  .numPages(Integer.parseInt(txtPages.getText().trim()))
                  .genre(boxGenre.getSelectionModel().getSelectedItem())
                  .build();
-         this.repo.save(book);
-         CustomAlert.getInstance()
-                 .buildAlert(Alert.AlertType.INFORMATION,
-                         "SUCCESS",
-                         "Book added!").show();
-         booksE.add(book);
-         this.tableBooks.getItems().add(book);
+         if (bookNameSet.add(book.getTitle())) {
+            this.repo.save(book);
+            booksE.add(book);
+            this.tableBooks.getItems().add(book);
+            alert.buildAlert(Alert.AlertType.INFORMATION,
+                    "SUCCESS",
+                    "Book added!").show();
+         } else {
+            alert.buildAlert(Alert.AlertType.WARNING, "WARNING", "Can't duplicate books").show();
+         }
       } catch (NullPointerException ne) {
-         CustomAlert.getInstance()
-                 .buildAlert(Alert.AlertType.ERROR,
+         alert.buildAlert(Alert.AlertType.ERROR,
                          "ERROR",
                          "Can't have empty fields.")
                  .show();
          throw new RuntimeException(ne);
-      }finally {
+      } finally {
          this.btnClear.fire();
       }
    }
 
    /**
     * Handles the update of the {@link BookEntity} object if it is present.
+    *
     * @param e The ActionEvent
     */
    @FXML
    private void handleUpdate(ActionEvent e) {
       Optional.ofNullable(selectedUuid)
               .ifPresent(uuid -> {
-                 BookEntity book = this.repo.findByUuid(uuid).orElse(null);
-                 if (book != null) {
-                    book.setTitle(txtTitle.getText().trim());
-                    book.setAuthor(txtAuthor.getText().trim());
-                    book.setEditorial(txtEditorial.getText().trim());
-                    book.setISBN(txtIsbn.getText().trim());
-                    book.setPubDate(pickerPubDate.getValue());
-                    book.setNumPages(Integer.parseInt(txtPages.getText().trim()));
-                    book.setGenre(boxGenre.getSelectionModel().getSelectedItem());
-                    //save changes
-                    this.repo.update(book);
-                    booksE.set(selectedIndex, book);
-                    this.tableBooks.getItems().set(selectedIndex, book);
-                    //confirmation
-                    CustomAlert.getInstance()
-                            .buildAlert(Alert.AlertType.INFORMATION,
-                                    "UPDATED",
-                                    String.format("Record with identifier [%s] Updated!", book.getUuid()))
-                            .show();
-                 } else {
-                    CustomAlert.getInstance()
-                            .buildAlert(Alert.AlertType.ERROR,
-                                    "ERROR",
-                                    "Not Found!")
-                            .show();
-                 }
+                 this.repo.findByUuid(uuid).ifPresentOrElse(book -> {
+                            book.setTitle(txtTitle.getText().trim());
+                            book.setAuthor(txtAuthor.getText().trim());
+                            book.setEditorial(txtEditorial.getText().trim());
+                            book.setISBN(txtIsbn.getText().trim());
+                            book.setPubDate(pickerPubDate.getValue());
+                            book.setNumPages(Integer.parseInt(txtPages.getText().trim()));
+                            book.setGenre(boxGenre.getSelectionModel().getSelectedItem());
+                            //save changes
+                            this.repo.update(book);
+                            booksE.set(selectedIndex, book);
+                            this.tableBooks.getItems().set(selectedIndex, book);
+                            //confirmation
+                            alert.buildAlert(Alert.AlertType.INFORMATION,
+                                            "UPDATED",
+                                            String.format("Book: [%s] Updated!", book.getTitle()))
+                                    .show();
+                         },
+                         () -> alert.buildAlert(Alert.AlertType.ERROR,
+                                         "ERROR",
+                                         "Not Found!")
+                                 .show());
               });
       this.btnClear.fire();
    }
@@ -261,13 +257,13 @@ public class Books {
    /**
     * Handles the deletion of an object {@link BookEntity} if the
     * user wants to.
+    *
     * @param e The ActionEvent
     */
    @FXML
    private void handleDelete(ActionEvent e) {
       Optional.ofNullable(selectedUuid).ifPresent(uuid -> {
-         CustomAlert.getInstance()
-                 .buildAlert(
+         alert.buildAlert(
                          Alert.AlertType.CONFIRMATION,
                          "DELETE",
                          "¿Do you want to delete this book record?"
@@ -276,8 +272,8 @@ public class Books {
                     if (response == ButtonType.OK) {
                        repo.deleteByUuid(uuid);
                        this.tableBooks.getItems().remove(selectedIndex);
-                       booksE.remove(selectedIndex);
-                       this.tableBooks.refresh();
+                       BookEntity bookEntity = booksE.remove(selectedIndex);
+                       bookNameSet.remove(bookEntity.getTitle());
                     }
                  });
       });
@@ -286,31 +282,33 @@ public class Books {
 
    /**
     * Handles the way to filter the table data using a {@link FilteredList}
-    * @param e The KeyEvent
+    *
+    * @param e            The KeyEvent
     * @param filteredData The Data List
     */
    @FXML
-   private void handleTextChange(KeyEvent e, FilteredList<BookEntity> filteredData){
+   private void handleTextChange(KeyEvent e, FilteredList<BookEntity> filteredData) {
       String text = txtSearch.getText().trim();
       filteredData.setPredicate(book -> {
-            if(text.isEmpty()) return true;
-            try{
-               return (book.getUuid().toString().contains(text)) ||
-                       (book.getTitle().contains(text)) ||
-                       (book.getAuthor().contains(text)) ||
-                       (book.getISBN().contains(text)) ||
-                       (book.getPubDate().toString().contains(text)) ||
-                       (String.valueOf(book.getNumPages()).contains(text))||
-                       (book.getGenre() == EGenre.valueOf(text.toUpperCase()));
-            }catch (IllegalArgumentException ex){
-               return false;
-            }
+         if (text.isEmpty()) return true;
+         try {
+            return (book.getUuid().toString().contains(text)) ||
+                    (book.getTitle().contains(text)) ||
+                    (book.getAuthor().contains(text)) ||
+                    (book.getISBN().contains(text)) ||
+                    (book.getPubDate().toString().contains(text)) ||
+                    (String.valueOf(book.getNumPages()).contains(text)) ||
+                    (book.getGenre() == EGenre.valueOf(text.toUpperCase()));
+         } catch (IllegalArgumentException ex) {
+            return false;
+         }
       });
       this.tableBooks.setItems(filteredData);
    }
 
-   @FXML private void loadPopOver(BookEntity book){
-      try{
+   @FXML
+   private void loadPopOver(BookEntity book) {
+      try {
          FXMLLoader loader = new FXMLLoader((Main.class.getResource("/templates/adminPanes/copies.fxml")));
          Parent root = loader.load();
 
@@ -324,8 +322,8 @@ public class Books {
          stage.resizableProperty().set(false);
          stage.initModality(Modality.APPLICATION_MODAL);
          stage.showAndWait();
-      }catch(IOException e){
-          throw new RuntimeException(e);
+      } catch (IOException e) {
+         throw new RuntimeException(e);
       }
    }
 }

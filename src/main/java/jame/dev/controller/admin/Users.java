@@ -9,6 +9,7 @@ import jame.dev.utils.CustomAlert;
 import jame.dev.utils.EmailSender;
 import jame.dev.utils.SessionManager;
 import jame.dev.utils.TokenGenerator;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,8 +17,8 @@ import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
+import lombok.extern.java.Log;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,13 +26,14 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Log
 public class Users {
 
    @FXML
    private ToggleButton togUuid, togName, togEmail, togRole;
 
    @FXML
-   private TextField txtName, txtSearch, txtEmail;
+   private TextField txtName, txtSearch, txtEmail, txtUsername;
 
    @FXML
    private PasswordField txtPassword;
@@ -45,6 +47,8 @@ public class Users {
    @FXML
    private TableColumn<UserEntity, String> colEmail;
    @FXML
+   private TableColumn<UserEntity, String> colUsername;
+   @FXML
    private TableColumn<UserEntity, String> colRole;
 
    @FXML
@@ -57,6 +61,8 @@ public class Users {
 
    private UUID uuidSelected;
    private int index;
+
+   private static final CustomAlert alert = CustomAlert.getInstance();
 
    /**
     * Initializes components, global data and listeners, everything of that
@@ -88,9 +94,10 @@ public class Users {
    @FXML
    private void initTable() {
       //columns
-      this.colUuid.setCellValueFactory(new PropertyValueFactory<>("uuid"));
-      this.colName.setCellValueFactory(new PropertyValueFactory<>("name"));
-      this.colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+      this.colUuid.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getUuid()));
+      this.colName.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
+      this.colEmail.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getEmail()));
+      this.colUsername.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getUsername()));
       this.colRole.setCellValueFactory(data ->
               new SimpleStringProperty(data.getValue().getRole().name()));
       //selection
@@ -98,7 +105,9 @@ public class Users {
       //set data
       ObservableList<UserEntity> users = FXCollections.observableArrayList(
               this.users.stream()
-                      .filter(u -> u.getRole() == ERole.ADMIN)
+                      .filter(u ->
+                              u.getRole() == ERole.ADMIN &&
+                                      u.getId().intValue() != SessionManager.getInstance().getSessionDto().id())
                       .collect(Collectors.toList())
       );
       tableAdmins.setItems(users);
@@ -139,7 +148,7 @@ public class Users {
 
    /***
     * Manages the build of data witch is going to be saved
-    * by the repository, also it updates the local ArrayList and sends a communication email
+    * by the repository, also it updates the local ArrayList and sends a communication username
     * to the new user, finally fire the clear button and shows an {@link CustomAlert}
     * for confirmation or error.
     */
@@ -148,24 +157,25 @@ public class Users {
       InfoUserDto userDto = InfoUserDto.builder()
               .name(txtName.getText().trim())
               .email(txtEmail.getText().trim())
+              .username(txtUsername.getText().trim())
               .password(txtPassword.getText().trim())
               .build();
       UserEntity user = UserEntity.builder()
               .uuid(UUID.randomUUID())
               .name(userDto.name())
               .email(userDto.email())
+              .username(userDto.username())
               .password(userDto.password())
               .role(ERole.ADMIN)
               .token(TokenGenerator.genToken())
               .verified(true)
               .build();
-      //check if it's a duplicate email in the table
-      boolean isEmailIn = this.users.stream()
-              .anyMatch(u -> u.getEmail().equals(user.getEmail()));
+      //check if it's a duplicate username in the table
+      boolean isDuplicateEntryIn = this.users.stream()
+              .anyMatch(u -> u.getEmail().equals(user.getEmail()) || u.getUsername().equals(user.getUsername()));
 
-      if (isEmailIn) {
-         CustomAlert.getInstance()
-                 .buildAlert(Alert.AlertType.WARNING, "WARNING", "Email duplicated!")
+      if (isDuplicateEntryIn) {
+         alert.buildAlert(Alert.AlertType.WARNING, "WARNING", "Entry duplicated! Check Email or Username values.")
                  .show();
          this.btnClear.fire();
          return;
@@ -175,13 +185,12 @@ public class Users {
       this.users.add(user);
       this.tableAdmins.getItems().add(user);
 
-      //send email with his credentials
+      //send username with his credentials
       Runnable r = () -> EmailSender.mailToWPassword(user.getEmail(), txtPassword.getText());
       Thread.ofVirtual().start(r);
 
       //notify
-      CustomAlert.getInstance()
-              .buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS!", "Admin added!")
+      alert.buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS!", "Admin added!")
               .show();
       this.btnClear.fire();
    }
@@ -189,21 +198,20 @@ public class Users {
    /**
     * Handles the deletions for an object of {@link UserEntity} if the user is not the
     * same as the current session.
+    *
     * @param e ActionEvent
     */
    @FXML
    private void handleDelete(ActionEvent e) {
-      String usernameSession = SessionManager.getInstance().getSessionDto().email();
+      String usernameSession = SessionManager.getInstance().getSessionDto().username();
       String usernameSelected = this.tableAdmins.getSelectionModel().getSelectedItem().getEmail();
       if (usernameSession.equals(usernameSelected)) {
-         CustomAlert.getInstance()
-                 .buildAlert(Alert.AlertType.WARNING, "WARNING", "You can´t delete you here.")
+         alert.buildAlert(Alert.AlertType.WARNING, "WARNING", "You can´t delete you here.")
                  .show();
          this.btnClear.fire();
          return;
       }
-      CustomAlert.getInstance()
-              .buildAlert(Alert.AlertType.WARNING, "DELETE",
+      alert.buildAlert(Alert.AlertType.WARNING, "DELETE",
                       "¿Do you want delete this fine?")
               .showAndWait()
               .ifPresent(confirmation -> {
@@ -234,11 +242,12 @@ public class Users {
             return user.getUuid().toString().contains(text) ||
                     user.getName().contains(text) ||
                     user.getEmail().contains(text) ||
+                    user.getUsername().contains(text) ||
                     user.getRole() == ERole.valueOf(text.toUpperCase());
          });
          this.tableAdmins.setItems(filteredList);
       } catch (IllegalArgumentException e) {
-         throw new RuntimeException(e);
+         log.severe(e.toString());
       }
    }
 }

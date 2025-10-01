@@ -15,6 +15,7 @@ public class UserEntity {
     @NonNull private UUID uuid;
     @NonNull private String name;
     @NonNull private String email;
+    @NonNull private String username;
     @NonNull private String password;
     @NonNull private ERole role;
     @NonNull private String token;

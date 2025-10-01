@@ -26,7 +26,7 @@
 .button:hover{
     -fx-scale-y: 1.1; 
     -fx-scale-x: 1.1;
-    -fx-opacity: 90%; 
+    -fx-opacity: 80%;
 }
 .text-field, .password-field{
     -fx-background-color: -fx--bg-components;

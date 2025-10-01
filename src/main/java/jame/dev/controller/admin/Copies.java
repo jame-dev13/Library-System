@@ -13,16 +13,16 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import lombok.extern.java.Log;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * @author jame-dev13
  */
+@Log
 public class Copies {
 
    @FXML private TextField txtCopyNum;
@@ -44,6 +44,7 @@ public class Copies {
    private static List<CopyEntity> copies;
    private UUID uuidSelected;
    private int indexSelected;
+   private static final CustomAlert alert = CustomAlert.getInstance();
 
    /**
     * Initializes components, global data and listeners, everything of that type
@@ -118,12 +119,9 @@ public class Copies {
 
       this.tableCopies.getSelectionModel().clearSelection();
 
-      if(!this.btnUpdate.isDisabled() && !this.btnDelete.isDisabled()){
-         this.btnUpdate.setDisable(true);
-         this.btnDelete.setDisable(true);
-      }
-      if(this.btnSave.isDisabled()) this.btnSave.setDisable(false);
-
+      this.btnSave.setDisable(!this.btnSave.isDisabled());
+      this.btnUpdate.setDisable(!this.btnUpdate.isDisabled());
+      this.btnDelete.setDisable(!this.btnDelete.isDisabled());
       this.uuidSelected = null;
       this.indexSelected = -1;
    }
@@ -141,14 +139,12 @@ public class Copies {
          this.repo.save(copy);
          this.tableCopies.getItems().add(copy);
          copies.add(copy);
-         CustomAlert.getInstance()
-                 .buildAlert(Alert.AlertType.INFORMATION, "SAVE", "Copy added successfully.")
+         alert.buildAlert(Alert.AlertType.INFORMATION, "SAVE", "Copy saved successfully.")
                  .show();
       }catch (NullPointerException e){
-         CustomAlert.getInstance()
-                 .buildAlert(Alert.AlertType.ERROR, "ERROR", "Empty fields present.")
+         alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Empty fields present.")
                  .show();
-         throw new RuntimeException("All fields must contain data." + e);
+         log.severe(e.toString());
       }
       finally {
          this.btnClear.fire();
@@ -160,8 +156,7 @@ public class Copies {
            .ifPresentOrElse(copy -> {
               copy.setStatusCopy(boxStatus.getSelectionModel().getSelectedItem());
               copy.setLanguage(boxLanguage.getSelectionModel().getSelectedItem());
-              CustomAlert.getInstance()
-                      .buildAlert(Alert.AlertType.CONFIRMATION, "UPDATE", "Do you want to update this record?")
+              alert.buildAlert(Alert.AlertType.CONFIRMATION, "UPDATE", "Do you want to update this record?")
                       .showAndWait()
                       .ifPresent(confirmation -> {
                          if(confirmation == ButtonType.OK){
@@ -170,15 +165,14 @@ public class Copies {
                             this.tableCopies.getItems().set(indexSelected, copy);
                          }
                       });
-           }, () -> CustomAlert.getInstance()
+           }, () -> alert
                    .buildAlert(Alert.AlertType.WARNING, "WARNING", "Not found.")
                    .show());
       this.btnClear.fire();
    }
 
    @FXML private void handleDelete(ActionEvent event){
-      CustomAlert.getInstance()
-              .buildAlert(Alert.AlertType.CONFIRMATION, "DELETE", "Do you want to delete this copy?")
+      alert.buildAlert(Alert.AlertType.CONFIRMATION, "DELETE", "Do you want to delete this copy?")
               .showAndWait()
               .ifPresent(confirmation -> {
                  if(confirmation == ButtonType.OK){

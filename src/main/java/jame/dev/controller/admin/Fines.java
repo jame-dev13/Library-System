@@ -15,14 +15,18 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
+import lombok.extern.java.Log;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+@Log
 public class Fines {
    //fields
    @FXML
@@ -79,7 +83,6 @@ public class Fines {
    private static List<FineEntity> fines;
    private static List<LoanEntity> loans;
    //aux
-   private int idUserSelected;
    private UUID uuidSelected;
    private int indexSelected;
    private FilteredList<?> filteredListFines;
@@ -106,7 +109,7 @@ public class Fines {
          if (isNowSelected) {
             checkState.setSelected(false);
             txtFilter.setDisable(false);
-            filteredListFines = new FilteredList<>(tableFines.getItems(), p -> true);
+            filteredListFines = new FilteredList<>(tableFines.getItems(), _ -> true);
          } else if (!checkState.isSelected()) {
             txtFilter.setDisable(true);
             filteredListFines = null;
@@ -117,7 +120,7 @@ public class Fines {
          if (isNowSelected) {
             checkFines.setSelected(false);
             txtFilter.setDisable(false);
-            filteredListFines = new FilteredList<>(tableStateUser.getItems(), p -> true);
+            filteredListFines = new FilteredList<>(tableStateUser.getItems(), _ -> true);
          } else if (!checkFines.isSelected()) {
             txtFilter.setDisable(true);
             filteredListFines = null;
@@ -151,16 +154,14 @@ public class Fines {
       //selection
       this.tableFines.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
       //listeners
-      this.tableFines.setOnMouseClicked(m ->
+      this.tableFines.setOnMouseClicked(_ ->
               Optional.ofNullable(this.tableFines.getSelectionModel().getSelectedItem())
-                      .ifPresentOrElse(selection -> {
+                      .ifPresent(selection -> {
                          this.uuidSelected = selection.getUuid();
                          this.indexSelected = this.tableFines.getSelectionModel().getSelectedIndex();
                          this.btnUpdate.setDisable(false);
                          this.btnDelete.setDisable(false);
-                      }, () -> alert
-                              .buildAlert(Alert.AlertType.ERROR, "ERROR", "NULL value.")
-                              .show())
+                      })
       );
    }
 
@@ -174,20 +175,17 @@ public class Fines {
       this.colId.setCellValueFactory(new PropertyValueFactory<>("idUser"));
       this.colStatus.setCellValueFactory(new PropertyValueFactory<>("statusLoan"));
       //data
-      ObservableList<LoanEntity> observableList = FXCollections.observableArrayList(loans);
+      ObservableList<LoanEntity> observableList = FXCollections.observableArrayList(
+              loans.stream().sorted(Comparator.comparing(LoanEntity::getIdUser)).distinct().collect(Collectors.toList()));
       this.tableStateUser.setItems(observableList);
       //Selection
       this.tableStateUser.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
       //listener
-      this.tableStateUser.setOnMouseClicked(m ->
+      this.tableStateUser.setOnMouseClicked(_ ->
               Optional.ofNullable(this.tableStateUser.getSelectionModel().getSelectedItem())
-                      .ifPresentOrElse(selection ->
-                                      this.txtIdUser.setText(String.valueOf(selection.getIdUser())),
-                              () -> alert
-                                      .buildAlert(Alert.AlertType.ERROR, "ERROR", "NULL value.")
-                                      .show()
-                      )
-      );
+                      .ifPresent(selection ->
+                              this.txtIdUser.setText(String.valueOf(selection.getIdUser()))
+                      ));
    }
 
    /**
@@ -205,15 +203,11 @@ public class Fines {
       this.tableFines.getSelectionModel().clearSelection();
       this.tableStateUser.getSelectionModel().clearSelection();
       //disable buttons
-      if (!btnDelete.isDisabled() && !btnUpdate.isDisabled()) {
-         this.btnUpdate.setDisable(true);
-         this.btnDelete.setDisable(true);
-      }
+      this.btnUpdate.setDisable(!this.btnUpdate.isDisabled());
+      this.btnDelete.setDisable(!this.btnDelete.isDisabled());
       //disable checks
-      if (this.checkFines.isSelected() || this.checkState.isSelected()) {
-         this.checkState.setSelected(false);
-         this.checkFines.setSelected(false);
-      }
+      this.checkFines.setSelected(!this.checkFines.isSelected());
+      this.checkState.setSelected(!this.checkState.isSelected());
       //resets globals
       this.uuidSelected = null;
       this.indexSelected = -1;
@@ -221,7 +215,7 @@ public class Fines {
 
    /***
     * Manages the build of data witch is going to be saved
-    * by the repository, also it updates the local ArrayList and sends a communication email
+    * by the repository, also it updates the local ArrayList and sends a communication username
     * to the new user, finally fire the clear button and shows an {@link CustomAlert}
     * for confirmation or error.
     */
@@ -242,7 +236,7 @@ public class Fines {
       } catch (NullPointerException e) {
          alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Fields Can´t contain null or empty values.")
                  .show();
-         throw new RuntimeException(e);
+         log.severe(e.toString());
       } finally {
          this.btnClear.fire();
       }
@@ -331,13 +325,12 @@ public class Fines {
 
       try {
          //set predicate
-         Optional.ofNullable(filteredList).ifPresentOrElse(list -> {
-            list.setPredicate(type -> {
-               if (type instanceof FineEntity fine) return predicateFines.test(fine);
-               if (type instanceof LoanEntity loan) return predicateLoans.test(loan);
-               return true;
-            });
-         }, () -> {
+         Optional.ofNullable(filteredList).ifPresentOrElse(list ->
+                 list.setPredicate(type -> {
+                    if (type instanceof FineEntity fine) return predicateFines.test(fine);
+                    if (type instanceof LoanEntity loan) return predicateLoans.test(loan);
+                    return true;
+                 }), () -> {
             throw new NullPointerException("List is not present");
          });
       } catch (IllegalArgumentException e) {
@@ -346,7 +339,4 @@ public class Fines {
       }
    }
 
-   protected void showItems() {
-      System.out.println(this.tableStateUser.getItems());
-   }
 }

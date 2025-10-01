@@ -46,7 +46,7 @@ public final class EmailSender {
             Transport.send(message);
             log.info("Email sent.\n");
         } catch (MessagingException e) {
-            log.severe("Cannot sent email.\n");
+            log.severe("Cannot sent username.\n");
         }
     }
 
@@ -82,7 +82,7 @@ public final class EmailSender {
             Transport.send(message);
             log.info("Email sent.\n");
         } catch (MessagingException e) {
-            log.severe("Cannot sent email.\n");
+            log.severe("Cannot sent username.\n");
         }
     }
 }

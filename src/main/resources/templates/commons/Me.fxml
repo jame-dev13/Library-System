@@ -13,41 +13,48 @@
 
 
 <?import javafx.scene.control.PasswordField?>
-<AnchorPane minHeight="300.0" minWidth="500.0" prefHeight="400.0" prefWidth="600.0" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jame.dev.controller.commons.Me">
-   <children>
-      <GridPane alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <columnConstraints>
-          <ColumnConstraints hgrow="ALWAYS" minWidth="150.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints maxHeight="340.0" minHeight="10.0" prefHeight="335.0" vgrow="ALWAYS" />
-          <RowConstraints maxHeight="193.0" minHeight="10.0" prefHeight="63.0" />
-        </rowConstraints>
-         <children>
-            <VBox alignment="CENTER" prefHeight="68.0" prefWidth="592.0" GridPane.rowIndex="1">
-               <children>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-                     <children>
-                        <Button fx:id="btnUpdate" mnemonicParsing="false" styleClass="update" text="Update" />
-                        <Button fx:id="btnClear" mnemonicParsing="false" styleClass="clear" text="Clear" />
-                     </children>
-                  </HBox>
-               </children>
-            </VBox>
-            <VBox alignment="CENTER" fillWidth="false" prefHeight="292.0" prefWidth="598.0" spacing="10.0">
-               <children>
-                  <Label text="Name:" />
-                  <TextField fx:id="txtName" alignment="CENTER" prefHeight="42.0" prefWidth="190.0" promptText="Name" />
-                  <Label text="Email:" />
-                  <TextField fx:id="txtEmail" alignment="CENTER" prefHeight="42.0" prefWidth="190.0" promptText="Email" />
-                  <Label text="Password:" />
-                  <PasswordField fx:id="txtPassword" alignment="CENTER" prefHeight="42.0" prefWidth="190.0" promptText="Password" />
-               </children>
-               <padding>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-               </padding>
-            </VBox>
-         </children>
-      </GridPane>
-   </children>
+<AnchorPane minHeight="300.0" minWidth="500.0" prefHeight="400.0" prefWidth="600.0"
+            stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/24.0.1"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="jame.dev.controller.commons.Me">
+  <children>
+    <GridPane alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+              AnchorPane.topAnchor="0.0">
+      <columnConstraints>
+        <ColumnConstraints hgrow="ALWAYS" minWidth="150.0"/>
+      </columnConstraints>
+      <rowConstraints>
+        <RowConstraints maxHeight="340.0" minHeight="10.0" prefHeight="335.0" vgrow="ALWAYS"/>
+        <RowConstraints maxHeight="193.0" minHeight="10.0" prefHeight="63.0"/>
+      </rowConstraints>
+      <children>
+        <VBox alignment="CENTER" prefHeight="68.0" prefWidth="592.0" GridPane.rowIndex="1">
+          <children>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+              <children>
+                <Button fx:id="btnUpdate" mnemonicParsing="false" styleClass="update" text="Update"/>
+                <Button fx:id="btnClear" mnemonicParsing="false" styleClass="clear" text="Clear"/>
+              </children>
+            </HBox>
+          </children>
+        </VBox>
+        <VBox alignment="CENTER" fillWidth="false" prefHeight="292.0" prefWidth="598.0" spacing="10.0">
+          <children>
+            <Label text="Name:"/>
+            <TextField fx:id="txtName" alignment="CENTER" prefHeight="42.0" prefWidth="190.0" promptText="Name"/>
+            <Label text="Email:"/>
+            <TextField fx:id="txtEmail" alignment="CENTER" prefHeight="42.0" prefWidth="190.0" promptText="Email"/>
+            <Label text="Username:"/>
+            <TextField fx:id="txtUsername" alignment="CENTER" prefHeight="42.0" prefWidth="190.0"
+                       promptText="Username"/>
+            <Label text="Password:"/>
+            <PasswordField fx:id="txtPassword" alignment="CENTER" prefHeight="42.0" prefWidth="190.0"
+                           promptText="Password"/>
+          </children>
+          <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+          </padding>
+        </VBox>
+      </children>
+    </GridPane>
+  </children>
 </AnchorPane>
