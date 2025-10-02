@@ -1,6 +1,6 @@
 package jame.dev.controller.admin;
 
-import jame.dev.dtos.InfoUserDto;
+import jame.dev.dtos.users.InfoUserDto;
 import jame.dev.models.entitys.UserEntity;
 import jame.dev.models.enums.ERole;
 import jame.dev.repositorys.CRUDRepo;

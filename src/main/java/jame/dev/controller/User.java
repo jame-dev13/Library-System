@@ -1,9 +1,7 @@
 package jame.dev.controller;
 
-import jame.dev.dtos.SessionDto;
-import jame.dev.utils.CustomAlert;
-import jame.dev.utils.ExecutorTabLoaderUtil;
-import jame.dev.utils.SessionManager;
+import jame.dev.dtos.users.SessionDto;
+import jame.dev.utils.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,6 +17,7 @@ import javafx.stage.Stage;
 import lombok.extern.java.Log;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -42,6 +41,8 @@ public class User {
    private Button btnLogout;
 
    private static final CustomAlert ALERT = CustomAlert.getInstance();
+   private static final GlobalNotificationChange changes = GlobalNotificationChange.getInstance();
+   private static final Map<String, Integer> changesMap = changes.getChanges();
 
    /**
     * Loads the content for the user Tabs in a lazy way using {@link ExecutorTabLoaderUtil} class.
@@ -51,8 +52,12 @@ public class User {
       this.btnLogout.setOnAction(this::handleLogout);
       Thread.ofVirtual().start(() -> this.tabPane.getSelectionModel().selectedItemProperty()
               .addListener((_, _, newTab) -> {
-                 if (newTab.equals(this.tabMyLoans))
-                    ExecutorTabLoaderUtil.reLoad("/templates/userPanes/myLoans.fxml", this.tabMyLoans);
+                 if(newTab.equals(this.tabMyLoans) &&
+                         changesMap.containsKey(EGlobalNames.BOOK_CLIENT.name())){
+                    changesMap.remove(EGlobalNames.BOOK_CLIENT.name());
+                    ExecutorTabLoaderUtil
+                            .reLoad("/templates/userPanes/myLoans.fxml", this.tabMyLoans);
+                 }
               }));
 
       ExecutorTabLoaderUtil.loadTab("/templates/commons/Me.fxml", this.tabMe);

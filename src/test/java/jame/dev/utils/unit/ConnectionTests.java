@@ -6,8 +6,7 @@ import org.junit.jupiter.api.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Connection DB tests")
 public class ConnectionTests {
@@ -25,6 +24,12 @@ public class ConnectionTests {
    void tearDown() throws SQLException {
       if(this.connection != null && !this.connection.isClosed())
          this.connection.close();
+   }
+
+   @Test
+   @DisplayName("Connection reached")
+   public void connection(){
+      assertNotNull(connection, "The connection shouldn't be null.");
    }
 
    @Test

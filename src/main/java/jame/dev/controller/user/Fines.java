@@ -1,6 +1,6 @@
 package jame.dev.controller.user;
 
-import jame.dev.dtos.FineUserDto;
+import jame.dev.dtos.fines.FineUserDto;
 import jame.dev.service.FineService;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;

@@ -1,6 +1,6 @@
 package jame.dev.service;
 
-import jame.dev.dtos.FineUserDto;
+import jame.dev.dtos.fines.FineUserDto;
 import jame.dev.models.entitys.FineEntity;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.repositorys.IMultiQuery;

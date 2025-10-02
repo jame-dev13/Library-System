@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
-
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jame.dev.controller.user.Resume">
    <children>
       <VBox alignment="CENTER" layoutX="250.0" layoutY="100.0" prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <PieChart fx:id="pieChart" title="You book resume." />
+            <Label fx:id="labelMsg" />
+            <PieChart fx:id="pieChart" legendSide="LEFT" title="You book history resume." />
          </children>
       </VBox>
    </children>

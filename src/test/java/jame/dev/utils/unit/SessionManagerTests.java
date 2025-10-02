@@ -1,6 +1,6 @@
 package jame.dev.utils.unit;
 
-import jame.dev.dtos.SessionDto;
+import jame.dev.dtos.users.SessionDto;
 import jame.dev.models.enums.ERole;
 import jame.dev.utils.SessionManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +37,7 @@ public class SessionManagerTests {
    public void login(){
       SessionDto sessionDto = SessionDto.builder()
               .id(1)
-              .email("test1@example.com")
+              .username("user123")
               .role(ERole.ADMIN)
               .build();
       this.sessionManager.login(sessionDto);
@@ -51,7 +51,7 @@ public class SessionManagerTests {
       SessionDto sessionDto = SessionDto.builder()
               .id(1)
               .uuid(UUID.randomUUID())
-              .email("test1@example.com")
+              .username("user123")
               .role(ERole.ADMIN)
               .build();
       this.sessionManager.login(sessionDto);

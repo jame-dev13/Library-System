@@ -1,7 +1,7 @@
 package jame.dev.controller;
 
-import jame.dev.dtos.SessionDto;
-import jame.dev.dtos.UserDto;
+import jame.dev.dtos.users.SessionDto;
+import jame.dev.dtos.users.UserDto;
 import jame.dev.repositorys.IAuthRepo;
 import jame.dev.service.AuthService;
 import jame.dev.utils.CustomAlert;

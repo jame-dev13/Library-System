@@ -1,6 +1,6 @@
 package jame.dev.service;
 
-import jame.dev.dtos.LoanDetailsDto;
+import jame.dev.dtos.loans.LoanDetailsDto;
 import jame.dev.models.entitys.LoanEntity;
 import jame.dev.models.enums.EStatusLoan;
 import jame.dev.repositorys.CRUDRepo;

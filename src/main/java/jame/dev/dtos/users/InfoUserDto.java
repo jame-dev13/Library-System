@@ -1,4 +1,4 @@
-package jame.dev.dtos;
+package jame.dev.dtos.users;
 
 import lombok.Builder;
 import org.mindrot.jbcrypt.BCrypt;

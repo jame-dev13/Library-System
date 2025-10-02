@@ -1,7 +1,7 @@
 package jame.dev.controller.commons;
 
-import jame.dev.dtos.InfoUserDto;
-import jame.dev.dtos.SessionDto;
+import jame.dev.dtos.users.InfoUserDto;
+import jame.dev.dtos.users.SessionDto;
 import jame.dev.models.entitys.UserEntity;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.UserService;

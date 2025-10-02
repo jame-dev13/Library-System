@@ -1,4 +1,4 @@
-package jame.dev.dtos;
+package jame.dev.dtos.copies;
 
 import jame.dev.models.enums.ELanguage;
 import jame.dev.models.enums.EStatusCopy;

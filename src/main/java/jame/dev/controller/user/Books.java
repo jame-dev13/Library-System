@@ -2,7 +2,7 @@ package jame.dev.controller.user;
 
 import jame.dev.Main;
 import jame.dev.controller.user.modal.ModalBookCopies;
-import jame.dev.dtos.BooksDto;
+import jame.dev.dtos.books.BooksDto;
 import jame.dev.models.enums.EGenre;
 import jame.dev.service.BookService;
 import javafx.beans.property.SimpleIntegerProperty;

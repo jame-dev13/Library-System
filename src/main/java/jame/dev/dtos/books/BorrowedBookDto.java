@@ -1,4 +1,4 @@
-package jame.dev.dtos;
+package jame.dev.dtos.books;
 
 import jame.dev.models.enums.EGenre;
 import lombok.Builder;

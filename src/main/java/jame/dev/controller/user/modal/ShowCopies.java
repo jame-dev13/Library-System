@@ -1,6 +1,6 @@
 package jame.dev.controller.user.modal;
 
-import jame.dev.dtos.CopyDetailsDto;
+import jame.dev.dtos.copies.CopyDetailsDto;
 import jame.dev.models.entitys.LoanEntity;
 import jame.dev.models.enums.EGenre;
 import jame.dev.models.enums.ELanguage;
@@ -10,6 +10,8 @@ import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.CopyService;
 import jame.dev.service.LoanService;
 import jame.dev.utils.CustomAlert;
+import jame.dev.utils.EGlobalNames;
+import jame.dev.utils.GlobalNotificationChange;
 import jame.dev.utils.SessionManager;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -58,6 +60,9 @@ public class ShowCopies {
 
    private static List<CopyDetailsDto> copies;
    private FilteredList<CopyDetailsDto> filteredList;
+   private static final CustomAlert ALERT = CustomAlert.getInstance();
+   private static final GlobalNotificationChange changes = GlobalNotificationChange.getInstance();
+
 
    @FXML
    private void initialize() throws IOException {
@@ -109,11 +114,12 @@ public class ShowCopies {
                  .statusLoan(EStatusLoan.ON_LOAN)
                  .build();
          this.loansRepo.save(loan);
-         CustomAlert.getInstance()
+         ALERT
                  .buildAlert(Alert.AlertType.INFORMATION, "SUCCESS", "Loan Saved")
                  .show();
+         changes.registerChange(EGlobalNames.BOOK_CLIENT.name());
       } catch (NullPointerException e) {
-         CustomAlert.getInstance().buildAlert(Alert.AlertType.ERROR, "ERROR", "THE FIELDS CAN'T BE NULL")
+         ALERT.buildAlert(Alert.AlertType.ERROR, "ERROR", "THE FIELDS CAN'T BE NULL")
                  .show();
          throw new RuntimeException("There's a Null value present.", e);
       } finally {

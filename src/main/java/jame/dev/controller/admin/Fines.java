@@ -1,6 +1,6 @@
 package jame.dev.controller.admin;
 
-import jame.dev.dtos.UserRunOutLoanDto;
+import jame.dev.dtos.users.UserRunOutLoanDto;
 import jame.dev.models.entitys.FineEntity;
 import jame.dev.models.entitys.LoanEntity;
 import jame.dev.models.enums.EStatusLoan;

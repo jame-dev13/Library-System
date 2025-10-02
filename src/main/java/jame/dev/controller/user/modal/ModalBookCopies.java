@@ -1,6 +1,6 @@
 package jame.dev.controller.user.modal;
 
-import jame.dev.dtos.BooksDto;
+import jame.dev.dtos.books.BooksDto;
 import jame.dev.models.entitys.CopyEntity;
 import jame.dev.models.entitys.LoanEntity;
 import jame.dev.models.enums.ELanguage;
@@ -10,6 +10,8 @@ import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.CopyService;
 import jame.dev.service.LoanService;
 import jame.dev.utils.CustomAlert;
+import jame.dev.utils.EGlobalNames;
+import jame.dev.utils.GlobalNotificationChange;
 import jame.dev.utils.SessionManager;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -58,6 +60,8 @@ public class ModalBookCopies {
    private static List<CopyEntity> copies;
    private CopyEntity copySelected;
    private int idBook;
+   private static final CustomAlert ALERT = CustomAlert.getInstance();
+   private static final GlobalNotificationChange changes = GlobalNotificationChange.getInstance();
 
    @FXML
    private void initialize() throws IOException {
@@ -125,17 +129,19 @@ public class ModalBookCopies {
                                          .statusLoan(EStatusLoan.ON_LOAN)
                                          .build()
                          );
-                         CustomAlert.getInstance()
+                         ALERT
                                  .buildAlert(Alert.AlertType.INFORMATION, "SUCCESS", "Loan saved.")
                                  .show();
+                         changes.registerChange(EGlobalNames.BOOK_CLIENT.name());
                       },
-                      () -> CustomAlert.getInstance()
+                      () -> ALERT
                               .buildAlert(Alert.AlertType.ERROR, "ERROR", "No value present.")
                               .show());
       this.btnClear.fire();
    }
 
-   @FXML private void handleClear(ActionEvent event){
+   @FXML
+   private void handleClear(ActionEvent event) {
       this.tableCopies.getSelectionModel().clearSelection();
       this.textUuid.clear();
       this.textDateNow.clear();

@@ -1,6 +1,6 @@
 package jame.dev.controller;
 
-import jame.dev.dtos.SessionDto;
+import jame.dev.dtos.users.SessionDto;
 import jame.dev.utils.CustomAlert;
 import jame.dev.utils.ExecutorTabLoaderUtil;
 import jame.dev.utils.SessionManager;

@@ -1,12 +1,13 @@
 package jame.dev.connection;
 
 
-import io.github.cdimascio.dotenv.Dotenv;
+import jame.dev.utils.LoadDotEnvUtil;
 import lombok.extern.java.Log;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * This is a singleton class which provides methods to
@@ -17,16 +18,7 @@ import java.sql.SQLException;
 public final class ConnectionDB {
 
    private static volatile ConnectionDB instance;
-   private static final String URL;
-   private static final String USER;
-   private static final String PWD;
-
-   static {
-      Dotenv dotenv = Dotenv.load();
-      URL = dotenv.get("DB_URL");
-      USER = dotenv.get("DB_USER");
-      PWD = dotenv.get("DB_PWD");
-   }
+   Map<String, String> credentials = LoadDotEnvUtil.getInstance().getMapDB();
 
    private ConnectionDB(){}
 
@@ -47,7 +39,8 @@ public final class ConnectionDB {
     */
    public Connection getConnection() {
       try {
-         Connection con = DriverManager.getConnection(URL, USER, PWD);
+         Connection con = DriverManager.getConnection(
+                 credentials.get("URL"), credentials.get("USER"), credentials.get("PWD"));
          con.setAutoCommit(false);
          return con;
       } catch (SQLException e) {

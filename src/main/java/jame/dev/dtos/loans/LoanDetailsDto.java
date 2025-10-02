@@ -1,4 +1,4 @@
-package jame.dev.dtos;
+package jame.dev.dtos.loans;
 
 import jame.dev.models.enums.EStatusLoan;
 import lombok.Builder;

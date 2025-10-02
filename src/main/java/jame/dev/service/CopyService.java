@@ -1,6 +1,6 @@
 package jame.dev.service;
 
-import jame.dev.dtos.CopyDetailsDto;
+import jame.dev.dtos.copies.CopyDetailsDto;
 import jame.dev.models.entitys.CopyEntity;
 import jame.dev.models.enums.EGenre;
 import jame.dev.models.enums.ELanguage;

@@ -1,4 +1,4 @@
-package jame.dev.dtos;
+package jame.dev.dtos.fines;
 
 import lombok.Builder;
 

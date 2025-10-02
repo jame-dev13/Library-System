@@ -6,6 +6,7 @@ import jame.dev.models.enums.EGenre;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.BookService;
 import jame.dev.utils.CustomAlert;
+import jame.dev.utils.GlobalNotificationChange;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -86,9 +87,9 @@ public class Books {
    private UUID selectedUuid;
    private int selectedIndex;
    private static List<BookEntity> booksE;
-   private static Set<String> bookNameSet = new HashSet<>();
+   private static final Set<String> bookNameSet = new HashSet<>();
    private static final CustomAlert alert = CustomAlert.getInstance();
-
+   private static final GlobalNotificationChange changes = GlobalNotificationChange.getInstance();
    @FXML
    private void initialize() throws IOException {
       //Service
@@ -205,6 +206,7 @@ public class Books {
             alert.buildAlert(Alert.AlertType.INFORMATION,
                     "SUCCESS",
                     "Book added!").show();
+            changes.registerChange(getClass().getName());
          } else {
             alert.buildAlert(Alert.AlertType.WARNING, "WARNING", "Can't duplicate books").show();
          }
@@ -245,6 +247,7 @@ public class Books {
                                             "UPDATED",
                                             String.format("Book: [%s] Updated!", book.getTitle()))
                                     .show();
+                            changes.registerChange(getClass().getName());
                          },
                          () -> alert.buildAlert(Alert.AlertType.ERROR,
                                          "ERROR",
@@ -274,6 +277,7 @@ public class Books {
                        this.tableBooks.getItems().remove(selectedIndex);
                        BookEntity bookEntity = booksE.remove(selectedIndex);
                        bookNameSet.remove(bookEntity.getTitle());
+                       changes.registerChange(getClass().getName());
                     }
                  });
       });
