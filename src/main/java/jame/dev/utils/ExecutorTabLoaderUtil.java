@@ -26,7 +26,7 @@ public final class ExecutorTabLoaderUtil {
             Parent root = FXMLLoader.load(url);
             Platform.runLater(() -> tab.setContent(root));
          } catch (IOException e) {
-            log.severe("Error loading the resource: " + e.getLocalizedMessage());
+            e.printStackTrace();
             Platform.runLater(() -> tab.setContent(new Label("Error loading UI")));
          }
       });

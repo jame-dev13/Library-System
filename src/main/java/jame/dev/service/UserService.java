@@ -35,8 +35,8 @@ public final class UserService implements CRUDRepo<UserEntity> {
    @Override
    public void save(UserEntity user) {
       String sql = """
-              INSERT INTO users (uuid, name, email,username, password, role, token, verified)
-              VALUES (?,?,?,?,?,?,?)
+              INSERT INTO users (uuid, name, email, username, password, role, token, verified)
+              VALUES (?,?,?,?,?,?,?,?)
               """;
       Object[] params = {
               user.getUuid().toString(), user.getName(), user.getEmail(),

@@ -1,5 +1,6 @@
 package jame.dev.controller.admin;
 
+import jame.dev.dtos.UserRunOutLoanDto;
 import jame.dev.models.entitys.FineEntity;
 import jame.dev.models.entitys.LoanEntity;
 import jame.dev.models.enums.EStatusLoan;
@@ -7,6 +8,8 @@ import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.FineService;
 import jame.dev.service.LoanService;
 import jame.dev.utils.CustomAlert;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -19,12 +22,10 @@ import lombok.extern.java.Log;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Log
 public class Fines {
@@ -58,7 +59,7 @@ public class Fines {
    @FXML
    private TableView<FineEntity> tableFines;
    @FXML
-   private TableView<LoanEntity> tableStateUser;
+   private TableView<UserRunOutLoanDto> tableStateUser;
 
    //columns table 'fines'
    @FXML
@@ -72,16 +73,14 @@ public class Fines {
 
    //columns table 'state users'
    @FXML
-   private TableColumn<LoanEntity, Integer> colId;
+   private TableColumn<UserRunOutLoanDto, Integer> colId;
    @FXML
-   private TableColumn<LoanEntity, EStatusLoan> colStatus;
+   private TableColumn<UserRunOutLoanDto, EStatusLoan> colStatus;
 
    //repositories
    private CRUDRepo<FineEntity> fineRepo;
-   private CRUDRepo<LoanEntity> loanRepo;
    //local list
    private static List<FineEntity> fines;
-   private static List<LoanEntity> loans;
    //aux
    private UUID uuidSelected;
    private int indexSelected;
@@ -97,10 +96,8 @@ public class Fines {
    private void initialize() throws IOException {
       //services
       this.fineRepo = new FineService();
-      this.loanRepo = new LoanService();
       //global List
       fines = this.fineRepo.getAll();
-      loans = this.loanRepo.getAll();
       //table Fines
       tableFinesConfig();
       tableStateLoanConfig();
@@ -172,11 +169,20 @@ public class Fines {
    @FXML
    private void tableStateLoanConfig() {
       //columns
-      this.colId.setCellValueFactory(new PropertyValueFactory<>("idUser"));
-      this.colStatus.setCellValueFactory(new PropertyValueFactory<>("statusLoan"));
+      this.colId.setCellValueFactory(data ->
+              new SimpleIntegerProperty(data.getValue().idUser()).asObject());
+      this.colStatus.setCellValueFactory(data ->
+              new SimpleObjectProperty<>(data.getValue().status()));
       //data
-      ObservableList<LoanEntity> observableList = FXCollections.observableArrayList(
-              loans.stream().sorted(Comparator.comparing(LoanEntity::getIdUser)).distinct().collect(Collectors.toList()));
+      List<UserRunOutLoanDto> runOutList = new LoanService().getAll()
+              .stream()
+              .map(l -> UserRunOutLoanDto.builder()
+                      .idUser(l.getIdUser())
+                      .status(l.getStatusLoan())
+                      .build())
+              .distinct()
+              .toList();
+      ObservableList<UserRunOutLoanDto> observableList = FXCollections.observableArrayList(runOutList);
       this.tableStateUser.setItems(observableList);
       //Selection
       this.tableStateUser.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -184,7 +190,7 @@ public class Fines {
       this.tableStateUser.setOnMouseClicked(_ ->
               Optional.ofNullable(this.tableStateUser.getSelectionModel().getSelectedItem())
                       .ifPresent(selection ->
-                              this.txtIdUser.setText(String.valueOf(selection.getIdUser()))
+                              this.txtIdUser.setText(String.valueOf(selection.idUser()))
                       ));
    }
 
@@ -267,7 +273,7 @@ public class Fines {
       } catch (NullPointerException e) {
          alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Fields Can´t contain null or empty values.")
                  .show();
-         throw new RuntimeException(e);
+         log.severe(e.toString());
       } finally {
          this.btnClear.fire();
       }

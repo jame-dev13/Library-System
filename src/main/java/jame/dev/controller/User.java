@@ -33,13 +33,13 @@ public class User {
    @FXML
    private Tab tabResume;
    @FXML
-   private Button btnLogout;
-   @FXML
    private Tab tabFines;
    @FXML
    private Tab tabBooks;
    @FXML
    private Tab tabMe;
+   @FXML
+   private Button btnLogout;
 
    private static final CustomAlert ALERT = CustomAlert.getInstance();
 

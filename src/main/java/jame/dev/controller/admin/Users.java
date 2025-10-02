@@ -30,9 +30,6 @@ import java.util.stream.Collectors;
 public class Users {
 
    @FXML
-   private ToggleButton togUuid, togName, togEmail, togRole;
-
-   @FXML
    private TextField txtName, txtSearch, txtEmail, txtUsername;
 
    @FXML
@@ -135,11 +132,6 @@ public class Users {
       txtSearch.setText("");
       //selections
       this.tableAdmins.getSelectionModel().clearSelection();
-      //toggle buttons
-      this.togUuid.setSelected(false);
-      this.togName.setSelected(false);
-      this.togEmail.setSelected(false);
-      this.togRole.setSelected(false);
 
       //reset globals
       this.uuidSelected = null;
@@ -212,12 +204,12 @@ public class Users {
          return;
       }
       alert.buildAlert(Alert.AlertType.WARNING, "DELETE",
-                      "¿Do you want delete this fine?")
+                      "¿Do you want delete this user?")
               .showAndWait()
               .ifPresent(confirmation -> {
                  if (confirmation == ButtonType.OK) {
                     this.repo.deleteByUuid(this.uuidSelected);
-                    this.tableAdmins.refresh();
+                    this.tableAdmins.getItems().remove(this.index);
                     this.users.remove(this.index);
                  }
               });
