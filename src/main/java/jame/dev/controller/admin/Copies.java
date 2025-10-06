@@ -7,16 +7,20 @@ import jame.dev.models.enums.EStatusCopy;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.CopyService;
 import jame.dev.utils.CustomAlert;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import lombok.extern.java.Log;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +34,7 @@ public class Copies {
    @FXML private TableColumn<CopyEntity, UUID> colUuid;
    @FXML private TableColumn<CopyEntity, Integer> colIdBook;
    @FXML private TableColumn<CopyEntity, Integer> colCopyNum;
+   @FXML private TableColumn<CopyEntity, String> colBorrowed;
    @FXML private TableColumn<CopyEntity, EStatusCopy> colStatus;
    @FXML private TableColumn<CopyEntity, ELanguage> colLanguage;
    @FXML private TextField txtIdBook;
@@ -46,11 +51,6 @@ public class Copies {
    private int indexSelected;
    private static final CustomAlert alert = CustomAlert.getInstance();
 
-   /**
-    * Initializes components, global data and listeners, everything of that type
-    * must be in this method.
-    * @throws IOException an Exception if the loader fails.
-    */
    @FXML private void initialize() throws IOException {
       this.repo = new CopyService();
       //fields
@@ -65,11 +65,18 @@ public class Copies {
 
    @FXML private void configTable(){
       //columns
-      this.colUuid.setCellValueFactory(new PropertyValueFactory<>("uuid"));
-      this.colIdBook.setCellValueFactory(new PropertyValueFactory<>("idBook"));
-      this.colCopyNum.setCellValueFactory(new PropertyValueFactory<>("copyNum"));
-      this.colStatus.setCellValueFactory(new PropertyValueFactory<>("statusCopy"));
-      this.colLanguage.setCellValueFactory(new PropertyValueFactory<>("language"));
+      this.colUuid.setCellValueFactory(data ->
+              new SimpleObjectProperty<>(data.getValue().getUuid()));
+      this.colIdBook.setCellValueFactory(data ->
+              new SimpleIntegerProperty(data.getValue().getIdBook()).asObject());
+      this.colCopyNum.setCellValueFactory(data ->
+              new SimpleIntegerProperty(data.getValue().getCopyNum()).asObject());
+      this.colBorrowed.setCellValueFactory(data ->
+              new SimpleStringProperty(data.getValue().getBorrowed() ? "YES": "NO"));
+      this.colStatus.setCellValueFactory(data ->
+              new SimpleObjectProperty<>(data.getValue().getStatusCopy()));
+      this.colLanguage.setCellValueFactory(data ->
+              new SimpleObjectProperty<>(data.getValue().getLanguage()));
 
       //selection
       this.tableCopies.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -132,6 +139,7 @@ public class Copies {
                  .uuid(UUID.randomUUID())
                  .idBook(Integer.parseInt(txtIdBook.getText().trim()))
                  .copyNum(Integer.parseInt(txtCopyNum.getText().trim()))
+                 .borrowed(false)
                  .statusCopy(boxStatus.getSelectionModel().getSelectedItem())
                  .language(boxLanguage.getSelectionModel().getSelectedItem())
                  .build();

@@ -1,14 +1,17 @@
 package jame.dev.controller.user.modal;
 
 import jame.dev.dtos.copies.CopyDetailsDto;
+import jame.dev.models.entitys.CopyEntity;
 import jame.dev.models.entitys.LoanEntity;
 import jame.dev.models.enums.EGenre;
 import jame.dev.models.enums.ELanguage;
 import jame.dev.models.enums.EStatusCopy;
 import jame.dev.models.enums.EStatusLoan;
 import jame.dev.repositorys.CRUDRepo;
+import jame.dev.repositorys.Joinable;
 import jame.dev.service.CopyService;
 import jame.dev.service.LoanService;
+import jame.dev.service.joins.CopyDetailsService;
 import jame.dev.utils.*;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -58,15 +61,17 @@ public class ShowCopies {
    private CRUDRepo<LoanEntity> loansRepo;
 
    private static List<CopyDetailsDto> copies;
+   private static final Joinable<CopyDetailsDto> COPY_INFO = new CopyDetailsService();
+   private static final CRUDRepo<CopyEntity> REPO_COPIES = new CopyService();
    private FilteredList<CopyDetailsDto> filteredList;
    private static final CustomAlert ALERT = CustomAlert.getInstance();
    private static final GlobalNotificationChange changes = GlobalNotificationChange.getInstance();
-
+   private int indexSelected;
 
    @FXML
    private void initialize() throws IOException {
       this.loansRepo = new LoanService();
-      copies = new CopyService().getJoins();
+      copies = COPY_INFO.getJoins();
       tableConfig();
       this.btnLoan.setOnAction(this::handleLoan);
       this.btnClear.setOnAction(this::handleClear);
@@ -96,6 +101,7 @@ public class ShowCopies {
                          txtIdCopy.setText(String.valueOf(copy.idCopy()));
                          txtDateNow.setText(LocalDate.now().toString());
                          this.btnLoan.setDisable(false);
+                         this.indexSelected = this.tableCopies.getSelectionModel().getSelectedIndex();
                       })
       );
       filteredList = new FilteredList<>(this.tableCopies.getItems(), p -> true);
@@ -118,9 +124,17 @@ public class ShowCopies {
             return;
          }
          this.loansRepo.save(loan);
+         REPO_COPIES.findByUuid(this.tableCopies.getSelectionModel().getSelectedItem().uuid())
+                         .ifPresent(copy -> {
+                            copy.setBorrowed(true);
+                            REPO_COPIES.update(copy);
+                         });
+         this.tableCopies.getItems().remove(indexSelected);
+         copies.remove(indexSelected);
          ALERT.buildAlert(Alert.AlertType.INFORMATION, "SUCCESS", "Loan Saved")
                  .show();
-         changes.registerChange(EGlobalNames.BOOK_CLIENT.name());
+         changes.registerChange(EGlobalNames.LOAN_CLIENT.name());
+         changes.registerChange(EGlobalNames.HISTORY.name());
       } catch (NullPointerException e) {
          ALERT.buildAlert(Alert.AlertType.ERROR, "ERROR", "THE FIELDS CAN'T BE NULL")
                  .show();
@@ -138,6 +152,7 @@ public class ShowCopies {
       this.txtDays.clear();
       this.txtFilter.clear();
       this.tableCopies.getSelectionModel().clearSelection();
+      this.indexSelected = -1;
    }
 
    @FXML

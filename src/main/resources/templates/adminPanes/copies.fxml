@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
@@ -10,12 +9,12 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="500.0" maxWidth="650.0" minHeight="450.0" minWidth="600.0" prefHeight="450.0" prefWidth="600.0" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jame.dev.controller.admin.Copies">
+<AnchorPane maxHeight="508.0" maxWidth="732.0" minHeight="450.0" minWidth="600.0" prefHeight="508.0" prefWidth="732.0" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jame.dev.controller.admin.Copies">
    <children>
-      <SplitPane dividerPositions="0.6" prefHeight="439.0" prefWidth="658.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <SplitPane dividerPositions="0.6813186813186813" prefHeight="439.0" prefWidth="658.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
@@ -28,6 +27,7 @@
                                   <TableColumn fx:id="colUuid" prefWidth="75.0" text="UUID" />
                                   <TableColumn fx:id="colIdBook" prefWidth="75.0" text="ID_BOOK" />
                                   <TableColumn fx:id="colCopyNum" prefWidth="86.0" text="COPY_NUM" />
+                                    <TableColumn fx:id="colBorrowed" prefWidth="75.0" text="BORROWED" />
                                   <TableColumn fx:id="colStatus" prefWidth="54.0" text="STATUS" />
                                     <TableColumn fx:id="colLanguage" prefWidth="75.0" text="LANGUAGE" />
                                 </columns>
@@ -41,35 +41,32 @@
                   </VBox>
                </children>
             </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+          <AnchorPane minHeight="0.0" minWidth="200.0" prefHeight="160.0" prefWidth="100.0">
                <children>
-                  <HBox alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                        <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="200.0" vgap="10.0" VBox.vgrow="ALWAYS">
                            <children>
                               <Label text="Id_Book:" />
                               <TextField fx:id="txtIdBook" alignment="CENTER" disable="true" prefHeight="42.0" prefWidth="184.0" promptText="ID_BOOK" />
                               <Label text="Copy_Num:" />
-                              <TextField fx:id="txtCopyNum" promptText="COPY_NUM" disable="true"/>
+                              <TextField fx:id="txtCopyNum" disable="true" promptText="COPY_NUM" />
                               <Label text="Status:" />
                               <ComboBox fx:id="boxStatus" prefWidth="150.0" promptText="STATUS" />
                               <Label text="Language:" />
                               <ComboBox fx:id="boxLanguage" prefWidth="150.0" promptText="LANGUAGE" />
                            </children>
-                           <padding>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </padding>
-                        </VBox>
-                        <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+                        </FlowPane>
+                        <FlowPane alignment="CENTER" hgap="20.0" prefHeight="200.0" prefWidth="200.0" vgap="20.0">
                            <children>
-                              <Button styleClass="clear" fx:id="btnClear" mnemonicParsing="false" text="Clear"  />
-                              <Button styleClass="save" fx:id="btnSave" mnemonicParsing="false" text="Save" />
-                              <Button styleClass="update" fx:id="btnUpdate" disable="true" mnemonicParsing="false" text="Update" />
-                              <Button styleClass="delete" fx:id="btnDelete" disable="true" mnemonicParsing="false" text="Delete" />
+                              <Button fx:id="btnClear" mnemonicParsing="false" styleClass="clear" text="Clear" />
+                              <Button fx:id="btnSave" mnemonicParsing="false" styleClass="save" text="Save" />
+                              <Button fx:id="btnUpdate" disable="true" mnemonicParsing="false" styleClass="update" text="Update" />
+                              <Button fx:id="btnDelete" disable="true" mnemonicParsing="false" styleClass="delete" text="Delete" />
                            </children>
-                        </VBox>
+                        </FlowPane>
                      </children>
-                  </HBox>
+                  </VBox>
                </children>
             </AnchorPane>
         </items>

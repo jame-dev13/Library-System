@@ -1,12 +1,9 @@
 package jame.dev.service;
 
-import jame.dev.dtos.copies.CopyDetailsDto;
 import jame.dev.models.entitys.CopyEntity;
-import jame.dev.models.enums.EGenre;
 import jame.dev.models.enums.ELanguage;
 import jame.dev.models.enums.EStatusCopy;
 import jame.dev.repositorys.CRUDRepo;
-import jame.dev.repositorys.Joinable;
 import jame.dev.utils.DMLActions;
 import jame.dev.utils.DQLActions;
 
@@ -15,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public final class CopyService implements CRUDRepo<CopyEntity>, Joinable<CopyDetailsDto> {
+public final class CopyService implements CRUDRepo<CopyEntity> {
 
    @Override
    public List<CopyEntity> getAll() {
@@ -28,8 +25,9 @@ public final class CopyService implements CRUDRepo<CopyEntity>, Joinable<CopyDet
                       .uuid(UUID.fromString(rs.getString(2)))
                       .idBook(rs.getInt(3))
                       .copyNum(rs.getInt(4))
-                      .statusCopy(EStatusCopy.valueOf(rs.getString(5)))
-                      .language(ELanguage.valueOf(rs.getString(6)))
+                      .borrowed(rs.getBoolean(5))
+                      .statusCopy(EStatusCopy.valueOf(rs.getString(6)))
+                      .language(ELanguage.valueOf(rs.getString(7)))
                       .build()
       );
    }
@@ -66,8 +64,9 @@ public final class CopyService implements CRUDRepo<CopyEntity>, Joinable<CopyDet
                               .uuid(UUID.fromString(rs.getString(2)))
                               .idBook(rs.getInt(3))
                               .copyNum(rs.getInt(4))
-                              .statusCopy(EStatusCopy.valueOf(rs.getString(5)))
-                              .language(ELanguage.valueOf(rs.getString(6)))
+                              .borrowed(rs.getBoolean(5))
+                              .statusCopy(EStatusCopy.valueOf(rs.getString(6)))
+                              .language(ELanguage.valueOf(rs.getString(7)))
                               .build()
               , uuid.toString());
       return Optional.ofNullable(result.getFirst());
@@ -76,11 +75,14 @@ public final class CopyService implements CRUDRepo<CopyEntity>, Joinable<CopyDet
    @Override
    public void update(CopyEntity t) {
       String sql = """
-              UPDATE copies SET status = ?, language = ? WHERE uuid = ?
+              UPDATE copies SET borrowed = ?, status = ?, language = ? WHERE uuid = ?
               """;
       try {
          Object[] params = {
-                 t.getStatusCopy().name(), t.getLanguage().name(), t.getUuid().toString()
+                 t.getBorrowed(),
+                 t.getStatusCopy().name(),
+                 t.getLanguage().name(),
+                 t.getUuid().toString()
          };
          DMLActions.update(sql, params);
       } catch (SQLException e) {
@@ -96,27 +98,5 @@ public final class CopyService implements CRUDRepo<CopyEntity>, Joinable<CopyDet
       } catch (SQLException e) {
          throw new RuntimeException(e);
       }
-   }
-
-   @Override
-   public List<CopyDetailsDto> getJoins() {
-      String sql = """
-              SELECT c.id AS ID, c.copy_num AS COPY_N,
-              b.title AS TITLE, b.genre AS GENRE,
-              c.status AS STATUS, c.language AS LANGUAGE
-              FROM copies c INNER JOIN
-              books b ON b.id = c.id_book
-              WHERE c.copy_num > 1
-              """;
-      return DQLActions.select(sql, rs ->
-              CopyDetailsDto.builder()
-                      .idCopy(rs.getInt("ID"))
-                      .copyNum(rs.getInt("COPY_N"))
-                      .bookName(rs.getString("TITLE"))
-                      .genre(EGenre.valueOf(rs.getString("GENRE")))
-                      .status(EStatusCopy.valueOf(rs.getString("STATUS")))
-                      .language(ELanguage.valueOf(rs.getString("LANGUAGE")))
-                      .build()
-      );
    }
 }

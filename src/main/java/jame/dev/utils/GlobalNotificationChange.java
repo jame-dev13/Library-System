@@ -19,6 +19,6 @@ public class GlobalNotificationChange {
    }
 
    public void registerChange(String classNameChange){
-      changes.put(classNameChange, changes.getOrDefault(classNameChange, 0) + 1);
+      changes.put(classNameChange, changes.getOrDefault(classNameChange, 1) + 1);
    }
 }

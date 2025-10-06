@@ -12,6 +12,7 @@ import jame.dev.service.LoanService;
 import jame.dev.utils.*;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -41,6 +42,8 @@ public class ModalBookCopies {
    private TableColumn<CopyEntity, UUID> colUuid;
    @FXML
    private TableColumn<CopyEntity, Integer> colCopyNum;
+   @FXML
+   private TableColumn<CopyEntity, String> colBorrowed;
    @FXML
    private TableColumn<CopyEntity, EStatusCopy> colStatus;
    @FXML
@@ -76,12 +79,12 @@ public class ModalBookCopies {
       this.textDateNow.setText(LocalDate.now().toString());
       //data
       Optional.ofNullable(this.copyRepo.getAll())
-              .ifPresent(copyEntities -> {
+              .ifPresent(copyEntities ->
                  copies = copyEntities.stream()
                          .filter(copy ->
-                                 copy.getIdBook() == this.idBook && copy.getCopyNum() > 1)
-                         .toList();
-              });
+                                 (copy.getIdBook() == this.idBook && copy.getCopyNum() > 1) && (!copy.getBorrowed()))
+                         .toList()
+              );
       tableConfig();
    }
 
@@ -92,6 +95,8 @@ public class ModalBookCopies {
               new SimpleObjectProperty<>(copy.getValue().getUuid()));
       colCopyNum.setCellValueFactory(copy ->
               new SimpleIntegerProperty(copy.getValue().getCopyNum()).asObject());
+      colBorrowed.setCellValueFactory(data ->
+              new SimpleStringProperty(data.getValue().getBorrowed() ? "YES": "NO"));
       colStatus.setCellValueFactory(copy ->
               new SimpleObjectProperty<>(copy.getValue().getStatusCopy()));
       colLang.setCellValueFactory(copy ->
@@ -108,6 +113,7 @@ public class ModalBookCopies {
                          this.copySelected = c;
                          this.textUuid.setText(copySelected.getUuid().toString());
                          this.textDateNow.setText(LocalDate.now().toString());
+                         this.btnLoan.setDisable(false);
                       })
       );
    }
@@ -130,10 +136,13 @@ public class ModalBookCopies {
                             return;
                          }
                          this.loanRepo.save(loan);
+                         copy.setBorrowed(true);
+                         this.copyRepo.update(copy);
                          ALERT
                                  .buildAlert(Alert.AlertType.INFORMATION, "SUCCESS", "Loan saved.")
                                  .show();
-                         changes.registerChange(EGlobalNames.BOOK_CLIENT.name());
+                         changes.registerChange(EGlobalNames.LOAN_CLIENT.name());
+                         changes.registerChange(EGlobalNames.HISTORY.name());
                       },
                       () -> ALERT
                               .buildAlert(Alert.AlertType.ERROR, "ERROR", "No value present.")
@@ -148,5 +157,6 @@ public class ModalBookCopies {
       this.textDateNow.clear();
       this.textDaysLoan.clear();
       this.copySelected = null;
+      this.btnLoan.setDisable(true);
    }
 }

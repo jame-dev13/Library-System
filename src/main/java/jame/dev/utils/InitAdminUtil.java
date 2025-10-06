@@ -6,14 +6,16 @@ import jame.dev.models.enums.ERole;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.UserService;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 public class InitAdminUtil {
-   private static final Set<UserEntity> SET = new HashSet<>();
    private static final CRUDRepo<UserEntity> REPO = new UserService();
-   public static void init(){
+   private static final String SQL = """
+           SELECT username FROM users
+           WHERE username = ?
+           """;
+
+   public static void init() {
       InfoUserDto userDto = InfoUserDto.builder()
               .name("admin")
               .email("admin@mail.com")
@@ -30,6 +32,11 @@ public class InitAdminUtil {
               .token(TokenGenerator.genToken())
               .verified(true)
               .build();
-      if(SET.add(userEntity)) REPO.save(userEntity);
+      var coincidences = DQLActions.selectWhere(SQL,
+              rs -> rs.getString("username"),
+              userEntity.getUsername());
+      if(!coincidences.isEmpty())
+         return;
+      REPO.save(userEntity);
    }
 }

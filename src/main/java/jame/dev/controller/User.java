@@ -51,11 +51,22 @@ public class User {
       this.btnLogout.setOnAction(this::handleLogout);
       Thread.ofVirtual().start(() -> this.tabPane.getSelectionModel().selectedItemProperty()
               .addListener((_, _, newTab) -> {
-                 if (newTab.equals(this.tabMyLoans) &&
-                         changes.containsKey(EGlobalNames.BOOK_CLIENT.name())) {
-                    changes.remove(EGlobalNames.BOOK_CLIENT.name());
+                 if (newTab.equals(this.tabMyLoans) && changes.containsKey(EGlobalNames.LOAN_CLIENT.name())) {
+                    System.out.println("Before");
+                    System.out.println(changes);
+                    changes.remove(EGlobalNames.LOAN_CLIENT.name());
                     ExecutorTabLoaderUtil
                             .reLoad("/templates/userPanes/myLoans.fxml", this.tabMyLoans);
+                    System.out.println("After");
+                    System.out.println(changes);
+                 }
+                 if (newTab.equals(this.tabResume) && (changes.containsKey(EGlobalNames.HISTORY.name()))) {
+                    System.out.println("Before");
+                    System.out.println(changes);
+                    changes.remove(EGlobalNames.HISTORY.name());
+                    ExecutorTabLoaderUtil.reLoad("/templates/userPanes/resume.fxml", this.tabResume);
+                    System.out.println("After");
+                    System.out.println(changes);
                  }
               }));
 
