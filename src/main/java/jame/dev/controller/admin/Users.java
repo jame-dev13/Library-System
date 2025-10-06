@@ -1,5 +1,6 @@
 package jame.dev.controller.admin;
 
+import jame.dev.dtos.users.AdminDto;
 import jame.dev.dtos.users.InfoUserDto;
 import jame.dev.models.entitys.UserEntity;
 import jame.dev.models.enums.ERole;
@@ -36,17 +37,17 @@ public class Users {
    private PasswordField txtPassword;
 
    @FXML
-   private TableView<UserEntity> tableAdmins;
+   private TableView<AdminDto> tableAdmins;
    @FXML
-   private TableColumn<UserEntity, UUID> colUuid;
+   private TableColumn<AdminDto, UUID> colUuid;
    @FXML
-   private TableColumn<UserEntity, String> colName;
+   private TableColumn<AdminDto, String> colName;
    @FXML
-   private TableColumn<UserEntity, String> colEmail;
+   private TableColumn<AdminDto, String> colEmail;
    @FXML
-   private TableColumn<UserEntity, String> colUsername;
+   private TableColumn<AdminDto, String> colUsername;
    @FXML
-   private TableColumn<UserEntity, String> colRole;
+   private TableColumn<AdminDto, String> colRole;
 
    @FXML
    private Button btnSave, btnClear, btnDrop;
@@ -54,7 +55,7 @@ public class Users {
 
    private CRUDRepo<UserEntity> repo;
 
-   private List<UserEntity> users;
+   private List<AdminDto> users;
 
    private UUID uuidSelected;
    private int index;
@@ -70,7 +71,18 @@ public class Users {
       //repository
       this.repo = new UserService();
       //data
-      this.users = this.repo.getAll();
+      this.users = this.repo.getAll().stream()
+              .filter(u -> u.getRole() == ERole.ADMIN &&
+                      u.getId().intValue() != SessionManager.getInstance().getSessionDto().id())
+              .map(u -> AdminDto.builder()
+                      .id(u.getId())
+                      .uuid(u.getUuid())
+                      .name(u.getName())
+                      .email(u.getEmail())
+                      .username(u.getUsername())
+                      .role(u.getRole())
+                      .build())
+              .collect(Collectors.toList());
       //table config
       initTable();
 
@@ -79,7 +91,7 @@ public class Users {
       this.btnSave.setOnAction(this::handleSave);
       this.btnDrop.setOnAction(this::handleDelete);
       //filter listener
-      FilteredList<UserEntity> filteredData =
+      FilteredList<AdminDto> filteredData =
               new FilteredList<>(this.tableAdmins.getItems(), p -> true);
       this.txtSearch.setOnKeyTyped(key -> this.handleFilter(key, filteredData));
    }
@@ -91,29 +103,28 @@ public class Users {
    @FXML
    private void initTable() {
       //columns
-      this.colUuid.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getUuid()));
-      this.colName.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
-      this.colEmail.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getEmail()));
-      this.colUsername.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getUsername()));
+      this.colUuid.setCellValueFactory(data ->
+              new SimpleObjectProperty<>(data.getValue().uuid()));
+      this.colName.setCellValueFactory(data ->
+              new SimpleStringProperty(data.getValue().name()));
+      this.colEmail.setCellValueFactory(data ->
+              new SimpleStringProperty(data.getValue().email()));
+      this.colUsername.setCellValueFactory(data ->
+              new SimpleStringProperty(data.getValue().username()));
       this.colRole.setCellValueFactory(data ->
-              new SimpleStringProperty(data.getValue().getRole().name()));
+              new SimpleStringProperty(data.getValue().role().name()));
       //selection
       this.tableAdmins.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
       //set data
-      ObservableList<UserEntity> users = FXCollections.observableArrayList(
-              this.users.stream()
-                      .filter(u ->
-                              u.getRole() == ERole.ADMIN &&
-                                      u.getId().intValue() != SessionManager.getInstance().getSessionDto().id())
-                      .collect(Collectors.toList())
-      );
-      tableAdmins.setItems(users);
+
+      ObservableList<AdminDto> observable = FXCollections.observableArrayList(users);
+      tableAdmins.setItems(observable);
 
       //listener
       this.tableAdmins.setOnMouseClicked(_ ->
               Optional.ofNullable(this.tableAdmins.getSelectionModel().getSelectedItem())
                       .ifPresent(selected -> {
-                         this.uuidSelected = selected.getUuid();
+                         this.uuidSelected = selected.uuid();
                          this.index = this.tableAdmins.getSelectionModel().getSelectedIndex();
                       })
       );
@@ -164,7 +175,8 @@ public class Users {
               .build();
       //check if it's a duplicate username in the table
       boolean isDuplicateEntryIn = this.users.stream()
-              .anyMatch(u -> u.getEmail().equals(user.getEmail()) || u.getUsername().equals(user.getUsername()));
+              .anyMatch(u -> u.email().equals(user.getEmail()) ||
+                      u.username().equals(user.getUsername()));
 
       if (isDuplicateEntryIn) {
          alert.buildAlert(Alert.AlertType.WARNING, "WARNING", "Entry duplicated! Check Email or Username values.")
@@ -174,8 +186,16 @@ public class Users {
       }
       //add the new user
       this.repo.save(user);
-      this.users.add(user);
-      this.tableAdmins.getItems().add(user);
+      AdminDto admin = AdminDto.builder()
+              .id(null)
+              .uuid(user.getUuid())
+              .name(user.getName())
+              .email(user.getEmail())
+              .username(user.getUsername())
+              .role(user.getRole())
+              .build();
+      this.users.add(admin);
+      this.tableAdmins.getItems().add(admin);
 
       //send username with his credentials
       Runnable r = () -> EmailSender.mailToWPassword(user.getEmail(), txtPassword.getText());
@@ -196,7 +216,8 @@ public class Users {
    @FXML
    private void handleDelete(ActionEvent e) {
       String usernameSession = SessionManager.getInstance().getSessionDto().username();
-      String usernameSelected = this.tableAdmins.getSelectionModel().getSelectedItem().getEmail();
+      String usernameSelected = this.tableAdmins.getSelectionModel()
+              .getSelectedItem().email();
       if (usernameSession.equals(usernameSelected)) {
          alert.buildAlert(Alert.AlertType.WARNING, "WARNING", "You can´t delete you here.")
                  .show();
@@ -226,16 +247,16 @@ public class Users {
     *                                  of the enum {@link ERole}
     */
    @FXML
-   private void handleFilter(KeyEvent key, FilteredList<UserEntity> filteredList) {
+   private void handleFilter(KeyEvent key, FilteredList<AdminDto> filteredList) {
       String text = txtSearch.getText().trim();
       try {
          filteredList.setPredicate(user -> {
             if (text.isEmpty()) return true;
-            return user.getUuid().toString().contains(text) ||
-                    user.getName().contains(text) ||
-                    user.getEmail().contains(text) ||
-                    user.getUsername().contains(text) ||
-                    user.getRole() == ERole.valueOf(text.toUpperCase());
+            return user.uuid().toString().contains(text) ||
+                    user.name().contains(text) ||
+                    user.email().contains(text) ||
+                    user.username().contains(text) ||
+                    user.role() == ERole.valueOf(text.toUpperCase());
          });
          this.tableAdmins.setItems(filteredList);
       } catch (IllegalArgumentException e) {

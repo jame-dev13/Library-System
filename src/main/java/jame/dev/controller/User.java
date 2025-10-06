@@ -52,24 +52,16 @@ public class User {
       Thread.ofVirtual().start(() -> this.tabPane.getSelectionModel().selectedItemProperty()
               .addListener((_, _, newTab) -> {
                  if (newTab.equals(this.tabMyLoans) && changes.containsKey(EGlobalNames.LOAN_CLIENT.name())) {
-                    System.out.println("Before");
-                    System.out.println(changes);
                     changes.remove(EGlobalNames.LOAN_CLIENT.name());
                     ExecutorTabLoaderUtil
                             .reLoad("/templates/userPanes/myLoans.fxml", this.tabMyLoans);
-                    System.out.println("After");
-                    System.out.println(changes);
                  }
                  if (newTab.equals(this.tabResume) && (changes.containsKey(EGlobalNames.HISTORY.name()))) {
-                    System.out.println("Before");
-                    System.out.println(changes);
                     changes.remove(EGlobalNames.HISTORY.name());
-                    ExecutorTabLoaderUtil.reLoad("/templates/userPanes/resume.fxml", this.tabResume);
-                    System.out.println("After");
-                    System.out.println(changes);
+                    ExecutorTabLoaderUtil
+                            .reLoad("/templates/userPanes/resume.fxml", this.tabResume);
                  }
               }));
-
       ExecutorTabLoaderUtil.loadTab("/templates/commons/Me.fxml", this.tabMe);
       ExecutorTabLoaderUtil.loadTab("/templates/userPanes/books.fxml", this.tabBooks);
       ExecutorTabLoaderUtil.loadTab("/templates/userPanes/fines.fxml", this.tabFines);

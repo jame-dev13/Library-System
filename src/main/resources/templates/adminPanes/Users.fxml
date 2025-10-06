@@ -11,6 +11,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -29,22 +30,30 @@
                   </padding>
             
                         <!-- Formulario de datos -->
-                  <VBox alignment="CENTER" minWidth="240.0" prefWidth="250" spacing="10">
-                    <Label text="Name:" />
-                    <TextField fx:id="txtName" alignment="CENTER" />
-                    <Label text="Email:" />
-                    <TextField fx:id="txtEmail" alignment="CENTER" />
-                    <Label text="Username:" />
-                    <TextField fx:id="txtUsername" alignment="CENTER" />
-                    <Label text="Password:" />
-                    <PasswordField fx:id="txtPassword" alignment="CENTER" />
+                  <VBox alignment="CENTER" minWidth="240.0" prefWidth="250">
+                        <FlowPane alignment="CENTER" hgap="10.0" orientation="VERTICAL" vgap="10.0">
+                           <children>
+                          <Label text="Name:" />
+                          <TextField fx:id="txtName" alignment="CENTER" />
+                          <Label text="Email:" />
+                          <TextField fx:id="txtEmail" alignment="CENTER" />
+                          <Label text="Username:" />
+                          <TextField fx:id="txtUsername" alignment="CENTER" />
+                          <Label text="Password:" />
+                          <PasswordField fx:id="txtPassword" alignment="CENTER" />
+                           </children>
+                        </FlowPane>
                   </VBox>
             
                         <!-- Botones -->
-                  <VBox alignment="CENTER" minWidth="110.0" prefWidth="120" spacing="15">
-                    <Button fx:id="btnSave" mnemonicParsing="false" styleClass="save" text="Save" />
-                    <Button fx:id="btnClear" mnemonicParsing="false" styleClass="clear" text="Clear" />
-                    <Button fx:id="btnDrop" mnemonicParsing="false" styleClass="delete" text="Drop" />
+                  <VBox alignment="CENTER" minWidth="110.0" prefWidth="120">
+                        <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" orientation="VERTICAL" vgap="10.0">
+                           <children>
+                          <Button fx:id="btnSave" mnemonicParsing="false" styleClass="save" text="Save" />
+                          <Button fx:id="btnClear" mnemonicParsing="false" styleClass="clear" text="Clear" />
+                          <Button fx:id="btnDrop" mnemonicParsing="false" styleClass="delete" text="Drop" />
+                           </children>
+                        </FlowPane>
                     <padding>
                       <Insets bottom="5" left="5" right="5" top="5" />
                     </padding>
@@ -54,13 +63,17 @@
                   </VBox>
             
                         <!-- Filters & search -->
-                  <VBox alignment="CENTER" minWidth="230.0" spacing="15">
-                        <Label text="Filter:" />
-                    <TextField fx:id="txtSearch" alignment="CENTER" prefHeight="35" promptText="Search">
-                      <font>
-                        <Font size="17.0" />
-                      </font>
-                    </TextField>
+                  <VBox alignment="CENTER" minWidth="230.0">
+                        <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" orientation="VERTICAL" vgap="10.0" VBox.vgrow="ALWAYS">
+                           <children>
+                              <Label text="Filter:" />
+                          <TextField fx:id="txtSearch" alignment="CENTER" prefHeight="35" promptText="Search">
+                            <font>
+                              <Font size="17.0" />
+                            </font>
+                          </TextField>
+                           </children>
+                        </FlowPane>
                   </VBox>
                 </HBox>
                </children>
@@ -72,7 +85,7 @@
                 <VBox alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             
                   <children>
-                    <ScrollPane fitToHeight="true" fitToWidth="true" maxWidth="-Infinity" minWidth="600.0" prefHeight="282.0" prefWidth="702.0">
+                    <ScrollPane fitToHeight="true" fitToWidth="true" minWidth="600.0" prefHeight="282.0" prefWidth="702.0" VBox.vgrow="ALWAYS">
                       <content>
                         <TableView fx:id="tableAdmins" minWidth="600.0" prefHeight="280.0" prefWidth="710.0" styleClass="table">
                           <columns>
