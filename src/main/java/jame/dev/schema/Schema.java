@@ -127,6 +127,7 @@ public final class Schema {
                   uuid CHAR(36) NOT NULL,
                   id_book INT NOT NULL,
                   copy_num INT NOT NULL,
+                  borrowed TINYINT(1) DEFAULT 0,
                   status CHAR(10) NOT NULL,
                   language CHAR(3) NOT NULL,
                   CONSTRAINT fk_copies_book FOREIGN KEY (id_book)
@@ -178,6 +179,7 @@ public final class Schema {
                   CONSTRAINT fk_history_loan FOREIGN KEY (id_loan)
                   REFERENCES loans(id)
                   ON DELETE CASCADE
+                  ON UPDATE CASCADE
               );
               """;
    }

@@ -71,8 +71,6 @@ public class Login {
       Optional.ofNullable(sessionDto)
               .ifPresentOrElse(dto -> {
                  session.login(dto);
-                 alert.buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS", "Login Successfully.")
-                         .show();
                  switch (dto.role()) {
                     case USER -> redirectTo(actionEvent, "/templates/userView.fxml");
                     case ADMIN -> redirectTo(actionEvent, "/templates/adminView.fxml");
@@ -88,18 +86,7 @@ public class Login {
     */
    @FXML
    private void handleClickGoToSignUp(ActionEvent actionEvent) {
-      try {
-         FXMLLoader loader = new FXMLLoader(getClass().getResource("/templates/signUp.fxml"));
-         Parent root = loader.load();
-         Scene scene = new Scene(root);
-
-         Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-         stage.setScene(scene);
-         stage.show();
-      } catch (IOException e) {
-         Platform.runLater(() -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Can't load SignUp page."));
-         log.severe("Resource loading went wrong" + e);
-      }
+      redirectTo(actionEvent, "/templates/signUp.fxml");
    }
 
    /**

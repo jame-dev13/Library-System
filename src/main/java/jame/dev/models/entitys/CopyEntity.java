@@ -16,6 +16,7 @@ public class CopyEntity {
     @NonNull private UUID uuid;
     @NonNull private int idBook;
     @NonNull private int copyNum;
+    private Boolean borrowed;
     @NonNull private EStatusCopy statusCopy;
     @NonNull private ELanguage language;
 }
