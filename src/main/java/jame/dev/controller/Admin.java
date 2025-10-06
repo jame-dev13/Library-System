@@ -1,9 +1,7 @@
 package jame.dev.controller;
 
 import jame.dev.dtos.users.SessionDto;
-import jame.dev.utils.CustomAlert;
-import jame.dev.utils.ExecutorTabLoaderUtil;
-import jame.dev.utils.SessionManager;
+import jame.dev.utils.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,6 +17,7 @@ import javafx.stage.Stage;
 import lombok.extern.java.Log;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Controller class for build the Admin view.
@@ -44,6 +43,8 @@ public class Admin {
    @FXML
    private Tab tabMe;
 
+   private static final Map<String, Integer> changes = GlobalNotificationChange.getInstance().getChanges();
+
    /**
     * Loads the content for the Admin Tabs in a lazy way using {@link ExecutorTabLoaderUtil} class.
     */
@@ -53,10 +54,9 @@ public class Admin {
       Thread.ofVirtual().start(() -> tabPane.getSelectionModel()
               .selectedItemProperty()
               .addListener((_, _, newTab) -> {
-                 if (newTab.equals(this.tabFines)) {
+                 if (newTab.equals(this.tabFines) && changes.containsKey(EGlobalNames.FINE_ADMIN.name())) {
+                    changes.remove(EGlobalNames.FINE_ADMIN.name());
                     ExecutorTabLoaderUtil.reLoad("/templates/adminPanes/Fines.fxml", this.tabFines);
-                 } else if (newTab.equals(this.tabLoans)) {
-                    ExecutorTabLoaderUtil.reLoad("/templates/adminPanes/Loans.fxml", this.tabLoans);
                  }
               }));
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Users.fxml", this.tabUsers);

@@ -6,7 +6,7 @@ import jame.dev.models.enums.EGenre;
 import jame.dev.models.enums.ELanguage;
 import jame.dev.models.enums.EStatusCopy;
 import jame.dev.repositorys.CRUDRepo;
-import jame.dev.repositorys.IMultiQuery;
+import jame.dev.repositorys.Joinable;
 import jame.dev.utils.DMLActions;
 import jame.dev.utils.DQLActions;
 
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public final class CopyService implements CRUDRepo<CopyEntity>, IMultiQuery<CopyDetailsDto> {
+public final class CopyService implements CRUDRepo<CopyEntity>, Joinable<CopyDetailsDto> {
 
    @Override
    public List<CopyEntity> getAll() {
@@ -99,7 +99,7 @@ public final class CopyService implements CRUDRepo<CopyEntity>, IMultiQuery<Copy
    }
 
    @Override
-   public List<CopyDetailsDto> getJoinsAll() {
+   public List<CopyDetailsDto> getJoins() {
       String sql = """
               SELECT c.id AS ID, c.copy_num AS COPY_N,
               b.title AS TITLE, b.genre AS GENRE,

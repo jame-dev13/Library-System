@@ -9,10 +9,7 @@ import jame.dev.models.enums.EStatusLoan;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.CopyService;
 import jame.dev.service.LoanService;
-import jame.dev.utils.CustomAlert;
-import jame.dev.utils.EGlobalNames;
-import jame.dev.utils.GlobalNotificationChange;
-import jame.dev.utils.SessionManager;
+import jame.dev.utils.*;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -119,16 +116,20 @@ public class ModalBookCopies {
    private void handleSaveLoan(ActionEvent event) {
       Optional.ofNullable(this.copySelected)
               .ifPresentOrElse(copy -> {
-                         this.loanRepo.save(
-                                 LoanEntity.builder()
-                                         .uuid(UUID.randomUUID())
-                                         .idUser(SessionManager.getInstance().getSessionDto().id())
-                                         .idCopy(copy.getId())
-                                         .loanDate(LocalDate.parse(textDateNow.getText().trim()))
-                                         .returnDate(LocalDate.now().plusDays(Integer.parseInt(textDaysLoan.getText().trim())))
-                                         .statusLoan(EStatusLoan.ON_LOAN)
-                                         .build()
-                         );
+                         LoanEntity loan = LoanEntity.builder()
+                                 .uuid(UUID.randomUUID())
+                                 .idUser(SessionManager.getInstance().getSessionDto().id())
+                                 .idCopy(copy.getId())
+                                 .loanDate(LocalDate.parse(textDateNow.getText().trim()))
+                                 .returnDate(LocalDate.now().plusDays(Integer.parseInt(textDaysLoan.getText().trim())))
+                                 .statusLoan(EStatusLoan.ON_LOAN)
+                                 .build();
+                         if (CheckFinesUtil.isFined(loan.getIdUser())) {
+                            ALERT.buildAlert(Alert.AlertType.INFORMATION, "UNAUTHORIZED", "You have fines, you can't request loans now.")
+                                    .show();
+                            return;
+                         }
+                         this.loanRepo.save(loan);
                          ALERT
                                  .buildAlert(Alert.AlertType.INFORMATION, "SUCCESS", "Loan saved.")
                                  .show();

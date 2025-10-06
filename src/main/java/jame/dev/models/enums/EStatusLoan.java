@@ -1,5 +1,5 @@
 package jame.dev.models.enums;
 
 public enum EStatusLoan {
-    RUN_OUT, RENEW, ON_LOAN, RETURNED
+    RUN_OUT, RENEWED, ON_LOAN, RETURNED, FINED
 }

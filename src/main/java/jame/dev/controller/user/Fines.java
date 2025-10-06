@@ -34,7 +34,7 @@ public class Fines {
               new SimpleIntegerProperty(data.getValue().daysRemaining()).asObject());
       //data
       ObservableList<FineUserDto> observableList = FXCollections.observableArrayList(
-              new FineService().getJoinsAll()
+              new FineService().getJoins()
                       .stream()
                       .filter(l -> l.daysRemaining() > 0)
                       .toList()

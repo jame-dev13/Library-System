@@ -4,7 +4,9 @@ import jame.dev.dtos.loans.LoanDetailsDto;
 import jame.dev.models.entitys.LoanEntity;
 import jame.dev.models.enums.EStatusLoan;
 import jame.dev.repositorys.CRUDRepo;
+import jame.dev.repositorys.Joinable;
 import jame.dev.service.LoanService;
+import jame.dev.service.joins.LoanDetailsService;
 import jame.dev.utils.CustomAlert;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -40,14 +42,17 @@ public class MyLoans {
 
    private UUID uuidSelected;
    private int indexSelected;
+   //dependencies
    private static final CRUDRepo<LoanEntity> REPO = new LoanService();
+   private static final Joinable<LoanDetailsDto> JOINABLE = new LoanDetailsService();
+
    private static List<LoanDetailsDto> loans;
    private static final CustomAlert ALERT = CustomAlert.getInstance();
 
 
    @FXML
    private void initialize() throws IOException {
-      loans = new LoanService().getJoinsAll();
+      loans = JOINABLE.getJoins();
       tableConfig();
       this.btnReturnLoan.setOnAction(this::handleReturnLoan);
       this.btnClear.setOnAction(this::handleClear);
@@ -96,6 +101,6 @@ public class MyLoans {
       this.tableLoans.getSelectionModel().clearSelection();
       this.uuidSelected = null;
       this.indexSelected = -1;
-      this.btnReturnLoan.setDisable(!this.btnReturnLoan.isDisabled());
+      this.btnReturnLoan.setDisable(true);
    }
 }

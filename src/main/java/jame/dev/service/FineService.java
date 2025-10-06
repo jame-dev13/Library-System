@@ -3,7 +3,7 @@ package jame.dev.service;
 import jame.dev.dtos.fines.FineUserDto;
 import jame.dev.models.entitys.FineEntity;
 import jame.dev.repositorys.CRUDRepo;
-import jame.dev.repositorys.IMultiQuery;
+import jame.dev.repositorys.Joinable;
 import jame.dev.utils.DMLActions;
 import jame.dev.utils.DQLActions;
 import jame.dev.utils.SessionManager;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public final class FineService implements CRUDRepo<FineEntity>, IMultiQuery<FineUserDto> {
+public final class FineService implements CRUDRepo<FineEntity>, Joinable<FineUserDto> {
    @Override
    public List<FineEntity> getAll() {
       String sql = "SELECT * FROM fines";
@@ -85,7 +85,7 @@ public final class FineService implements CRUDRepo<FineEntity>, IMultiQuery<Fine
    }
 
    @Override
-   public List<FineUserDto> getJoinsAll() {
+   public List<FineUserDto> getJoins() {
       final String sql = """
               SELECT f.cause AS CAUSE,
               f.expiration AS EXP,

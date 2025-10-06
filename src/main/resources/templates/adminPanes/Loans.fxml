@@ -10,13 +10,14 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="547.0" prefWidth="695.0" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jame.dev.controller.admin.Loans">
    <children>
-      <SplitPane dividerPositions="0.3" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <SplitPane dividerPositions="0.3701657458563536" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
@@ -29,16 +30,28 @@
                               <Label text="New Return Date:" />
                               <DatePicker fx:id="dateReturn" />
                            </children>
+                           <HBox.margin>
+                              <Insets bottom="5.0" />
+                           </HBox.margin>
                         </VBox>
                         <VBox alignment="CENTER" minWidth="-Infinity" spacing="10.0">
                            <children>
-                              <Button fx:id="btnSet" disable="true" mnemonicParsing="false" text="Set" styleClass="update"/>
-                              <Button fx:id="btnDelete" disable="true" mnemonicParsing="false" text="Delete" styleClass="delete" />
-                              <Button fx:id="btnClear" mnemonicParsing="false" text="Clear" styleClass="clear" />
+                              <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" prefWrapLength="200.0" vgap="10.0" VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <Button fx:id="btnSet" disable="true" mnemonicParsing="false" styleClass="update" text="Set" />
+                                    <Button fx:id="btnDelete" disable="true" mnemonicParsing="false" styleClass="delete" text="Delete" />
+                                    <Button fx:id="btnClear" mnemonicParsing="false" styleClass="clear" text="Clear" />
+                                    <Button fx:id="btnFine" mnemonicParsing="false" styleClass="aux" text="Fine" />
+                                    <Button fx:id="btnShowFines" mnemonicParsing="false" styleClass="show" text="Show Fines" />
+                                 </children>
+                              </FlowPane>
                            </children>
                            <padding>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </padding>
+                           <HBox.margin>
+                              <Insets bottom="5.0" />
+                           </HBox.margin>
                         </VBox>
                         <VBox alignment="CENTER" prefHeight="125.0" prefWidth="182.0" spacing="10.0">
                            <children>
@@ -51,7 +64,7 @@
                               <TextField fx:id="txtFilter" />
                            </children>
                            <HBox.margin>
-                              <Insets />
+                              <Insets bottom="5.0" />
                            </HBox.margin>
                         </VBox>
                      </children>

@@ -75,6 +75,9 @@
 .show{
     -fx-background-color: #4FB7B3;
 }
+.aux{
+    -fx-background-color: #DC143C;
+}
 
 .text-area{
     -fx-text-fill: white;

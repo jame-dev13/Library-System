@@ -1,15 +1,15 @@
 package jame.dev.service;
 
 import jame.dev.models.enums.EGenre;
-import jame.dev.repositorys.IMultiQuery;
+import jame.dev.repositorys.Joinable;
 import jame.dev.utils.DQLActions;
 import jame.dev.utils.SessionManager;
 
 import java.util.List;
 
-public class HistoryLoanService implements IMultiQuery<EGenre> {
+public final class HistoryLoanService implements Joinable<EGenre> {
    @Override
-   public List<EGenre> getJoinsAll() {
+   public List<EGenre> getJoins() {
       final String sql = """
               SELECT b.genre AS GENRE
               FROM books b

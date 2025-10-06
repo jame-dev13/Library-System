@@ -1,10 +1,14 @@
 package jame.dev.controller.admin;
 
+import jame.dev.models.entitys.FineEntity;
 import jame.dev.models.entitys.LoanEntity;
 import jame.dev.models.enums.EStatusLoan;
 import jame.dev.repositorys.CRUDRepo;
+import jame.dev.service.FineService;
 import jame.dev.service.LoanService;
 import jame.dev.utils.CustomAlert;
+import jame.dev.utils.EGlobalNames;
+import jame.dev.utils.GlobalNotificationChange;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -18,7 +22,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Loans {
 
@@ -46,6 +52,9 @@ public class Loans {
    private Button btnDelete;
    @FXML
    private Button btnClear;
+
+   @FXML
+   private Button btnFine;
    //Date Pickers
    @FXML
    private DatePicker dateLoan;
@@ -55,11 +64,14 @@ public class Loans {
    @FXML
    private TextField txtFilter;
 
-   private CRUDRepo<LoanEntity> repo;
+   private final CRUDRepo<LoanEntity> repo = new LoanService();
    private static List<LoanEntity> loans;
+   private static final FineService fineService = new FineService();
    private UUID uuidSelected;
    private int indexSelected;
    private static final CustomAlert alert = CustomAlert.getInstance();
+   private static final GlobalNotificationChange changes = GlobalNotificationChange.getInstance();
+   private static final String changeName = EGlobalNames.FINE_ADMIN.name();
 
    /**
     * Initializes components, global data and listeners, everything of that
@@ -67,8 +79,6 @@ public class Loans {
     */
    @FXML
    private void initialize() throws IOException {
-      //repo
-      repo = new LoanService();
       //label date
       this.labelDateToday.setText(LocalDate.now().toString());
       //loan data
@@ -80,17 +90,23 @@ public class Loans {
       btnClear.setOnAction(this::handleClear);
       btnSet.setOnAction(this::handleSet);
       btnDelete.setOnAction(this::handleDelete);
+      btnFine.setOnAction(this::handleFine);
 
       //txtFilter listener
       FilteredList<LoanEntity> filteredList = new FilteredList<>(this.tableLoans.getItems(), p -> true);
       txtFilter.setOnKeyTyped(key -> this.handleFilter(key, filteredList));
 
       //update status loan on expired date.
-      if (!loans.isEmpty()) {
-         loans.stream()
-                 .filter(loan -> LocalDate.now().isAfter(loan.getReturnDate()))
-                 .forEach(loan -> loan.setStatusLoan(EStatusLoan.RUN_OUT));
-      }
+      Optional.ofNullable(loans)
+              .ifPresent(l ->
+                      l.stream()
+                              .filter(loan -> LocalDate.now().isAfter(loan.getReturnDate())
+                                      && loan.getStatusLoan() == EStatusLoan.ON_LOAN)
+                              .forEach(loan -> {
+                                 loan.setStatusLoan(EStatusLoan.RUN_OUT);
+                                 this.repo.update(loan);
+                              })
+              );
    }
 
    @FXML
@@ -109,7 +125,7 @@ public class Loans {
       this.tableLoans.setItems(observableList);
 
       //listeners
-      this.tableLoans.setOnMouseClicked(e ->
+      this.tableLoans.setOnMouseClicked(_ ->
               Optional.ofNullable(this.tableLoans.getSelectionModel().getSelectedItem())
                       .ifPresent(selection -> {
                          this.uuidSelected = selection.getUuid();
@@ -172,6 +188,42 @@ public class Loans {
                          });
               });
       this.btnClear.fire();
+   }
+
+   @FXML
+   private void handleFine(ActionEvent event) {
+      Set<Integer> idUsers = fineService.getAll()
+              .stream()
+              .map(FineEntity::getIdUser)
+              .collect(Collectors.toSet());
+      alert.buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Do you want fine this user?")
+              .showAndWait()
+              .ifPresent(confirmation -> {
+                 if (confirmation == ButtonType.OK) {
+                    Optional.ofNullable(this.tableLoans.getSelectionModel().getSelectedItem())
+                            .ifPresent(entity -> {
+                               if (idUsers.add(entity.getIdUser())) {
+                                  fineService.save(
+                                          FineEntity.builder()
+                                                  .uuid(UUID.randomUUID())
+                                                  .idUser(entity.getIdUser())
+                                                  .cause("Don't return the loan on time.")
+                                                  .expiration(LocalDate.now().plusDays(15))
+                                                  .build()
+                                  );
+                                  alert.buildAlert(Alert.AlertType.INFORMATION, "INFO", "User fined.")
+                                          .show();
+                                  entity.setStatusLoan(EStatusLoan.FINED);
+                                  this.repo.update(entity);
+                                  loans.set(indexSelected, entity);
+                                  this.tableLoans.getItems().set(indexSelected, entity);
+                                  changes.registerChange(changeName);
+                               } else
+                                  alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "This user is fined already.")
+                                          .show();
+                            });
+                 }
+              });
    }
 
    @FXML

@@ -1,7 +1,7 @@
 package jame.dev.controller.user;
 
 import jame.dev.models.enums.EGenre;
-import jame.dev.repositorys.IMultiQuery;
+import jame.dev.repositorys.Joinable;
 import jame.dev.service.HistoryLoanService;
 import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
@@ -18,7 +18,7 @@ public class Resume {
    private PieChart pieChart;
    @FXML
    private Label labelMsg;
-   private final IMultiQuery<EGenre> repo = new HistoryLoanService();
+   private final Joinable<EGenre> repo = new HistoryLoanService();
 
    @FXML
    private void initialize() throws IOException {
@@ -27,7 +27,7 @@ public class Resume {
 
    @FXML
    private void loadChart() {
-      List<EGenre> genres = repo.getJoinsAll();
+      List<EGenre> genres = repo.getJoins();
       if(genres.isEmpty()){
          labelMsg.setText("There's no data for show yet.");
          return;

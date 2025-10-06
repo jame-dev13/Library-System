@@ -9,10 +9,7 @@ import jame.dev.models.enums.EStatusLoan;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.CopyService;
 import jame.dev.service.LoanService;
-import jame.dev.utils.CustomAlert;
-import jame.dev.utils.EGlobalNames;
-import jame.dev.utils.GlobalNotificationChange;
-import jame.dev.utils.SessionManager;
+import jame.dev.utils.*;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -23,6 +20,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
+import lombok.extern.java.Log;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -30,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Log
 public class ShowCopies {
    @FXML
    private TextField txtFilter;
@@ -67,7 +66,7 @@ public class ShowCopies {
    @FXML
    private void initialize() throws IOException {
       this.loansRepo = new LoanService();
-      copies = new CopyService().getJoinsAll();
+      copies = new CopyService().getJoins();
       tableConfig();
       this.btnLoan.setOnAction(this::handleLoan);
       this.btnClear.setOnAction(this::handleClear);
@@ -113,15 +112,19 @@ public class ShowCopies {
                  .returnDate(LocalDate.now().plusDays(Integer.parseInt(txtDays.getText().trim())))
                  .statusLoan(EStatusLoan.ON_LOAN)
                  .build();
+         if(CheckFinesUtil.isFined(loan.getIdUser())) {
+            ALERT.buildAlert(Alert.AlertType.INFORMATION, "UNAUTHORIZED", "You have fines, you can't request loans now.")
+                    .show();
+            return;
+         }
          this.loansRepo.save(loan);
-         ALERT
-                 .buildAlert(Alert.AlertType.INFORMATION, "SUCCESS", "Loan Saved")
+         ALERT.buildAlert(Alert.AlertType.INFORMATION, "SUCCESS", "Loan Saved")
                  .show();
          changes.registerChange(EGlobalNames.BOOK_CLIENT.name());
       } catch (NullPointerException e) {
          ALERT.buildAlert(Alert.AlertType.ERROR, "ERROR", "THE FIELDS CAN'T BE NULL")
                  .show();
-         throw new RuntimeException("There's a Null value present.", e);
+         e.printStackTrace();
       } finally {
          this.btnClear.fire();
       }

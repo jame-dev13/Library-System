@@ -177,6 +177,7 @@ public final class Schema {
                   action_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                   CONSTRAINT fk_history_loan FOREIGN KEY (id_loan)
                   REFERENCES loans(id)
+                  ON DELETE CASCADE
               );
               """;
    }

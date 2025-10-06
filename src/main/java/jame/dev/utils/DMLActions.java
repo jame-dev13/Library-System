@@ -76,7 +76,7 @@ public final class DMLActions {
          try (PreparedStatement st = connection.prepareStatement(sql)) {
             setParams().accept(st, params);
             int rows = st.executeUpdate();
-            log.info((rows > 0) ? rows + " rows affected.\n" : "0 rows affected.\n");
+            log.info((rows > 0) ? rows + " rows affected at ." + " \n" : "0 rows affected.\n");
          }
          connection.commit();
       } catch (SQLException e) {

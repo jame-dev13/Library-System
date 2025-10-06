@@ -119,9 +119,9 @@ public class Copies {
 
       this.tableCopies.getSelectionModel().clearSelection();
 
-      this.btnSave.setDisable(!this.btnSave.isDisabled());
-      this.btnUpdate.setDisable(!this.btnUpdate.isDisabled());
-      this.btnDelete.setDisable(!this.btnDelete.isDisabled());
+      this.btnSave.setDisable(false);
+      this.btnUpdate.setDisable(true);
+      this.btnDelete.setDisable(true);
       this.uuidSelected = null;
       this.indexSelected = -1;
    }
