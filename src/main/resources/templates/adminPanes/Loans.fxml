@@ -45,7 +45,7 @@
                                     <Button fx:id="btnSet" disable="true" mnemonicParsing="false" styleClass="update" text="Set" />
                                     <Button fx:id="btnDelete" disable="true" mnemonicParsing="false" styleClass="delete" text="Delete" />
                                     <Button fx:id="btnClear" mnemonicParsing="false" styleClass="clear" text="Clear" />
-                                    <Button fx:id="btnFine" mnemonicParsing="false" styleClass="aux" text="Fine" />
+                                    <Button fx:id="btnFine" disable="true" mnemonicParsing="false" styleClass="aux" text="Fine" />
                                     <Button fx:id="btnShowFines" mnemonicParsing="false" styleClass="show" text="Show Fines" />
                                  </children>
                               </FlowPane>

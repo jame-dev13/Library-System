@@ -51,14 +51,6 @@ public class Admin {
    @FXML
    public void initialize() {
       this.btnLogout.setOnAction(this::handleLogout);
-      Thread.ofVirtual().start(() -> tabPane.getSelectionModel()
-              .selectedItemProperty()
-              .addListener((_, _, newTab) -> {
-                 if (newTab.equals(this.tabFines) && changes.containsKey(EGlobalNames.FINE_ADMIN.name())) {
-                    changes.remove(EGlobalNames.FINE_ADMIN.name());
-                    ExecutorTabLoaderUtil.reLoad("/templates/adminPanes/Fines.fxml", this.tabFines);
-                 }
-              }));
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Users.fxml", this.tabUsers);
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Books.fxml", this.tabBooks);
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Loans.fxml", this.tabLoans);

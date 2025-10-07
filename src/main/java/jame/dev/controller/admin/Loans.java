@@ -7,16 +7,21 @@ import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.FineService;
 import jame.dev.service.LoanService;
 import jame.dev.utils.CustomAlert;
-import jame.dev.utils.EGlobalNames;
-import jame.dev.utils.GlobalNotificationChange;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import lombok.extern.java.Log;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -26,6 +31,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Log
 public class Loans {
 
    @FXML
@@ -55,6 +61,8 @@ public class Loans {
 
    @FXML
    private Button btnFine;
+   @FXML
+   private Button btnShowFines;
    //Date Pickers
    @FXML
    private DatePicker dateLoan;
@@ -70,8 +78,6 @@ public class Loans {
    private UUID uuidSelected;
    private int indexSelected;
    private static final CustomAlert alert = CustomAlert.getInstance();
-   private static final GlobalNotificationChange changes = GlobalNotificationChange.getInstance();
-   private static final String changeName = EGlobalNames.FINE_ADMIN.name();
 
    /**
     * Initializes components, global data and listeners, everything of that
@@ -91,6 +97,7 @@ public class Loans {
       btnSet.setOnAction(this::handleSet);
       btnDelete.setOnAction(this::handleDelete);
       btnFine.setOnAction(this::handleFine);
+      btnShowFines.setOnAction(_ -> loadModalFines());
 
       //txtFilter listener
       FilteredList<LoanEntity> filteredList = new FilteredList<>(this.tableLoans.getItems(), p -> true);
@@ -125,17 +132,26 @@ public class Loans {
       this.tableLoans.setItems(observableList);
 
       //listeners
-      this.tableLoans.setOnMouseClicked(_ ->
-              Optional.ofNullable(this.tableLoans.getSelectionModel().getSelectedItem())
-                      .ifPresent(selection -> {
-                         this.uuidSelected = selection.getUuid();
-                         this.indexSelected = this.tableLoans.getSelectionModel().getSelectedIndex();
-                         this.dateLoan.setValue(selection.getLoanDate());
-                         this.dateReturn.setValue(selection.getReturnDate());
-                         this.btnSet.setDisable(false);
-                         this.btnDelete.setDisable(false);
-                      })
-      );
+      this.tableLoans.setOnMouseClicked(m -> {
+         LoanEntity selected = this.tableLoans.getSelectionModel().getSelectedItem();
+         Optional.ofNullable(selected)
+                 .ifPresent(selection -> {
+                    this.uuidSelected = selection.getUuid();
+                    this.indexSelected = this.tableLoans.getSelectionModel().getSelectedIndex();
+                    this.dateLoan.setValue(selection.getLoanDate());
+                    this.dateReturn.setValue(selection.getReturnDate());
+                    this.btnSet.setDisable(false);
+                    this.btnDelete.setDisable(false);
+                    if (selection.getStatusLoan() == EStatusLoan.RUN_OUT) btnFine.setDisable(false);
+                 });
+         int clicks = m.getClickCount();
+         if (clicks == 2) {
+            repo.findByUuid(uuidSelected)
+                    .ifPresentOrElse(l -> loadModalFines(l.getIdUser()),
+                            () -> alert.buildAlert(Alert.AlertType.INFORMATION, "INFO", "No value to load present.")
+                                    .show());
+         }
+      });
    }
 
    @FXML
@@ -207,7 +223,7 @@ public class Loans {
                                           FineEntity.builder()
                                                   .uuid(UUID.randomUUID())
                                                   .idUser(entity.getIdUser())
-                                                  .cause("Don't return the loan on time.")
+                                                  .cause("Didn't return the loan on time.")
                                                   .expiration(LocalDate.now().plusDays(15))
                                                   .build()
                                   );
@@ -217,7 +233,6 @@ public class Loans {
                                   this.repo.update(entity);
                                   loans.set(indexSelected, entity);
                                   this.tableLoans.getItems().set(indexSelected, entity);
-                                  changes.registerChange(changeName);
                                } else
                                   alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "This user is fined already.")
                                           .show();
@@ -239,6 +254,48 @@ public class Loans {
          });
       } catch (IllegalArgumentException e) {
          alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Value is not defined.").show();
+      }
+   }
+
+   @FXML
+   private void loadModalFines(int id) {
+      try {
+         FXMLLoader loader = new FXMLLoader(getClass().getResource("/templates/adminPanes/fines.fxml"));
+         Parent root = loader.load();
+
+         Fines controller = loader.getController();
+         controller.setIdUser(id);
+
+         Stage stage = new Stage();
+         stage.setTitle("User Fines");
+         stage.setScene(new Scene(root));
+         stage.resizableProperty().set(false);
+         stage.initModality(Modality.APPLICATION_MODAL);
+         stage.showAndWait();
+      } catch (IOException e) {
+         Platform.runLater(() -> new Label("Error loading modal."));
+         log.severe(e.getMessage());
+      }
+   }
+
+   @FXML
+   private void loadModalFines() {
+      try {
+         FXMLLoader loader = new FXMLLoader(getClass().getResource("/templates/adminPanes/fines.fxml"));
+         Parent root = loader.load();
+
+         Fines controller = loader.getController();
+         controller.setData();
+
+         Stage stage = new Stage();
+         stage.setTitle("Fines");
+         stage.setScene(new Scene(root));
+         stage.resizableProperty().set(false);
+         stage.initModality(Modality.APPLICATION_MODAL);
+         stage.showAndWait();
+      } catch (IOException e) {
+         Platform.runLater(() -> new Label("Error loading modal."));
+         log.severe(e.getMessage());
       }
    }
 }
