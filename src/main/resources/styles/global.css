@@ -162,3 +162,33 @@
 .table .decrement-button {
     -fx-background-color: transparent;
 }
+
+.tab-pane {
+    -fx-background-color: #19183B;
+    -fx-tab-min-width: 100px;
+    -fx-tab-max-width: 200px;
+    -fx-tab-min-height: 40px;
+    -fx-text-fill: black;
+}
+
+.tab-pane .tab-header-area {
+    -fx-background-color: #19183B;
+}
+
+.tab-pane .tab {
+    -fx-background-color: #19183B;
+    -fx-background-radius: 8 8 0 0;
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #000000;
+    -fx-border-color: transparent transparent #19183B transparent;
+    -fx-border-width: 0 0 3px 0;
+    -fx-border-style: solid;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: #708993;
+    -fx-border-color: transparent transparent #A8FBD3 transparent;
+}
+

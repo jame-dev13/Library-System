@@ -25,7 +25,7 @@
                      <children>
                         <VBox alignment="CENTER" minWidth="-Infinity" prefHeight="150.0" prefWidth="193.0" spacing="10.0">
                            <children>
-                              <FlowPane alignment="CENTER" hgap="10.0" orientation="VERTICAL" vgap="10.0" VBox.vgrow="ALWAYS">
+                              <FlowPane alignment="CENTER" hgap="10.0" vgap="10.0" VBox.vgrow="ALWAYS">
                                  <children>
                                     <Label text="New Loan Date" />
                                     <DatePicker fx:id="dateLoan" />
