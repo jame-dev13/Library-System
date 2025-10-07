@@ -90,6 +90,7 @@ public class Books {
    private static final Set<String> bookNameSet = new HashSet<>();
    private static final CustomAlert alert = CustomAlert.getInstance();
    private static final GlobalNotificationChange changes = GlobalNotificationChange.getInstance();
+
    @FXML
    private void initialize() throws IOException {
       //Service
@@ -148,7 +149,11 @@ public class Books {
          this.btnDrop.setDisable(false);
 
          if (l.getClickCount() == 2) {
-            this.loadPopOver(this.tableBooks.getSelectionModel().getSelectedItem());
+            repo.findByUuid(this.selectedUuid)
+                    .ifPresentOrElse(this::loadPopOver,
+                            () -> alert
+                                    .buildAlert(Alert.AlertType.ERROR, "ERROR", "Can't load the popOver.")
+                                    .show());
          }
       });
    }
