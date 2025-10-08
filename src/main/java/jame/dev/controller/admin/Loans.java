@@ -197,6 +197,12 @@ public class Loans {
                          .showAndWait()
                          .ifPresent(confirmation -> {
                             if (confirmation == ButtonType.OK) {
+                               EStatusLoan statusSelected = loans.get(indexSelected).getStatusLoan();
+                               if(statusSelected == EStatusLoan.ON_LOAN || statusSelected == EStatusLoan.RENEWED){
+                                  alert.buildAlert(Alert.AlertType.ERROR, "NOT ALLOWED", "This is a temporary valid loan that can't be removed yet.")
+                                          .show();
+                                  return;
+                               }
                                this.repo.deleteByUuid(uuid);
                                loans.remove(indexSelected);
                                this.tableLoans.getItems().remove(indexSelected);
