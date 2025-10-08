@@ -110,6 +110,12 @@ public class ShowCopies {
    @FXML
    private void handleLoan(ActionEvent event) {
       try {
+         int plusDays = Integer.parseInt(txtDays.getText().trim());
+         if (plusDays > 60) {
+            ALERT.buildAlert(Alert.AlertType.WARNING, "NOT ALLOWED", "You can't request a loan for more than 60 days")
+                    .show();
+            return;
+         }
          LoanEntity loan = LoanEntity.builder()
                  .uuid(UUID.randomUUID())
                  .idUser(SessionManager.getInstance().getSessionDto().id())
@@ -118,27 +124,28 @@ public class ShowCopies {
                  .returnDate(LocalDate.now().plusDays(Integer.parseInt(txtDays.getText().trim())))
                  .statusLoan(EStatusLoan.ON_LOAN)
                  .build();
-         if(CheckFinesUtil.isFined(loan.getIdUser())) {
+         if (CheckFinesUtil.isFined(loan.getIdUser())) {
             ALERT.buildAlert(Alert.AlertType.INFORMATION, "UNAUTHORIZED", "You have fines, you can't request loans now.")
                     .show();
             return;
          }
          this.loansRepo.save(loan);
          REPO_COPIES.findByUuid(this.tableCopies.getSelectionModel().getSelectedItem().uuid())
-                         .ifPresent(copy -> {
-                            copy.setBorrowed(true);
-                            REPO_COPIES.update(copy);
-                         });
+                 .ifPresent(copy -> {
+                    copy.setBorrowed(true);
+                    REPO_COPIES.update(copy);
+                 });
          this.tableCopies.getItems().remove(indexSelected);
          copies.remove(indexSelected);
          ALERT.buildAlert(Alert.AlertType.INFORMATION, "SUCCESS", "Loan Saved")
                  .show();
          changes.registerChange(EGlobalNames.LOAN_CLIENT.name());
          changes.registerChange(EGlobalNames.HISTORY.name());
+
       } catch (NullPointerException e) {
          ALERT.buildAlert(Alert.AlertType.ERROR, "ERROR", "THE FIELDS CAN'T BE NULL")
                  .show();
-         e.printStackTrace();
+         log.severe(e.getMessage());
       } finally {
          this.btnClear.fire();
       }

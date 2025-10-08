@@ -80,10 +80,10 @@ public class ModalBookCopies {
       //data
       Optional.ofNullable(this.copyRepo.getAll())
               .ifPresent(copyEntities ->
-                 copies = copyEntities.stream()
-                         .filter(copy ->
-                                 (copy.getIdBook() == this.idBook && copy.getCopyNum() > 1) && (!copy.getBorrowed()))
-                         .toList()
+                      copies = copyEntities.stream()
+                              .filter(copy ->
+                                      (copy.getIdBook() == this.idBook && copy.getCopyNum() > 1) && (!copy.getBorrowed()))
+                              .toList()
               );
       tableConfig();
    }
@@ -96,7 +96,7 @@ public class ModalBookCopies {
       colCopyNum.setCellValueFactory(copy ->
               new SimpleIntegerProperty(copy.getValue().getCopyNum()).asObject());
       colBorrowed.setCellValueFactory(data ->
-              new SimpleStringProperty(data.getValue().getBorrowed() ? "YES": "NO"));
+              new SimpleStringProperty(data.getValue().getBorrowed() ? "YES" : "NO"));
       colStatus.setCellValueFactory(copy ->
               new SimpleObjectProperty<>(copy.getValue().getStatusCopy()));
       colLang.setCellValueFactory(copy ->
@@ -122,12 +122,18 @@ public class ModalBookCopies {
    private void handleSaveLoan(ActionEvent event) {
       Optional.ofNullable(this.copySelected)
               .ifPresentOrElse(copy -> {
+                         int plusDays = Integer.parseInt(textDaysLoan.getText().trim());
+                         if (plusDays > 60) {
+                            ALERT.buildAlert(Alert.AlertType.WARNING, "NOT ALLOWED", "You can't request a loan for more than 60 days")
+                                    .show();
+                            return;
+                         }
                          LoanEntity loan = LoanEntity.builder()
                                  .uuid(UUID.randomUUID())
                                  .idUser(SessionManager.getInstance().getSessionDto().id())
                                  .idCopy(copy.getId())
                                  .loanDate(LocalDate.parse(textDateNow.getText().trim()))
-                                 .returnDate(LocalDate.now().plusDays(Integer.parseInt(textDaysLoan.getText().trim())))
+                                 .returnDate(LocalDate.now().plusDays(plusDays))
                                  .statusLoan(EStatusLoan.ON_LOAN)
                                  .build();
                          if (CheckFinesUtil.isFined(loan.getIdUser())) {

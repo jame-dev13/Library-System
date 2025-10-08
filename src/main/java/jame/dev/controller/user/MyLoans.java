@@ -17,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,6 +28,8 @@ public class MyLoans {
    private Button btnClear;
    @FXML
    private Button btnReturnLoan;
+   @FXML
+   private Button btnRenew;
    @FXML
    private TableView<LoanDetailsDto> tableLoans;
    @FXML
@@ -55,6 +58,7 @@ public class MyLoans {
       loans = JOINABLE.getJoins();
       tableConfig();
       this.btnReturnLoan.setOnAction(this::handleReturnLoan);
+      this.btnRenew.setOnAction(this::handleRenewLoan);
       this.btnClear.setOnAction(this::handleClear);
    }
 
@@ -77,6 +81,7 @@ public class MyLoans {
                          this.uuidSelected = loanDto.uuid();
                          this.indexSelected = this.tableLoans.getSelectionModel().getSelectedIndex();
                          this.btnReturnLoan.setDisable(false);
+                         this.btnRenew.setDisable(false);
                       })
       );
    }
@@ -95,12 +100,58 @@ public class MyLoans {
                                  }
                               }),
               () -> ALERT.buildAlert(Alert.AlertType.WARNING, "NOT FOUND", "Loan not found.").show());
+      this.btnClear.fire();
    }
 
-   @FXML private void handleClear(ActionEvent event){
+   @FXML
+   private void handleRenewLoan(ActionEvent event) {
+      REPO.findByUuid(uuidSelected).ifPresentOrElse(loan -> {
+         if (loan.getStatusLoan() == EStatusLoan.RUN_OUT || loan.getStatusLoan() == EStatusLoan.FINED) {
+            ALERT.buildAlert(Alert.AlertType.ERROR, "ERROR", "You can't renew your loan now")
+                    .show();
+            return;
+         }
+         ALERT.buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Do you want to renew this loan?")
+                 .showAndWait()
+                 .ifPresent(confirmation -> {
+                    if (confirmation == ButtonType.OK) {
+                       LoanDetailsDto loanMap = this.tableLoans.getSelectionModel().getSelectedItem();
+                       TextInputDialog input = new TextInputDialog();
+                       input.setHeaderText("DAYS");
+                       input.setContentText("Enter the number of days for the renew: ");
+                       input.showAndWait()
+                               .ifPresent(value -> {
+                                  int intValue = Integer.parseInt(value);
+                                  if(intValue > 60) {
+                                     ALERT.buildAlert(Alert.AlertType.WARNING, "NOT ALLOWED", "Can't renew a Loan for more than 60 days")
+                                             .show();
+                                     return;
+                                  }
+                                  loan.setStatusLoan(EStatusLoan.RENEWED);
+                                  loan.setReturnDate(LocalDate.now().plusDays(intValue));
+                                  REPO.update(loan);
+                                  loans.set(indexSelected, LoanDetailsDto.builder()
+                                          .uuid(loan.getUuid())
+                                          .title(loanMap.title())
+                                          .author(loanMap.author())
+                                          .statusLoan(loan.getStatusLoan())
+                                          .remainingDays(intValue)
+                                          .build());
+                                  this.tableLoans.getItems().set(indexSelected, loans.get(indexSelected));
+                               });
+                    }
+                 });
+
+      }, () -> ALERT.buildAlert(Alert.AlertType.WARNING, "NOT FOUND", "Loan not found.").show());
+      this.btnClear.fire();
+   }
+
+   @FXML
+   private void handleClear(ActionEvent event) {
       this.tableLoans.getSelectionModel().clearSelection();
       this.uuidSelected = null;
       this.indexSelected = -1;
       this.btnReturnLoan.setDisable(true);
+      this.btnRenew.setDisable(true);
    }
 }
