@@ -14,8 +14,8 @@ public final class EmailSender {
     private static final String FROM = env.get("MAIL_FROM");
     private static final String PWD = env.get("PWD_APP");
 
-    public static void mailTo(@NonNull String to, String token){
-        //Properties SMTP
+    public static boolean mailTo(@NonNull String to, String token){
+       //Properties SMTP
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -45,12 +45,14 @@ public final class EmailSender {
             // SEND MESSAGE
             Transport.send(message);
             log.info("Email sent.\n");
+            return true;
         } catch (MessagingException e) {
             log.severe("Cannot sent username.\n");
+            return false;
         }
     }
 
-    public static void mailToWPassword(@NonNull String to, String password){
+    public static boolean mailToWPassword(@NonNull String to, String password){
         //Properties SMTP
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -81,8 +83,10 @@ public final class EmailSender {
             // SEND MESSAGE
             Transport.send(message);
             log.info("Email sent.\n");
+           return true;
         } catch (MessagingException e) {
             log.severe("Cannot sent username.\n");
+            return false;
         }
     }
 }

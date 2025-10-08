@@ -62,7 +62,7 @@ public class SignUp {
 
    /**
     * Handles the registration logic for a user with the ROLE of USER.
-    * It builds the Entity, sends an username verification and checks it for
+    * It builds the Entity, sends a username verification and checks it for
     * doing the insertion successfully.
     *
     * @param event The ActionEvent
@@ -74,9 +74,11 @@ public class SignUp {
       String username = txtUsername.getText().trim();
       String password = txtPassword.getText().trim();
 
-      if (!ValidatorUtil.isValidString(name, email, password)) {
+      if (!ValidatorUtil.isValidString(name, username) && !ValidatorUtil.isEmailValid(email) && !ValidatorUtil.validPassword(password)) {
          Platform.runLater(() ->
-                 alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "All fields are required.")
+                 alert.buildAlert(Alert.AlertType.ERROR,
+                                 "ERROR",
+                                 "Names can't start with numbers or any other characters that is not a letter, same for email")
                          .show()
          );
          return;
@@ -100,10 +102,19 @@ public class SignUp {
 
       this.token = this.user.getToken();
 
-      Runnable r = () -> EmailSender.mailTo(this.user.getEmail(), this.token);
+      Runnable r = () -> {
+         boolean emailSent = EmailSender.mailTo(this.user.getEmail(), this.token);
+         Platform.runLater(() -> {
+            this.btnReg.setDisable(true);
+            if (!emailSent) {
+               alert.buildAlert(Alert.AlertType.INFORMATION, "NOT FOUND", "Your email address could not be found.")
+                       .show();
+               return;
+            }
+            checkVerification(this.token);
+         });
+      };
       Thread.ofVirtual().start(r);
-
-      checkVerification(this.token);
    }
 
 
@@ -133,6 +144,7 @@ public class SignUp {
          alert.buildAlert(Alert.AlertType.INFORMATION, "REGISTER", "Sign Up success, you can signIn now!").showAndWait();
          this.btnToSignIn.fire();
       }, () -> alert.buildAlert(Alert.AlertType.ERROR, "CANCEL", "Operation canceled, try again.").show());
+      this.btnReg.setDisable(true);
    }
 
    /**

@@ -71,6 +71,9 @@ public class Login {
       Optional.ofNullable(sessionDto)
               .ifPresentOrElse(dto -> {
                  session.login(dto);
+                 Platform.runLater(() ->
+                         alert.buildAlert(Alert.AlertType.INFORMATION, "LOGIN", "Login attempt successfully")
+                                 .show());
                  switch (dto.role()) {
                     case USER -> redirectTo(actionEvent, "/templates/userView.fxml");
                     case ADMIN -> redirectTo(actionEvent, "/templates/adminView.fxml");
