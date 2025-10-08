@@ -162,10 +162,9 @@ public class Loans {
       //selection
       this.tableLoans.getSelectionModel().clearSelection();
       //disable buttons
-      if (!btnDelete.isDisabled() && !btnSet.isDisabled()) {
-         this.btnDelete.setDisable(true);
-         this.btnSet.setDisable(true);
-      }
+      this.btnDelete.setDisable(true);
+      this.btnSet.setDisable(true);
+      this.btnFine.setDisable(true);
       //reset globals
       this.uuidSelected = null;
       this.indexSelected = -1;
@@ -176,7 +175,7 @@ public class Loans {
       this.repo.findByUuid(uuidSelected)
               .ifPresent(loan -> {
                  loan.setLoanDate(dateLoan.getValue());
-                 loan.setReturnDate(dateLoan.getValue());
+                 loan.setReturnDate(dateReturn.getValue());
                  this.repo.update(loan);
                  this.tableLoans.getItems().set(indexSelected, loan);
                  loans.set(indexSelected, loan);
@@ -198,7 +197,7 @@ public class Loans {
                          .ifPresent(confirmation -> {
                             if (confirmation == ButtonType.OK) {
                                EStatusLoan statusSelected = loans.get(indexSelected).getStatusLoan();
-                               if(statusSelected == EStatusLoan.ON_LOAN || statusSelected == EStatusLoan.RENEWED){
+                               if (statusSelected == EStatusLoan.ON_LOAN || statusSelected == EStatusLoan.RENEWED) {
                                   alert.buildAlert(Alert.AlertType.ERROR, "NOT ALLOWED", "This is a temporary valid loan that can't be removed yet.")
                                           .show();
                                   return;
@@ -245,6 +244,7 @@ public class Loans {
                             });
                  }
               });
+      this.btnClear.fire();
    }
 
    @FXML
