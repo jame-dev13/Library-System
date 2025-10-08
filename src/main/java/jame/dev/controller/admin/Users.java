@@ -10,6 +10,7 @@ import jame.dev.utils.CustomAlert;
 import jame.dev.utils.EmailSender;
 import jame.dev.utils.SessionManager;
 import jame.dev.utils.TokenGenerator;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -137,12 +138,14 @@ public class Users {
    @FXML
    private void handleClear(ActionEvent e) {
       //fields
-      txtName.setText("");
-      txtEmail.setText("");
-      txtPassword.setText("");
-      txtSearch.setText("");
+      txtName.clear();
+      txtEmail.clear();
+      txtUsername.clear();
+      txtPassword.clear();
+      txtSearch.clear();
       //selections
       this.tableAdmins.getSelectionModel().clearSelection();
+      this.btnSave.setDisable(false);
 
       //reset globals
       this.uuidSelected = null;
@@ -184,26 +187,37 @@ public class Users {
          this.btnClear.fire();
          return;
       }
-      //add the new user
-      this.repo.save(user);
-      AdminDto admin = AdminDto.builder()
-              .id(null)
-              .uuid(user.getUuid())
-              .name(user.getName())
-              .email(user.getEmail())
-              .username(user.getUsername())
-              .role(user.getRole())
-              .build();
-      this.users.add(admin);
-      this.tableAdmins.getItems().add(admin);
+      //add the new user if a mail has been sent to him
+      Runnable emailTo = () -> {
+         boolean mailSent = EmailSender.mailToWPassword(user.getEmail(), txtPassword.getText().trim());
+         Platform.runLater(() -> {
+            this.btnSave.setDisable(true);
+            if(!mailSent){
+               alert.buildAlert(Alert.AlertType.INFORMATION, "NOT FOUND", "Your email address could not be found.")
+                       .show();
+               return;
+            }
+            alert.buildAlert(Alert.AlertType.INFORMATION, "INFO", "Email sent to: " + user.getEmail() + " plase check it.")
+                    .show();
+            this.repo.save(user);
 
-      //send username with his credentials
-      Runnable r = () -> EmailSender.mailToWPassword(user.getEmail(), txtPassword.getText());
-      Thread.ofVirtual().start(r);
+            AdminDto admin = AdminDto.builder()
+                    .id(null)
+                    .uuid(user.getUuid())
+                    .name(user.getName())
+                    .email(user.getEmail())
+                    .username(user.getUsername())
+                    .role(user.getRole())
+                    .build();
+            this.users.add(admin);
+            this.tableAdmins.getItems().add(admin);
 
-      //notify
-      alert.buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS!", "Admin added!")
-              .show();
+            //notify
+            alert.buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS!", "Admin added!")
+                    .show();
+         });
+      };
+      Thread.ofVirtual().start(emailTo);
       this.btnClear.fire();
    }
 
@@ -249,18 +263,19 @@ public class Users {
    @FXML
    private void handleFilter(KeyEvent key, FilteredList<AdminDto> filteredList) {
       String text = txtSearch.getText().trim();
-      try {
          filteredList.setPredicate(user -> {
             if (text.isEmpty()) return true;
-            return user.uuid().toString().contains(text) ||
-                    user.name().contains(text) ||
-                    user.email().contains(text) ||
-                    user.username().contains(text) ||
-                    user.role() == ERole.valueOf(text.toUpperCase());
+            try {
+
+               return user.uuid().toString().contains(text) ||
+                       user.name().contains(text) ||
+                       user.email().contains(text) ||
+                       user.username().contains(text) ||
+                       user.role() == ERole.valueOf(text.toUpperCase());
+            } catch (IllegalArgumentException e) {
+               return false;
+            }
          });
-         this.tableAdmins.setItems(filteredList);
-      } catch (IllegalArgumentException e) {
-         log.severe(e.toString());
-      }
+      this.tableAdmins.setItems(filteredList);
    }
 }
