@@ -37,14 +37,11 @@ public class ValidatorUtilTests {
    }
 
    @Test
-   @DisplayName("Valid Password")
-   public void isValidPassword(){
-      Assertions.assertTrue(ValidatorUtil.isValidPassword("abcABC123$#."),
-              "Should pass because it meets has length grater than 11, 3 lower, 3 upper, 2 or more digits and 2 or more spec chars.");
-      Assertions.assertFalse(ValidatorUtil.isValidPassword("abAB1234564#"), "Should fail because it doesn't meet the requirements.");
-      Assertions.assertFalse(ValidatorUtil.isValidPassword("abc"), "Should fail cause the length is less than 11.");
-      Assertions.assertFalse(ValidatorUtil.isValidPassword("29f42 f402f4"), "Should fail cause white space is present.");
-      Assertions.assertFalse(ValidatorUtil.isValidPassword(""), "Should fail cause is blank.");
-      Assertions.assertFalse(ValidatorUtil.isValidPassword(null), "Should fail cause is null.");
+   @DisplayName("Is pwd strong")
+   public void isStrongPwd(){
+      Assertions.assertTrue(ValidatorUtil.pwdIsStrong(".RDFs5067al!"),
+              "It Should pass if pwd has at least 3 or more lower, 3 upper, 3 digit and 2 or more especial chars and his length it's greater than 8");
+      Assertions.assertFalse(ValidatorUtil.pwdIsStrong("ghTY12.-"),
+              "Should fail, 3 upper, 3 lower, 3 digit and 2 or more spec chars are required to have a pwd 'strong'.");
    }
 }

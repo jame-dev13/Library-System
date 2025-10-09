@@ -58,7 +58,8 @@ public class Login {
       btnLogin.setOnAction(this::handleClickLogin);
       btnToSignUp.setOnAction(this::handleClickGoToSignUp);
       ComponentValidationUtil.addValidation(txtUsername, lbUsername, ValidatorUtil::isValidString, "Username not valid.");
-      ComponentValidationUtil.addValidation(txtPassword, lbPassword, ValidatorUtil::isValidPassword, "Password not valid");
+      ComponentValidationUtil.addValidation(txtPassword, lbPassword, ValidatorUtil::pwdIsStrong,
+              !ValidatorUtil.pwdIsStrong(txtPassword.getText()) ? "Password weak": "");
    }
 
    /**
