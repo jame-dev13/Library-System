@@ -4,8 +4,10 @@ import jame.dev.dtos.users.SessionDto;
 import jame.dev.dtos.users.UserDto;
 import jame.dev.repositorys.IAuthRepo;
 import jame.dev.service.AuthService;
+import jame.dev.utils.ComponentValidationUtil;
 import jame.dev.utils.CustomAlert;
 import jame.dev.utils.SessionManager;
+import jame.dev.utils.ValidatorUtil;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -13,10 +15,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.extern.java.Log;
 
@@ -29,6 +28,10 @@ import java.util.Optional;
 @Log
 public class Login {
 
+   @FXML
+   private Label lbUsername;
+   @FXML
+   private Label lbPassword;
    @FXML
    private Button btnLogin;
 
@@ -54,6 +57,8 @@ public class Login {
       this.repo = new AuthService();
       btnLogin.setOnAction(this::handleClickLogin);
       btnToSignUp.setOnAction(this::handleClickGoToSignUp);
+      ComponentValidationUtil.addValidation(txtUsername, lbUsername, ValidatorUtil::isValidString, "Username not valid.");
+      ComponentValidationUtil.addValidation(txtPassword, lbPassword, ValidatorUtil::isValidPassword, "Password not valid");
    }
 
    /**
