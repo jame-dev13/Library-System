@@ -2,7 +2,7 @@ package jame.dev.service.joins;
 
 import jame.dev.dtos.fines.FineDetailsDto;
 import jame.dev.repositorys.Joinable;
-import jame.dev.utils.DQLActions;
+import jame.dev.utils.db.DQLActions;
 
 import java.util.List;
 import java.util.UUID;

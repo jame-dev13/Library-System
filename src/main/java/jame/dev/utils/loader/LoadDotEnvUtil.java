@@ -1,10 +1,10 @@
-package jame.dev.utils;
+package jame.dev.utils.loader;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Map;
 
-public class LoadDotEnvUtil {
+public final class LoadDotEnvUtil {
    private static volatile LoadDotEnvUtil loader;
    private static final Dotenv dotenv = Dotenv.load();
    private LoadDotEnvUtil() {

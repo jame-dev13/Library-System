@@ -2,8 +2,8 @@ package jame.dev.view;
 
 import jame.dev.Main;
 import jame.dev.schema.Schema;
-import jame.dev.utils.ExecutorTabLoaderUtil;
-import jame.dev.utils.InitAdminUtil;
+import jame.dev.utils.loader.ExecutorTabLoaderUtil;
+import jame.dev.utils.loader.InitAdminUtil;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

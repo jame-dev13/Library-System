@@ -2,7 +2,7 @@ package jame.dev.utils.unit;
 
 import jame.dev.dtos.users.SessionDto;
 import jame.dev.models.enums.ERole;
-import jame.dev.utils.SessionManager;
+import jame.dev.utils.session.SessionManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

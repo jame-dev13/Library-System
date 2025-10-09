@@ -4,7 +4,7 @@ import jame.dev.dtos.users.SessionDto;
 import jame.dev.dtos.users.UserDto;
 import jame.dev.models.enums.ERole;
 import jame.dev.repositorys.IAuthRepo;
-import jame.dev.utils.DQLActions;
+import jame.dev.utils.db.DQLActions;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.NoSuchElementException;

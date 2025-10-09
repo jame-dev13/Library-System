@@ -7,7 +7,7 @@ import jame.dev.repositorys.CRUDRepo;
 import jame.dev.repositorys.Joinable;
 import jame.dev.service.LoanService;
 import jame.dev.service.joins.LoanDetailsService;
-import jame.dev.utils.CustomAlert;
+import jame.dev.utils.ui.CustomAlert;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;

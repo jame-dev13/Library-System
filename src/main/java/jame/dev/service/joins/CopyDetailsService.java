@@ -5,7 +5,7 @@ import jame.dev.models.enums.EGenre;
 import jame.dev.models.enums.ELanguage;
 import jame.dev.models.enums.EStatusCopy;
 import jame.dev.repositorys.Joinable;
-import jame.dev.utils.DQLActions;
+import jame.dev.utils.db.DQLActions;
 
 import java.util.List;
 import java.util.UUID;

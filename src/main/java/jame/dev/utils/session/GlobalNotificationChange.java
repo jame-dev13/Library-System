@@ -1,9 +1,9 @@
-package jame.dev.utils;
+package jame.dev.utils.session;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class GlobalNotificationChange {
+public final class GlobalNotificationChange {
    private static volatile GlobalNotificationChange instance;
    private static final Map<String, Integer> changes = new HashMap<>();
    private GlobalNotificationChange(){}

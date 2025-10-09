@@ -2,8 +2,8 @@ package jame.dev.service;
 
 import jame.dev.models.enums.EGenre;
 import jame.dev.repositorys.Joinable;
-import jame.dev.utils.DQLActions;
-import jame.dev.utils.SessionManager;
+import jame.dev.utils.db.DQLActions;
+import jame.dev.utils.session.SessionManager;
 
 import java.util.List;
 

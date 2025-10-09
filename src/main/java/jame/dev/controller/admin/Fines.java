@@ -6,7 +6,7 @@ import jame.dev.repositorys.CRUDRepo;
 import jame.dev.repositorys.Joinable;
 import jame.dev.service.FineService;
 import jame.dev.service.joins.FineDetailsService;
-import jame.dev.utils.CustomAlert;
+import jame.dev.utils.ui.CustomAlert;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;

@@ -1,4 +1,4 @@
-package jame.dev.utils;
+package jame.dev.utils.tools;
 
 import java.util.HashMap;
 import java.util.Map;

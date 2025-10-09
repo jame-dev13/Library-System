@@ -3,8 +3,8 @@ package jame.dev.service.joins;
 import jame.dev.dtos.loans.LoanDetailsDto;
 import jame.dev.models.enums.EStatusLoan;
 import jame.dev.repositorys.Joinable;
-import jame.dev.utils.DQLActions;
-import jame.dev.utils.SessionManager;
+import jame.dev.utils.db.DQLActions;
+import jame.dev.utils.session.SessionManager;
 
 import java.util.List;
 import java.util.UUID;
