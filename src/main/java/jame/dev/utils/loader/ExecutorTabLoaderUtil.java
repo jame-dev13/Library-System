@@ -1,4 +1,4 @@
-package jame.dev.utils;
+package jame.dev.utils.loader;
 
 import jame.dev.Main;
 import javafx.application.Platform;

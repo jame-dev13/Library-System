@@ -1,4 +1,4 @@
-package jame.dev.utils;
+package jame.dev.utils.db;
 
 import jame.dev.connection.ConnectionDB;
 

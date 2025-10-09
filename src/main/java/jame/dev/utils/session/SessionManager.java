@@ -1,4 +1,4 @@
-package jame.dev.utils;
+package jame.dev.utils.session;
 
 import jame.dev.dtos.users.SessionDto;
 import lombok.Getter;

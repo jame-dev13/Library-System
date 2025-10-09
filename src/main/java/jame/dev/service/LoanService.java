@@ -3,8 +3,8 @@ package jame.dev.service;
 import jame.dev.models.entitys.LoanEntity;
 import jame.dev.models.enums.EStatusLoan;
 import jame.dev.repositorys.CRUDRepo;
-import jame.dev.utils.DMLActions;
-import jame.dev.utils.DQLActions;
+import jame.dev.utils.db.DMLActions;
+import jame.dev.utils.db.DQLActions;
 
 import java.sql.SQLException;
 import java.util.List;

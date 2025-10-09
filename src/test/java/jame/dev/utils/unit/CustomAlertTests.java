@@ -1,6 +1,6 @@
 package jame.dev.utils.unit;
 
-import jame.dev.utils.CustomAlert;
+import jame.dev.utils.ui.CustomAlert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

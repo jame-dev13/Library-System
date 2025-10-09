@@ -1,11 +1,11 @@
-package jame.dev.utils;
+package jame.dev.utils.ui;
 
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import java.util.function.Function;
 
-public class ComponentValidationUtil {
+public final class ComponentValidationUtil {
 
    public static void addValidation(TextField text, Label label, Function<String, Boolean> validator, String msg){
       text.textProperty().addListener(

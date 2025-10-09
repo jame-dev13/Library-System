@@ -6,7 +6,7 @@ import jame.dev.models.enums.EStatusLoan;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.FineService;
 import jame.dev.service.LoanService;
-import jame.dev.utils.CustomAlert;
+import jame.dev.utils.ui.CustomAlert;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

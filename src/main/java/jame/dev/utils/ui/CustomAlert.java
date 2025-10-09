@@ -1,4 +1,4 @@
-package jame.dev.utils;
+package jame.dev.utils.ui;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;

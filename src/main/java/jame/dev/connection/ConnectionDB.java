@@ -1,7 +1,7 @@
 package jame.dev.connection;
 
 
-import jame.dev.utils.LoadDotEnvUtil;
+import jame.dev.utils.loader.LoadDotEnvUtil;
 import lombok.extern.java.Log;
 
 import java.sql.Connection;

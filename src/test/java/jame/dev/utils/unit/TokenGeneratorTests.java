@@ -1,6 +1,6 @@
 package jame.dev.utils.unit;
 
-import jame.dev.utils.TokenGenerator;
+import jame.dev.utils.tools.TokenGenerator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

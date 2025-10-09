@@ -6,7 +6,7 @@ import jame.dev.models.enums.ELanguage;
 import jame.dev.models.enums.EStatusCopy;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.CopyService;
-import jame.dev.utils.CustomAlert;
+import jame.dev.utils.ui.CustomAlert;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;

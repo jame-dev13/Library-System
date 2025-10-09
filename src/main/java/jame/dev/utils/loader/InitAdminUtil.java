@@ -1,14 +1,16 @@
-package jame.dev.utils;
+package jame.dev.utils.loader;
 
 import jame.dev.dtos.users.InfoUserDto;
 import jame.dev.models.entitys.UserEntity;
 import jame.dev.models.enums.ERole;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.UserService;
+import jame.dev.utils.tools.TokenGenerator;
+import jame.dev.utils.db.DQLActions;
 
 import java.util.UUID;
 
-public class InitAdminUtil {
+public final class InitAdminUtil {
    private static final CRUDRepo<UserEntity> REPO = new UserService();
    private static final String SQL = """
            SELECT username FROM users

@@ -4,9 +4,9 @@ import jame.dev.dtos.fines.FineUserDto;
 import jame.dev.models.entitys.FineEntity;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.repositorys.Joinable;
-import jame.dev.utils.DMLActions;
-import jame.dev.utils.DQLActions;
-import jame.dev.utils.SessionManager;
+import jame.dev.utils.db.DMLActions;
+import jame.dev.utils.db.DQLActions;
+import jame.dev.utils.session.SessionManager;
 
 import java.sql.SQLException;
 import java.util.List;
