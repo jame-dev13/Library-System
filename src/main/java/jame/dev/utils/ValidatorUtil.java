@@ -1,11 +1,14 @@
 package jame.dev.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public final class ValidatorUtil {
 
    public static boolean isValidString(String... s) {
-      if(s == null || s.length == 0) return false;
+      if (s == null || s.length == 0) return false;
       for (String string : s) {
-         if(string == null || string.isBlank() || !string.matches("^[a-zA-záéíóúÁÉÍÓÚñÑ][a-zA-Z0-9áéíóúÁÉÍÓÚñÑ@'. ]+$")){
+         if (string == null || string.isBlank() || !string.matches("^[a-zA-záéíóúÁÉÍÓÚñÑ][a-zA-Z0-9áéíóúÁÉÍÓÚñÑ@'. ]+$")) {
             return false;
          }
       }
@@ -16,38 +19,27 @@ public final class ValidatorUtil {
       return s.matches("^[a-zA-Z][a-zA-Z0-9.-_]+@+[a-zA-Z0-9.-]+\\.[a-zA-Z0-9]{2,}$");
    }
 
-   public static boolean isValidPassword(String s) {
-      final int MIN_LENGTH = 11;
-      final int MIN_UPPER = 3;
-      final int MIN_LOWER = 3;
-      final int MIN_DIGIT = 2;
-      final int MIN_SPEC = 2;
-
-      if (s == null || s.isBlank() || s.length() < MIN_LENGTH) {
-         return false;
-      }
-
-      int upper = 0, lower = 0, digit = 0, spec = 0;
-
-      for (char c : s.toCharArray()) {
-         if (Character.isSpaceChar(c))
-            return false;
-         else if (Character.isUpperCase(c)) {
-            upper++;
-         } else if (Character.isLowerCase(c)) {
-            lower++;
+   public static boolean pwdIsStrong(String pwd) {
+      Map<String, Integer> characterCount = new HashMap<>();
+      characterCount.put("lower", 0);
+      characterCount.put("upper", 0);
+      characterCount.put("digit", 0);
+      characterCount.put("spec", 0);
+      for (char c : pwd.toCharArray()) {
+         if (Character.isLowerCase(c)) {
+            characterCount.put("lower", characterCount.get("lower") + 1);
+         } else if (Character.isUpperCase(c)) {
+            characterCount.put("upper", characterCount.get("upper") + 1);
          } else if (Character.isDigit(c)) {
-            digit++;
+            characterCount.put("digit", characterCount.get("digit") + 1);
          } else {
-            spec++;
-         }
-
-         if (upper >= MIN_UPPER && lower >= MIN_LOWER && digit >= MIN_DIGIT && spec >= MIN_SPEC) {
-            return true;
+            characterCount.put("spec", characterCount.get("spec") + 1);
          }
       }
-
-      return upper >= MIN_UPPER && lower >= MIN_LOWER && digit >= MIN_DIGIT && spec >= MIN_SPEC;
+      return pwd.length() > 8 &&
+              (characterCount.get("lower") >= 3) &&
+              (characterCount.get("upper") >= 3) &&
+              (characterCount.get("digit") >= 3) &&
+              (characterCount.get("spec") >= 2);
    }
-
 }

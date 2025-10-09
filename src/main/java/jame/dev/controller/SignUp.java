@@ -66,7 +66,8 @@ public class SignUp {
       ComponentValidationUtil.addValidation(txtName, lbName, ValidatorUtil::isValidString, "Name not valid.");
       ComponentValidationUtil.addValidation(txtEmail, lbEmail, ValidatorUtil::isEmailValid, "Email not valid.");
       ComponentValidationUtil.addValidation(txtUsername, lbUsername, ValidatorUtil::isValidString, "Username not valid.");
-      ComponentValidationUtil.addValidation(txtPassword, lbPwd, ValidatorUtil::isValidPassword, "Password not valid.");
+      ComponentValidationUtil.addValidation(txtPassword, lbPwd, ValidatorUtil::pwdIsStrong,
+              !ValidatorUtil.pwdIsStrong(txtPassword.getText()) ? "Password weak": "");
    }
 
    /**
@@ -83,7 +84,7 @@ public class SignUp {
       String username = txtUsername.getText().trim();
       String password = txtPassword.getText().trim();
 
-      if (!ValidatorUtil.isValidString(name, username) && !ValidatorUtil.isEmailValid(email) && !ValidatorUtil.isValidPassword(password)) {
+      if (!ValidatorUtil.isValidString(name, username) && !ValidatorUtil.isEmailValid(email)) {
          Platform.runLater(() ->
                  alert.buildAlert(Alert.AlertType.ERROR,
                                  "ERROR",
