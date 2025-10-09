@@ -39,12 +39,12 @@ public class ValidatorUtilTests {
    @Test
    @DisplayName("Valid Password")
    public void isValidPassword(){
-      Assertions.assertTrue(ValidatorUtil.validPassword("abcABC123$#."),
+      Assertions.assertTrue(ValidatorUtil.isValidPassword("abcABC123$#."),
               "Should pass because it meets has length grater than 11, 3 lower, 3 upper, 2 or more digits and 2 or more spec chars.");
-      Assertions.assertFalse(ValidatorUtil.validPassword("abAB1234564#"), "Should fail because it doesn't meet the requirements.");
-      Assertions.assertFalse(ValidatorUtil.validPassword("abc"), "Should fail cause the length is less than 11.");
-      Assertions.assertFalse(ValidatorUtil.validPassword("29f42 f402f4"), "Should fail cause white space is present.");
-      Assertions.assertFalse(ValidatorUtil.validPassword(""), "Should fail cause is blank.");
-      Assertions.assertFalse(ValidatorUtil.validPassword(null), "Should fail cause is null.");
+      Assertions.assertFalse(ValidatorUtil.isValidPassword("abAB1234564#"), "Should fail because it doesn't meet the requirements.");
+      Assertions.assertFalse(ValidatorUtil.isValidPassword("abc"), "Should fail cause the length is less than 11.");
+      Assertions.assertFalse(ValidatorUtil.isValidPassword("29f42 f402f4"), "Should fail cause white space is present.");
+      Assertions.assertFalse(ValidatorUtil.isValidPassword(""), "Should fail cause is blank.");
+      Assertions.assertFalse(ValidatorUtil.isValidPassword(null), "Should fail cause is null.");
    }
 }

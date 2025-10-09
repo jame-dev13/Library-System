@@ -192,3 +192,7 @@
     -fx-border-color: transparent transparent #A8FBD3 transparent;
 }
 
+.warning{
+    -fx-text-fill: #DC143C;
+    -fx-font-size: 12px;
+}

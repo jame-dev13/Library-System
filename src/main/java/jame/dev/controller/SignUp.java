@@ -5,10 +5,7 @@ import jame.dev.models.entitys.UserEntity;
 import jame.dev.models.enums.ERole;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.UserService;
-import jame.dev.utils.CustomAlert;
-import jame.dev.utils.EmailSender;
-import jame.dev.utils.TokenGenerator;
-import jame.dev.utils.ValidatorUtil;
+import jame.dev.utils.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -31,6 +28,14 @@ import java.util.UUID;
 public class SignUp {
 
    @FXML
+   private Label lbName;
+   @FXML
+   private Label lbEmail;
+   @FXML
+   private Label lbUsername;
+   @FXML
+   private Label lbPwd;
+   @FXML
    private TextField txtName;
    @FXML
    private TextField txtEmail;
@@ -42,7 +47,7 @@ public class SignUp {
    private Button btnReg;
    @FXML
    private Button btnToSignIn;
-
+   @FXML
    private CRUDRepo<UserEntity> repo;
    private UserEntity user;
    private String token;
@@ -58,6 +63,10 @@ public class SignUp {
       this.repo = new UserService();
       btnReg.setOnAction(this::handleSignUp);
       btnToSignIn.setOnAction(this::handleReturnToSignIn);
+      ComponentValidationUtil.addValidation(txtName, lbName, ValidatorUtil::isValidString, "Name not valid.");
+      ComponentValidationUtil.addValidation(txtEmail, lbEmail, ValidatorUtil::isEmailValid, "Email not valid.");
+      ComponentValidationUtil.addValidation(txtUsername, lbUsername, ValidatorUtil::isValidString, "Username not valid.");
+      ComponentValidationUtil.addValidation(txtPassword, lbPwd, ValidatorUtil::isValidPassword, "Password not valid.");
    }
 
    /**
@@ -74,7 +83,7 @@ public class SignUp {
       String username = txtUsername.getText().trim();
       String password = txtPassword.getText().trim();
 
-      if (!ValidatorUtil.isValidString(name, username) && !ValidatorUtil.isEmailValid(email) && !ValidatorUtil.validPassword(password)) {
+      if (!ValidatorUtil.isValidString(name, username) && !ValidatorUtil.isEmailValid(email) && !ValidatorUtil.isValidPassword(password)) {
          Platform.runLater(() ->
                  alert.buildAlert(Alert.AlertType.ERROR,
                                  "ERROR",

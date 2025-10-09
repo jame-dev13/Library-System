@@ -16,7 +16,7 @@ public final class ValidatorUtil {
       return s.matches("^[a-zA-Z][a-zA-Z0-9.-_]+@+[a-zA-Z0-9.-]+\\.[a-zA-Z0-9]{2,}$");
    }
 
-   public static boolean validPassword(String s) {
+   public static boolean isValidPassword(String s) {
       final int MIN_LENGTH = 11;
       final int MIN_UPPER = 3;
       final int MIN_LOWER = 3;

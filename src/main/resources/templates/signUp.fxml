@@ -12,17 +12,21 @@
 
 <AnchorPane prefHeight="516.0" prefWidth="393.0" stylesheets="@../styles/global.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jame.dev.controller.SignUp">
    <children>
-      <VBox alignment="CENTER" fillWidth="false" prefHeight="430.0" prefWidth="298.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox alignment="CENTER" fillWidth="false" layoutX="2.0" layoutY="2.0" prefHeight="430.0" prefWidth="450.0" spacing="8.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <Label text="Library System, SignUp." />
             <Label text="Name:" />
             <TextField fx:id="txtName" promptText="Your Name" />
+            <Label fx:id="lbName" style="-fx-text-fill: #DC143C;" styleClass="warning" />
             <Label text="Email:" />
             <TextField fx:id="txtEmail" promptText="email@gmail.com" />
+            <Label fx:id="lbEmail" styleClass="warning" />
             <Label text="Username:" />
             <TextField fx:id="txtUsername" promptText="Username" />
+            <Label fx:id="lbUsername" styleClass="warning" />
             <Label text="Password:" />
             <PasswordField fx:id="txtPassword" promptText="Min. 8 characters" />
+            <Label fx:id="lbPwd" styleClass="warning" />
             <HBox alignment="CENTER" prefHeight="35.0" prefWidth="276.0" spacing="10.0">
                <children>
                   <Button fx:id="btnReg" mnemonicParsing="false" styleClass="save" text="SignUp">
@@ -41,7 +45,7 @@
             </HBox>
          </children>
          <padding>
-            <Insets left="10.0" right="10.0" />
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </padding>
       </VBox>
    </children>
