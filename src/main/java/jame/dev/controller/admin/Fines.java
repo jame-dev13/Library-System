@@ -26,7 +26,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Log
-public class Fines {
+public class Fines{
 
    @FXML
    private TextArea txtNewCause;
@@ -86,22 +86,16 @@ public class Fines {
       //listeners
       this.tableFines.setOnMouseClicked(m -> {
          Optional.ofNullable(this.tableFines.getSelectionModel().getSelectedItem())
-                 .ifPresent(selection -> {
-                    this.uuidSelected = selection.uuid();
-                    this.indexSelected = tableFines.getSelectionModel().getSelectedIndex();
-                    this.btnDelete.setDisable(false);
-                    this.btnUpdate.setDisable(false);
-                    this.txtNewCause.setText(selection.cause());
-                 });
+                 .ifPresent(this::onSelection);
       });
-      filteredList = new FilteredList<>(this.tableFines.getItems(), _-> true);
+      filteredList = new FilteredList<>(this.tableFines.getItems(), _ -> true);
    }
 
    @FXML
    private void handleClear(ActionEvent event) {
       this.tableFines.getSelectionModel().clearSelection();
-      btnDelete.setDisable(!btnDelete.isDisabled());
-      btnUpdate.setDisable(!btnUpdate.isDisabled());
+      btnDelete.setDisable(true);
+      btnUpdate.setDisable(true);
       txtNewCause.clear();
       txtFilter.clear();
       this.uuidSelected = null;
@@ -115,32 +109,20 @@ public class Fines {
               .ifPresent(confirmation -> {
                  if (confirmation == ButtonType.OK) {
                     REPO.findByUuid(uuidSelected)
-                            .ifPresentOrElse(f -> {
-                               f.setCause(txtNewCause.getText().trim());
-                               REPO.update(f);
-                               FineDetailsDto fine = FineDetailsDto
-                                       .builder()
-                                       .uuid(uuidSelected)
-                                       .nameUser(this.tableFines.getSelectionModel().getSelectedItem().nameUser())
-                                       .idUser(f.getIdUser())
-                                       .cause(f.getCause())
-                                       .daysRemaining(this.tableFines.getSelectionModel().getSelectedItem().daysRemaining())
-                                       .build();
-                               fines.set(indexSelected, fine);
-                               this.tableFines.getItems().set(indexSelected, fine);
-                            }, () ->
-                                    ALERT.buildAlert(Alert.AlertType.INFORMATION, "INFO", "Can't find the associated fine.")
+                            .ifPresentOrElse(this::updateCause,
+                                    () -> ALERT.buildAlert(Alert.AlertType.INFORMATION, "INFO", "Can't find the associated fine.")
                                             .show());
                  }
               });
       this.btnClear.fire();
    }
 
-   @FXML private void handleDeleteFine(ActionEvent event){
+   @FXML
+   private void handleDeleteFine(ActionEvent event) {
       ALERT.buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Do you want remove this fine?")
               .showAndWait()
               .ifPresent(confirmation -> {
-                 if(confirmation == ButtonType.OK){
+                 if (confirmation == ButtonType.OK) {
                     REPO.deleteByUuid(uuidSelected);
                     fines.remove(indexSelected);
                     this.tableFines.getItems().remove(indexSelected);
@@ -149,10 +131,11 @@ public class Fines {
       this.btnClear.fire();
    }
 
-   @FXML private void handleFilter(KeyEvent keyEvent, FilteredList<FineDetailsDto> filteredList){
+   @FXML
+   private void handleFilter(KeyEvent keyEvent, FilteredList<FineDetailsDto> filteredList) {
       String value = txtFilter.getText().trim();
       filteredList.setPredicate(fine -> {
-         if(value.isEmpty()){
+         if (value.isEmpty()) {
             return true;
          }
          return fine.nameUser().contains(value) ||
@@ -177,5 +160,28 @@ public class Fines {
    protected void setData() {
       fines = FINES_DETAILS.getJoins();
       tableConfig();
+   }
+
+   private void onSelection(FineDetailsDto selection){
+      this.uuidSelected = selection.uuid();
+      this.indexSelected = tableFines.getSelectionModel().getSelectedIndex();
+      this.btnDelete.setDisable(false);
+      this.btnUpdate.setDisable(false);
+      this.txtNewCause.setText(selection.cause());
+   }
+
+   private void updateCause(FineEntity f) {
+      f.setCause(txtNewCause.getText().trim());
+      REPO.update(f);
+      FineDetailsDto fine = FineDetailsDto
+              .builder()
+              .uuid(uuidSelected)
+              .nameUser(this.tableFines.getSelectionModel().getSelectedItem().nameUser())
+              .idUser(f.getIdUser())
+              .cause(f.getCause())
+              .daysRemaining(this.tableFines.getSelectionModel().getSelectedItem().daysRemaining())
+              .build();
+      fines.set(indexSelected, fine);
+      this.tableFines.getItems().set(indexSelected, fine);
    }
 }

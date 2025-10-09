@@ -62,8 +62,7 @@ public class ShowCopies {
    @FXML
    private Button btnClear;
 
-   private CRUDRepo<LoanEntity> loansRepo;
-
+   private static final CRUDRepo<LoanEntity> LOANS_REPO = new LoanService();
    private static List<CopyDetailsDto> copies;
    private static final Joinable<CopyDetailsDto> COPY_INFO = new CopyDetailsService();
    private static final CRUDRepo<CopyEntity> REPO_COPIES = new CopyService();
@@ -74,7 +73,6 @@ public class ShowCopies {
 
    @FXML
    private void initialize() throws IOException {
-      this.loansRepo = new LoanService();
       copies = COPY_INFO.getJoins();
       tableConfig();
       this.btnLoan.setOnAction(this::handleLoan);
@@ -108,7 +106,7 @@ public class ShowCopies {
                          this.indexSelected = this.tableCopies.getSelectionModel().getSelectedIndex();
                       })
       );
-      filteredList = new FilteredList<>(this.tableCopies.getItems(), p -> true);
+      filteredList = new FilteredList<>(this.tableCopies.getItems(), _ -> true);
    }
 
    @FXML
@@ -120,27 +118,7 @@ public class ShowCopies {
                     .show();
             return;
          }
-         LoanEntity loan = LoanEntity.builder()
-                 .uuid(UUID.randomUUID())
-                 .idUser(SessionManager.getInstance().getSessionDto().id())
-                 .idCopy(Integer.parseInt(txtIdCopy.getText().trim()))
-                 .loanDate(LocalDate.parse(txtDateNow.getText().trim()))
-                 .returnDate(LocalDate.now().plusDays(Integer.parseInt(txtDays.getText().trim())))
-                 .statusLoan(EStatusLoan.ON_LOAN)
-                 .build();
-         if (CheckFinesUtil.isFined(loan.getIdUser())) {
-            ALERT.buildAlert(Alert.AlertType.INFORMATION, "UNAUTHORIZED", "You have fines, you can't request loans now.")
-                    .show();
-            return;
-         }
-         this.loansRepo.save(loan);
-         REPO_COPIES.findByUuid(this.tableCopies.getSelectionModel().getSelectedItem().uuid())
-                 .ifPresent(copy -> {
-                    copy.setBorrowed(true);
-                    REPO_COPIES.update(copy);
-                 });
-         this.tableCopies.getItems().remove(indexSelected);
-         copies.remove(indexSelected);
+         this.save(plusDays);
          ALERT.buildAlert(Alert.AlertType.INFORMATION, "SUCCESS", "Loan Saved")
                  .show();
          changes.registerChange(EGlobalNames.LOAN_CLIENT.name());
@@ -184,5 +162,29 @@ public class ShowCopies {
          }
       });
       this.tableCopies.setItems(filteredList);
+   }
+
+   private void save(int plusDays){
+      LoanEntity loan = LoanEntity.builder()
+              .uuid(UUID.randomUUID())
+              .idUser(SessionManager.getInstance().getSessionDto().id())
+              .idCopy(Integer.parseInt(txtIdCopy.getText().trim()))
+              .loanDate(LocalDate.parse(txtDateNow.getText().trim()))
+              .returnDate(LocalDate.now().plusDays(plusDays))
+              .statusLoan(EStatusLoan.ON_LOAN)
+              .build();
+      if (CheckFinesUtil.isFined(loan.getIdUser())) {
+         ALERT.buildAlert(Alert.AlertType.INFORMATION, "UNAUTHORIZED", "You have fines, you can't request loans now.")
+                 .show();
+         return;
+      }
+      LOANS_REPO.save(loan);
+      REPO_COPIES.findByUuid(this.tableCopies.getSelectionModel().getSelectedItem().uuid())
+              .ifPresent(copy -> {
+                 copy.setBorrowed(true);
+                 REPO_COPIES.update(copy);
+              });
+      this.tableCopies.getItems().remove(indexSelected);
+      copies.remove(indexSelected);
    }
 }

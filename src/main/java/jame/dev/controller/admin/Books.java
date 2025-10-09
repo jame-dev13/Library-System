@@ -20,6 +20,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import lombok.extern.java.Log;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -30,6 +31,7 @@ import java.util.*;
  * Controller class for a specific pane that manages CRUD operations
  * for books.
  */
+@Log
 public class Books {
    //Fields
    @FXML
@@ -80,9 +82,6 @@ public class Books {
    @FXML
    private TableColumn<BookEntity, String> colTitle;
 
-   @FXML
-   private Tooltip toolTip;
-
    private CRUDRepo<BookEntity> repo;
    private UUID selectedUuid;
    private int selectedIndex;
@@ -98,6 +97,7 @@ public class Books {
       //Data
       booksE = this.repo.getAll();
       bookNameSet.addAll(booksE.stream().map(BookEntity::getTitle).toList());
+
       this.tableConfig();
       this.boxGenre.setItems(FXCollections.observableArrayList(EGenre.values()));
       //button actions
@@ -131,20 +131,8 @@ public class Books {
 
       //listeners
       this.tableBooks.setOnMouseClicked(l -> {
-         //HandleNullPointerException
          Optional.ofNullable(this.tableBooks.getSelectionModel().getSelectedItem())
-                 .ifPresent(selection -> {
-                    this.selectedUuid = selection.getUuid();
-                    this.selectedIndex = this.tableBooks.getSelectionModel().getSelectedIndex();
-                    //set fields with the object 'book' values.
-                    txtTitle.setText(selection.getTitle());
-                    txtAuthor.setText(selection.getAuthor());
-                    txtIsbn.setText(selection.getISBN());
-                    txtEditorial.setText(selection.getEditorial());
-                    pickerPubDate.setValue(selection.getPubDate());
-                    txtPages.setText(String.valueOf(selection.getNumPages()));
-                    boxGenre.setValue(selection.getGenre());
-                 });
+                 .ifPresent(this::setFieldsOnSelection);
          this.btnUpdate.setDisable(false);
          this.btnDrop.setDisable(false);
 
@@ -178,8 +166,8 @@ public class Books {
       //selection
       this.tableBooks.getSelectionModel().clearSelection();
       //disable buttons
-      this.btnUpdate.setDisable(!this.btnUpdate.isDisabled());
-      this.btnDrop.setDisable(!this.btnDrop.isDisabled());
+      this.btnUpdate.setDisable(true);
+      this.btnDrop.setDisable(true);
       //reset global
       this.selectedUuid = null;
       this.selectedIndex = -1;
@@ -205,22 +193,20 @@ public class Books {
                  .genre(boxGenre.getSelectionModel().getSelectedItem())
                  .build();
          if (bookNameSet.add(book.getTitle())) {
-            this.repo.save(book);
-            booksE.add(book);
-            this.tableBooks.getItems().add(book);
+            this.save(book);
             alert.buildAlert(Alert.AlertType.INFORMATION,
                     "SUCCESS",
                     "Book added!").show();
-            changes.registerChange(getClass().getName());
-         } else {
-            alert.buildAlert(Alert.AlertType.WARNING, "WARNING", "Can't duplicate books").show();
+            return;
          }
+         alert.buildAlert(Alert.AlertType.WARNING, "WARNING", "Can't duplicate books").show();
+
       } catch (NullPointerException ne) {
          alert.buildAlert(Alert.AlertType.ERROR,
                          "ERROR",
                          "Can't have empty fields.")
                  .show();
-         throw new RuntimeException(ne);
+         log.severe(ne.getMessage());
       } finally {
          this.btnClear.fire();
       }
@@ -234,31 +220,20 @@ public class Books {
    @FXML
    private void handleUpdate(ActionEvent e) {
       Optional.ofNullable(selectedUuid)
-              .ifPresent(uuid -> {
-                 this.repo.findByUuid(uuid).ifPresentOrElse(book -> {
-                            book.setTitle(txtTitle.getText().trim());
-                            book.setAuthor(txtAuthor.getText().trim());
-                            book.setEditorial(txtEditorial.getText().trim());
-                            book.setISBN(txtIsbn.getText().trim());
-                            book.setPubDate(pickerPubDate.getValue());
-                            book.setNumPages(Integer.parseInt(txtPages.getText().trim()));
-                            book.setGenre(boxGenre.getSelectionModel().getSelectedItem());
-                            //save changes
-                            this.repo.update(book);
-                            booksE.set(selectedIndex, book);
-                            this.tableBooks.getItems().set(selectedIndex, book);
-                            //confirmation
-                            alert.buildAlert(Alert.AlertType.INFORMATION,
-                                            "UPDATED",
-                                            String.format("Book: [%s] Updated!", book.getTitle()))
-                                    .show();
-                            changes.registerChange(getClass().getName());
-                         },
-                         () -> alert.buildAlert(Alert.AlertType.ERROR,
-                                         "ERROR",
-                                         "Not Found!")
-                                 .show());
-              });
+              .ifPresent(uuid -> this.repo.findByUuid(uuid)
+                      .ifPresentOrElse(book -> {
+                                 this.update(book);
+                                 //confirmation
+                                 alert.buildAlert(Alert.AlertType.INFORMATION,
+                                                 "UPDATED",
+                                                 String.format("Book: [%s] Updated!", book.getTitle()))
+                                         .show();
+                              },
+                              () -> alert.buildAlert(Alert.AlertType.ERROR,
+                                              "ERROR",
+                                              "Not Found!")
+                                      .show())
+              );
       this.btnClear.fire();
    }
 
@@ -278,11 +253,7 @@ public class Books {
                  )
                  .showAndWait().ifPresent(response -> {
                     if (response == ButtonType.OK) {
-                       repo.deleteByUuid(uuid);
-                       this.tableBooks.getItems().remove(selectedIndex);
-                       BookEntity bookEntity = booksE.remove(selectedIndex);
-                       bookNameSet.remove(bookEntity.getTitle());
-                       changes.registerChange(getClass().getName());
+                       this.delete(uuid);
                     }
                  });
       });
@@ -334,5 +305,43 @@ public class Books {
       } catch (IOException e) {
          throw new RuntimeException(e);
       }
+   }
+
+   private void save(BookEntity book) {
+      this.repo.save(book);
+      tableBooks.getItems().add(book);
+      booksE.add(book);
+   }
+
+   private void update(BookEntity book) {
+      book.setTitle(txtTitle.getText().trim());
+      book.setAuthor(txtAuthor.getText().trim());
+      book.setEditorial(txtEditorial.getText().trim());
+      book.setISBN(txtIsbn.getText().trim());
+      book.setPubDate(pickerPubDate.getValue());
+      book.setNumPages(Integer.parseInt(txtPages.getText().trim()));
+      book.setGenre(boxGenre.getSelectionModel().getSelectedItem());
+      this.repo.update(book);
+      BookEntity bookUp = booksE.set(selectedIndex, book);
+      this.tableBooks.getItems().set(selectedIndex, bookUp);
+   }
+
+   private void delete(UUID uuid) {
+      this.repo.deleteByUuid(uuid);
+      this.tableBooks.getItems().remove(selectedIndex);
+      BookEntity book = booksE.remove(selectedIndex);
+      bookNameSet.remove(book.getTitle());
+   }
+
+   private void setFieldsOnSelection(BookEntity selection) {
+      this.selectedUuid = selection.getUuid();
+      this.selectedIndex = this.tableBooks.getSelectionModel().getSelectedIndex();
+      txtTitle.setText(selection.getTitle());
+      txtAuthor.setText(selection.getAuthor());
+      txtIsbn.setText(selection.getISBN());
+      txtEditorial.setText(selection.getEditorial());
+      pickerPubDate.setValue(selection.getPubDate());
+      txtPages.setText(String.valueOf(selection.getNumPages()));
+      boxGenre.setValue(selection.getGenre());
    }
 }
