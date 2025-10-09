@@ -133,9 +133,6 @@
                                  <padding>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </padding>
-                                 <tooltip>
-                                    <Tooltip fx:id="toolTip" text="Empty Tooltip" />
-                                 </tooltip>
                     </TableView>
                   </content>
                 </ScrollPane>

@@ -5,10 +5,10 @@ import jame.dev.dtos.users.SessionDto;
 import jame.dev.models.entitys.UserEntity;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.UserService;
-import jame.dev.utils.ui.ComponentValidationUtil;
-import jame.dev.utils.ui.CustomAlert;
 import jame.dev.utils.session.SessionManager;
 import jame.dev.utils.tools.ValidatorUtil;
+import jame.dev.utils.ui.ComponentValidationUtil;
+import jame.dev.utils.ui.CustomAlert;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -34,11 +34,10 @@ public class Me {
 
    private static final SessionManager session = SessionManager.getInstance();
    private static final CustomAlert alert = CustomAlert.getInstance();
-   private CRUDRepo<UserEntity> repo;
+   private static final CRUDRepo<UserEntity> REPO = new UserService();
 
    @FXML
    private void initialize() throws IOException {
-      this.repo = new UserService();
       this.setInfo();
       this.btnClear.setOnAction(this::handleClear);
       this.btnUpdate.setOnAction(this::handleUpdate);
@@ -46,7 +45,7 @@ public class Me {
       ComponentValidationUtil.addValidation(txtEmail, lblEmail, ValidatorUtil::isEmailValid, "Email not valid.");
       ComponentValidationUtil.addValidation(txtUsername, lblUsername, ValidatorUtil::isValidString, "Username not valid.");
       ComponentValidationUtil.addValidation(txtPassword, lblPwd, ValidatorUtil::pwdIsStrong,
-              !ValidatorUtil.pwdIsStrong(txtPassword.getText()) ? "Password weak": "");
+              !ValidatorUtil.pwdIsStrong(txtPassword.getText()) ? "Password weak" : "");
    }
 
    @FXML
@@ -56,29 +55,17 @@ public class Me {
 
    @FXML
    private void handleUpdate(ActionEvent event) {
-      InfoUserDto userDto = InfoUserDto.builder()
-              .name(txtName.getText().trim())
-              .email(txtEmail.getText().trim())
-              .username(txtUsername.getText().trim())
-              .password(txtPassword.getText().trim())
-              .build();
+      if(txtPassword.getText().isBlank()){
+         alert.buildAlert(Alert.AlertType.INFORMATION, "ERROR", "Password field empty").show();
+         return;
+      }
       alert.buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Do you want update your own info?")
               .showAndWait()
               .ifPresent(confirmation -> {
                  if (confirmation == ButtonType.OK) {
-                    this.repo.findByUuid(session.getSessionDto().uuid())
+                    REPO.findByUuid(session.getSessionDto().uuid())
                             .ifPresentOrElse(userEntity -> {
-                               userEntity.setName(userDto.name());
-                               userEntity.setEmail(userDto.email());
-                               userEntity.setUsername(userDto.username());
-                               userEntity.setPassword(userDto.password());
-                               this.repo.update(userEntity);
-                               session.logout();
-                               session.login(SessionDto.builder()
-                                       .id(userEntity.getId())
-                                       .uuid(userEntity.getUuid())
-                                       .username(userEntity.getUsername())
-                                       .role(userEntity.getRole()).build());
+                               this.update(userEntity);
                                alert.buildAlert(Alert.AlertType.INFORMATION, "INFO", "Information updated successfully.").show();
                             }, () -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Information required not found.").show());
                  }
@@ -88,11 +75,31 @@ public class Me {
 
    @FXML
    private void setInfo() {
-      this.repo.findByUuid(session.getSessionDto().uuid())
+      REPO.findByUuid(session.getSessionDto().uuid())
               .ifPresentOrElse(entity -> {
                  txtName.setText(entity.getName());
                  txtEmail.setText(entity.getEmail());
                  txtUsername.setText(entity.getUsername());
               }, () -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "No information available!").show());
+   }
+
+   private void update(UserEntity userEntity) {
+      InfoUserDto userDto = InfoUserDto.builder()
+              .name(txtName.getText().trim())
+              .email(txtEmail.getText().trim())
+              .username(txtUsername.getText().trim())
+              .password(txtPassword.getText().trim())
+              .build();
+      userEntity.setName(userDto.name());
+      userEntity.setEmail(userDto.email());
+      userEntity.setUsername(userDto.username());
+      userEntity.setPassword(userDto.password());
+      REPO.update(userEntity);
+      session.logout();
+      session.login(SessionDto.builder()
+              .id(userEntity.getId())
+              .uuid(userEntity.getUuid())
+              .username(userEntity.getUsername())
+              .role(userEntity.getRole()).build());
    }
 }

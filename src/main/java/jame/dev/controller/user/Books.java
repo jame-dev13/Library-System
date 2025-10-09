@@ -51,12 +51,12 @@ public class Books {
       configTable();
       this.boxGenre.setItems(FXCollections.observableArrayList(EGenre.values()));
       this.lblBookCount.setText(books.size() + " different books.");
-      this.btnShowCopies.setOnAction(_ -> this.loadModal(MODAL_COPIES));
+      this.btnShowCopies.setOnAction(_ -> this.loadModal());
       this.btnClearFilter.setOnAction(_ -> this.boxGenre.getSelectionModel().clearSelection());
-      //listener combobox
+      //listener comboBox
       filteredList = new FilteredList<>(this.tableBooks.getItems(), p -> true);
       this.tableBooks.setItems(filteredList);
-      this.boxGenre.valueProperty().addListener((obs, oldV, newV)-> {
+      this.boxGenre.valueProperty().addListener((_, _, newV)-> {
          filteredList.setPredicate(book -> {
             if(newV == null) {
                this.btnClearFilter.fire();
@@ -112,9 +112,9 @@ public class Books {
               .toList();
    }
 
-   @FXML private void loadModal(String route){
+   @FXML private void loadModal(){
       try{
-         URL url = Main.class.getResource(route);
+         URL url = Main.class.getResource(MODAL_COPIES);
          FXMLLoader loader = new FXMLLoader(url);
          Parent root = loader.load();
 

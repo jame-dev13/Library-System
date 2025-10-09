@@ -57,7 +57,7 @@ public class Users {
 
    @FXML private Label lblName, lblEmail, lblUsername, lblPwd;
 
-   private CRUDRepo<UserEntity> repo;
+   private static final CRUDRepo<UserEntity> REPO = new UserService();
 
    private List<AdminDto> users;
 
@@ -72,21 +72,8 @@ public class Users {
     */
    @FXML
    public void initialize() throws IOException {
-      //repository
-      this.repo = new UserService();
       //data
-      this.users = this.repo.getAll().stream()
-              .filter(u -> u.getRole() == ERole.ADMIN &&
-                      u.getId().intValue() != SessionManager.getInstance().getSessionDto().id())
-              .map(u -> AdminDto.builder()
-                      .id(u.getId())
-                      .uuid(u.getUuid())
-                      .name(u.getName())
-                      .email(u.getEmail())
-                      .username(u.getUsername())
-                      .role(u.getRole())
-                      .build())
-              .collect(Collectors.toList());
+      mapToDto();
       //table config
       initTable();
 
@@ -206,21 +193,9 @@ public class Users {
                        .show();
                return;
             }
-            alert.buildAlert(Alert.AlertType.INFORMATION, "INFO", "Email sent to: " + user.getEmail() + " plase check it.")
+            alert.buildAlert(Alert.AlertType.INFORMATION, "INFO", "Email sent to: " + user.getEmail() + " please check it.")
                     .show();
-            this.repo.save(user);
-
-            AdminDto admin = AdminDto.builder()
-                    .id(null)
-                    .uuid(user.getUuid())
-                    .name(user.getName())
-                    .email(user.getEmail())
-                    .username(user.getUsername())
-                    .role(user.getRole())
-                    .build();
-            this.users.add(admin);
-            this.tableAdmins.getItems().add(admin);
-
+            this.save(user);
             //notify
             alert.buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS!", "Admin added!")
                     .show();
@@ -252,7 +227,7 @@ public class Users {
               .showAndWait()
               .ifPresent(confirmation -> {
                  if (confirmation == ButtonType.OK) {
-                    this.repo.deleteByUuid(this.uuidSelected);
+                    REPO.deleteByUuid(this.uuidSelected);
                     this.tableAdmins.getItems().remove(this.index);
                     this.users.remove(this.index);
                  }
@@ -286,5 +261,34 @@ public class Users {
             }
          });
       this.tableAdmins.setItems(filteredList);
+   }
+
+   private void mapToDto(){
+      this.users = REPO.getAll().stream()
+              .filter(u -> u.getRole() == ERole.ADMIN &&
+                      u.getId().intValue() != SessionManager.getInstance().getSessionDto().id())
+              .map(u -> AdminDto.builder()
+                      .id(u.getId())
+                      .uuid(u.getUuid())
+                      .name(u.getName())
+                      .email(u.getEmail())
+                      .username(u.getUsername())
+                      .role(u.getRole())
+                      .build())
+              .collect(Collectors.toList());
+   }
+
+   private void save(UserEntity user){
+      REPO.save(user);
+      AdminDto admin = AdminDto.builder()
+              .id(null)
+              .uuid(user.getUuid())
+              .name(user.getName())
+              .email(user.getEmail())
+              .username(user.getUsername())
+              .role(user.getRole())
+              .build();
+      this.users.add(admin);
+      this.tableAdmins.getItems().add(admin);
    }
 }

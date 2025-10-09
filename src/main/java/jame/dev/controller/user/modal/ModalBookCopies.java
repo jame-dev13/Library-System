@@ -132,22 +132,7 @@ public class ModalBookCopies {
                                     .show();
                             return;
                          }
-                         LoanEntity loan = LoanEntity.builder()
-                                 .uuid(UUID.randomUUID())
-                                 .idUser(SessionManager.getInstance().getSessionDto().id())
-                                 .idCopy(copy.getId())
-                                 .loanDate(LocalDate.parse(textDateNow.getText().trim()))
-                                 .returnDate(LocalDate.now().plusDays(plusDays))
-                                 .statusLoan(EStatusLoan.ON_LOAN)
-                                 .build();
-                         if (CheckFinesUtil.isFined(loan.getIdUser())) {
-                            ALERT.buildAlert(Alert.AlertType.INFORMATION, "UNAUTHORIZED", "You have fines, you can't request loans now.")
-                                    .show();
-                            return;
-                         }
-                         this.loanRepo.save(loan);
-                         copy.setBorrowed(true);
-                         this.copyRepo.update(copy);
+                         this.save(copy, plusDays);
                          ALERT
                                  .buildAlert(Alert.AlertType.INFORMATION, "SUCCESS", "Loan saved.")
                                  .show();
@@ -168,5 +153,24 @@ public class ModalBookCopies {
       this.textDaysLoan.clear();
       this.copySelected = null;
       this.btnLoan.setDisable(true);
+   }
+
+   private void save(CopyEntity copy, int plusDays){
+      LoanEntity loan = LoanEntity.builder()
+              .uuid(UUID.randomUUID())
+              .idUser(SessionManager.getInstance().getSessionDto().id())
+              .idCopy(copy.getId())
+              .loanDate(LocalDate.parse(textDateNow.getText().trim()))
+              .returnDate(LocalDate.now().plusDays(plusDays))
+              .statusLoan(EStatusLoan.ON_LOAN)
+              .build();
+      if (CheckFinesUtil.isFined(loan.getIdUser())) {
+         ALERT.buildAlert(Alert.AlertType.INFORMATION, "UNAUTHORIZED", "You have fines, you can't request loans now.")
+                 .show();
+         return;
+      }
+      this.loanRepo.save(loan);
+      copy.setBorrowed(true);
+      this.copyRepo.update(copy);
    }
 }

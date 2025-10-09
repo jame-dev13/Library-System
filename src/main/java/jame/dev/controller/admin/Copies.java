@@ -29,21 +29,36 @@ import java.util.stream.Collectors;
 @Log
 public class Copies {
 
-   @FXML private TextField txtCopyNum;
-   @FXML private TableView<CopyEntity> tableCopies;
-   @FXML private TableColumn<CopyEntity, UUID> colUuid;
-   @FXML private TableColumn<CopyEntity, Integer> colIdBook;
-   @FXML private TableColumn<CopyEntity, Integer> colCopyNum;
-   @FXML private TableColumn<CopyEntity, String> colBorrowed;
-   @FXML private TableColumn<CopyEntity, EStatusCopy> colStatus;
-   @FXML private TableColumn<CopyEntity, ELanguage> colLanguage;
-   @FXML private TextField txtIdBook;
-   @FXML private ComboBox<EStatusCopy> boxStatus;
-   @FXML private ComboBox<ELanguage> boxLanguage;
-   @FXML private Button btnClear;
-   @FXML private Button btnSave;
-   @FXML private Button btnUpdate;
-   @FXML private Button btnDelete;
+   @FXML
+   private TextField txtCopyNum;
+   @FXML
+   private TableView<CopyEntity> tableCopies;
+   @FXML
+   private TableColumn<CopyEntity, UUID> colUuid;
+   @FXML
+   private TableColumn<CopyEntity, Integer> colIdBook;
+   @FXML
+   private TableColumn<CopyEntity, Integer> colCopyNum;
+   @FXML
+   private TableColumn<CopyEntity, String> colBorrowed;
+   @FXML
+   private TableColumn<CopyEntity, EStatusCopy> colStatus;
+   @FXML
+   private TableColumn<CopyEntity, ELanguage> colLanguage;
+   @FXML
+   private TextField txtIdBook;
+   @FXML
+   private ComboBox<EStatusCopy> boxStatus;
+   @FXML
+   private ComboBox<ELanguage> boxLanguage;
+   @FXML
+   private Button btnClear;
+   @FXML
+   private Button btnSave;
+   @FXML
+   private Button btnUpdate;
+   @FXML
+   private Button btnDelete;
 
    private CRUDRepo<CopyEntity> repo;
    private static List<CopyEntity> copies;
@@ -51,7 +66,8 @@ public class Copies {
    private int indexSelected;
    private static final CustomAlert alert = CustomAlert.getInstance();
 
-   @FXML private void initialize() throws IOException {
+   @FXML
+   private void initialize() throws IOException {
       this.repo = new CopyService();
       //fields
       this.boxStatus.setItems(FXCollections.observableArrayList(EStatusCopy.values()));
@@ -63,7 +79,8 @@ public class Copies {
       this.btnDelete.setOnAction(this::handleDelete);
    }
 
-   @FXML private void configTable(){
+   @FXML
+   private void configTable() {
       //columns
       this.colUuid.setCellValueFactory(data ->
               new SimpleObjectProperty<>(data.getValue().getUuid()));
@@ -72,7 +89,7 @@ public class Copies {
       this.colCopyNum.setCellValueFactory(data ->
               new SimpleIntegerProperty(data.getValue().getCopyNum()).asObject());
       this.colBorrowed.setCellValueFactory(data ->
-              new SimpleStringProperty(data.getValue().getBorrowed() ? "YES": "NO"));
+              new SimpleStringProperty(data.getValue().getBorrowed() ? "YES" : "NO"));
       this.colStatus.setCellValueFactory(data ->
               new SimpleObjectProperty<>(data.getValue().getStatusCopy()));
       this.colLanguage.setCellValueFactory(data ->
@@ -89,24 +106,12 @@ public class Copies {
       //listener
       this.tableCopies.setOnMouseClicked(m -> {
          Optional.ofNullable(this.tableCopies.getSelectionModel().getSelectedItem())
-                 .ifPresent(selection -> {
-                    //set aux
-                    this.uuidSelected = selection.getUuid();
-                    this.indexSelected = this.tableCopies.getSelectionModel().getSelectedIndex();
-                    //set fields
-                    txtIdBook.setText(String.valueOf(selection.getIdBook()));
-                    txtCopyNum.setText(String.valueOf(selection.getCopyNum()));
-                    boxStatus.setValue(selection.getStatusCopy());
-                    boxLanguage.setValue(selection.getLanguage());
-                    //enable buttons
-                    this.btnUpdate.setDisable(false);
-                    this.btnDelete.setDisable(false);
-                    this.btnSave.setDisable(true);
-                 });
+                 .ifPresent(this::onSelection);
       });
    }
 
-   @FXML public void setBookInfo(BookEntity book){
+   @FXML
+   public void setBookInfo(BookEntity book) {
       Optional.ofNullable(this.repo.getAll())
               .ifPresent(list -> copies = list
                       .stream()
@@ -119,13 +124,12 @@ public class Copies {
       this.configTable();
    }
 
-   @FXML private void handleClear(ActionEvent event){
-      this.txtCopyNum.setText(String.valueOf(copies.size() +1));
+   @FXML
+   private void handleClear(ActionEvent event) {
+      this.txtCopyNum.setText(String.valueOf(copies.size() + 1));
       this.boxStatus.setValue(null);
       this.boxLanguage.setValue(null);
-
       this.tableCopies.getSelectionModel().clearSelection();
-
       this.btnSave.setDisable(false);
       this.btnUpdate.setDisable(true);
       this.btnDelete.setDisable(true);
@@ -133,62 +137,85 @@ public class Copies {
       this.indexSelected = -1;
    }
 
-   @FXML private void handleSave(ActionEvent event){
-      try{
-         CopyEntity copy = CopyEntity.builder()
-                 .uuid(UUID.randomUUID())
-                 .idBook(Integer.parseInt(txtIdBook.getText().trim()))
-                 .copyNum(Integer.parseInt(txtCopyNum.getText().trim()))
-                 .borrowed(false)
-                 .statusCopy(boxStatus.getSelectionModel().getSelectedItem())
-                 .language(boxLanguage.getSelectionModel().getSelectedItem())
-                 .build();
-
-         this.repo.save(copy);
-         this.tableCopies.getItems().add(copy);
-         copies.add(copy);
+   @FXML
+   private void handleSave(ActionEvent event) {
+      try {
+         this.save();
          alert.buildAlert(Alert.AlertType.INFORMATION, "SAVE", "Copy saved successfully.")
                  .show();
-      }catch (NullPointerException e){
+      } catch (NullPointerException e) {
          alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Empty fields present.")
                  .show();
          log.severe(e.toString());
-      }
-      finally {
+      } finally {
          this.btnClear.fire();
       }
    }
 
-   @FXML private void handleUpdate(ActionEvent event){
+   @FXML
+   private void handleUpdate(ActionEvent event) {
       this.repo.findByUuid(this.uuidSelected)
-           .ifPresentOrElse(copy -> {
-              copy.setStatusCopy(boxStatus.getSelectionModel().getSelectedItem());
-              copy.setLanguage(boxLanguage.getSelectionModel().getSelectedItem());
-              alert.buildAlert(Alert.AlertType.CONFIRMATION, "UPDATE", "Do you want to update this record?")
-                      .showAndWait()
-                      .ifPresent(confirmation -> {
-                         if(confirmation == ButtonType.OK){
-                            this.repo.update(copy);
-                            copies.set(indexSelected, copy);
-                            this.tableCopies.getItems().set(indexSelected, copy);
-                         }
-                      });
-           }, () -> alert
-                   .buildAlert(Alert.AlertType.WARNING, "WARNING", "Not found.")
-                   .show());
+              .ifPresentOrElse(this::update,
+                      () -> alert
+                              .buildAlert(Alert.AlertType.WARNING, "WARNING", "Not found.")
+                              .show());
       this.btnClear.fire();
    }
 
-   @FXML private void handleDelete(ActionEvent event){
+   @FXML
+   private void handleDelete(ActionEvent event) {
       alert.buildAlert(Alert.AlertType.CONFIRMATION, "DELETE", "Do you want to delete this copy?")
               .showAndWait()
               .ifPresent(confirmation -> {
-                 if(confirmation == ButtonType.OK){
+                 if (confirmation == ButtonType.OK) {
                     this.repo.deleteByUuid(uuidSelected);
                     this.tableCopies.getItems().remove(indexSelected);
                     copies.remove(indexSelected);
                  }
               });
       this.btnClear.fire();
+   }
+
+   private void onSelection(CopyEntity selection) {
+      //set aux
+      this.uuidSelected = selection.getUuid();
+      this.indexSelected = this.tableCopies.getSelectionModel().getSelectedIndex();
+      //set fields
+      txtIdBook.setText(String.valueOf(selection.getIdBook()));
+      txtCopyNum.setText(String.valueOf(selection.getCopyNum()));
+      boxStatus.setValue(selection.getStatusCopy());
+      boxLanguage.setValue(selection.getLanguage());
+      //enable buttons
+      this.btnUpdate.setDisable(false);
+      this.btnDelete.setDisable(false);
+      this.btnSave.setDisable(true);
+   }
+
+   private void save() {
+      CopyEntity copy = CopyEntity.builder()
+              .uuid(UUID.randomUUID())
+              .idBook(Integer.parseInt(txtIdBook.getText().trim()))
+              .copyNum(Integer.parseInt(txtCopyNum.getText().trim()))
+              .borrowed(false)
+              .statusCopy(boxStatus.getSelectionModel().getSelectedItem())
+              .language(boxLanguage.getSelectionModel().getSelectedItem())
+              .build();
+      this.repo.save(copy);
+      this.tableCopies.getItems().add(copy);
+      copies.add(copy);
+   }
+
+   private void update(CopyEntity copy) {
+      copy.setStatusCopy(boxStatus.getSelectionModel().getSelectedItem());
+      copy.setLanguage(boxLanguage.getSelectionModel().getSelectedItem());
+      alert.buildAlert(Alert.AlertType.CONFIRMATION, "UPDATE", "Do you want to update this record?")
+              .showAndWait()
+              .ifPresent(confirmation -> {
+                 if (confirmation == ButtonType.OK) {
+                    this.repo.update(copy);
+                    copies.set(indexSelected, copy);
+                    this.tableCopies.getItems().set(indexSelected, copy);
+                 }
+              });
    }
 }

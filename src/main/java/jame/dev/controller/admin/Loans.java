@@ -8,6 +8,8 @@ import jame.dev.service.FineService;
 import jame.dev.service.LoanService;
 import jame.dev.utils.ui.CustomAlert;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -17,7 +19,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -25,10 +26,7 @@ import lombok.extern.java.Log;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Log
@@ -74,6 +72,7 @@ public class Loans {
 
    private final CRUDRepo<LoanEntity> repo = new LoanService();
    private static List<LoanEntity> loans;
+   private static Set<Integer> IDS = new HashSet<>();
    private static final FineService fineService = new FineService();
    private UUID uuidSelected;
    private int indexSelected;
@@ -89,6 +88,10 @@ public class Loans {
       this.labelDateToday.setText(LocalDate.now().toString());
       //loan data
       loans = repo.getAll();
+      IDS = fineService.getAll()
+              .stream()
+              .map(FineEntity::getIdUser)
+              .collect(Collectors.toSet());
       //table
       tableConfig();
 
@@ -97,7 +100,7 @@ public class Loans {
       btnSet.setOnAction(this::handleSet);
       btnDelete.setOnAction(this::handleDelete);
       btnFine.setOnAction(this::handleFine);
-      btnShowFines.setOnAction(_ -> loadModalFines());
+      btnShowFines.setOnAction(this::loadModalFines);
 
       //txtFilter listener
       FilteredList<LoanEntity> filteredList = new FilteredList<>(this.tableLoans.getItems(), p -> true);
@@ -105,26 +108,24 @@ public class Loans {
 
       //update status loan on expired date.
       Optional.ofNullable(loans)
-              .ifPresent(l ->
-                      l.stream()
-                              .filter(loan -> LocalDate.now().isAfter(loan.getReturnDate())
-                                      && loan.getStatusLoan() == EStatusLoan.ON_LOAN)
-                              .forEach(loan -> {
-                                 loan.setStatusLoan(EStatusLoan.RUN_OUT);
-                                 this.repo.update(loan);
-                              })
-              );
+              .ifPresent(this::updateStatusOnLoad);
    }
 
    @FXML
    private void tableConfig() {
       //columns
-      this.colUuid.setCellValueFactory(new PropertyValueFactory<>("uuid"));
-      this.colIdUser.setCellValueFactory(new PropertyValueFactory<>("idUser"));
-      this.colIdCopy.setCellValueFactory(new PropertyValueFactory<>("idCopy"));
-      this.colLoanDate.setCellValueFactory(new PropertyValueFactory<>("loanDate"));
-      this.colReturnDate.setCellValueFactory(new PropertyValueFactory<>("returnDate"));
-      this.colStatus.setCellValueFactory(new PropertyValueFactory<>("statusLoan"));
+      this.colUuid.setCellValueFactory(data ->
+              new SimpleObjectProperty<>(data.getValue().getUuid()));
+      this.colIdUser.setCellValueFactory(data ->
+              new SimpleIntegerProperty(data.getValue().getIdUser()).asObject());
+      this.colIdCopy.setCellValueFactory(data ->
+              new SimpleIntegerProperty(data.getValue().getIdCopy()).asObject());
+      this.colLoanDate.setCellValueFactory(data ->
+              new SimpleObjectProperty<>(data.getValue().getLoanDate()));
+      this.colReturnDate.setCellValueFactory(data ->
+              new SimpleObjectProperty<>(data.getValue().getReturnDate()));
+      this.colStatus.setCellValueFactory(data ->
+              new SimpleObjectProperty<>(data.getValue().getStatusLoan()));
 
       //table config
       this.tableLoans.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -134,16 +135,7 @@ public class Loans {
       //listeners
       this.tableLoans.setOnMouseClicked(m -> {
          LoanEntity selected = this.tableLoans.getSelectionModel().getSelectedItem();
-         Optional.ofNullable(selected)
-                 .ifPresent(selection -> {
-                    this.uuidSelected = selection.getUuid();
-                    this.indexSelected = this.tableLoans.getSelectionModel().getSelectedIndex();
-                    this.dateLoan.setValue(selection.getLoanDate());
-                    this.dateReturn.setValue(selection.getReturnDate());
-                    this.btnSet.setDisable(false);
-                    this.btnDelete.setDisable(false);
-                    if (selection.getStatusLoan() == EStatusLoan.RUN_OUT) btnFine.setDisable(false);
-                 });
+         Optional.ofNullable(selected).ifPresent(this::onSelection);
          int clicks = m.getClickCount();
          if (clicks == 2) {
             repo.findByUuid(uuidSelected)
@@ -171,77 +163,34 @@ public class Loans {
    }
 
    @FXML
-   private void handleSet(ActionEvent event) {
-      this.repo.findByUuid(uuidSelected)
-              .ifPresent(loan -> {
-                 loan.setLoanDate(dateLoan.getValue());
-                 loan.setReturnDate(dateReturn.getValue());
-                 this.repo.update(loan);
-                 this.tableLoans.getItems().set(indexSelected, loan);
-                 loans.set(indexSelected, loan);
-                 alert.buildAlert(Alert.AlertType.INFORMATION, "UPDATED", "Record updated!")
-                         .show();
-              });
-      this.btnClear.fire();
-   }
-
-   @FXML
-   private void handleDelete(ActionEvent event) {
-      Optional.ofNullable(uuidSelected)
-              .ifPresent(uuid -> {
-                 //add an alert for confirmation
-                 alert.buildAlert(Alert.AlertType.CONFIRMATION,
-                                 "CONFIRMATION",
-                                 "¿Do you want to delete this record?")
-                         .showAndWait()
-                         .ifPresent(confirmation -> {
-                            if (confirmation == ButtonType.OK) {
-                               EStatusLoan statusSelected = loans.get(indexSelected).getStatusLoan();
-                               if (statusSelected == EStatusLoan.ON_LOAN || statusSelected == EStatusLoan.RENEWED) {
-                                  alert.buildAlert(Alert.AlertType.ERROR, "NOT ALLOWED", "This is a temporary valid loan that can't be removed yet.")
-                                          .show();
-                                  return;
-                               }
-                               this.repo.deleteByUuid(uuid);
-                               loans.remove(indexSelected);
-                               this.tableLoans.getItems().remove(indexSelected);
-                            }
-                         });
-              });
-      this.btnClear.fire();
-   }
-
-   @FXML
    private void handleFine(ActionEvent event) {
-      Set<Integer> idUsers = fineService.getAll()
-              .stream()
-              .map(FineEntity::getIdUser)
-              .collect(Collectors.toSet());
       alert.buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Do you want fine this user?")
               .showAndWait()
               .ifPresent(confirmation -> {
                  if (confirmation == ButtonType.OK) {
                     Optional.ofNullable(this.tableLoans.getSelectionModel().getSelectedItem())
-                            .ifPresent(entity -> {
-                               if (idUsers.add(entity.getIdUser())) {
-                                  fineService.save(
-                                          FineEntity.builder()
-                                                  .uuid(UUID.randomUUID())
-                                                  .idUser(entity.getIdUser())
-                                                  .cause("Didn't return the loan on time.")
-                                                  .expiration(LocalDate.now().plusDays(15))
-                                                  .build()
-                                  );
-                                  alert.buildAlert(Alert.AlertType.INFORMATION, "INFO", "User fined.")
-                                          .show();
-                                  entity.setStatusLoan(EStatusLoan.FINED);
-                                  this.repo.update(entity);
-                                  loans.set(indexSelected, entity);
-                                  this.tableLoans.getItems().set(indexSelected, entity);
-                               } else
-                                  alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "This user is fined already.")
-                                          .show();
-                            });
+                            .ifPresent(this::save);
+                 }
+              });
+      this.btnClear.fire();
+   }
+
+   @FXML
+   private void handleSet(ActionEvent event) {
+      this.repo.findByUuid(uuidSelected)
+              .ifPresent(this::update);
+      this.btnClear.fire();
+   }
+
+   @FXML
+   private void handleDelete(ActionEvent event) {
+      alert.buildAlert(Alert.AlertType.CONFIRMATION,
+                      "CONFIRMATION",
+                      "¿Do you want to delete this record?")
+              .showAndWait()
+              .ifPresent(confirmation -> {
+                 if (confirmation == ButtonType.OK) {
+                    this.delete();
                  }
               });
       this.btnClear.fire();
@@ -285,7 +234,7 @@ public class Loans {
    }
 
    @FXML
-   private void loadModalFines() {
+   private void loadModalFines(ActionEvent event) {
       try {
          FXMLLoader loader = new FXMLLoader(getClass().getResource("/templates/adminPanes/fines.fxml"));
          Parent root = loader.load();
@@ -303,5 +252,68 @@ public class Loans {
          Platform.runLater(() -> new Label("Error loading modal."));
          log.severe(e.getMessage());
       }
+   }
+
+   private void updateStatusOnLoad(List<LoanEntity> l){
+      l.stream()
+              .filter(loan -> LocalDate.now().isAfter(loan.getReturnDate())
+                      && loan.getStatusLoan() == EStatusLoan.ON_LOAN)
+              .forEach(loan -> {
+                 loan.setStatusLoan(EStatusLoan.RUN_OUT);
+                 this.repo.update(loan);
+              });
+   }
+
+   private void onSelection(LoanEntity selection){
+      this.uuidSelected = selection.getUuid();
+      this.indexSelected = this.tableLoans.getSelectionModel().getSelectedIndex();
+      this.dateLoan.setValue(selection.getLoanDate());
+      this.dateReturn.setValue(selection.getReturnDate());
+      this.btnSet.setDisable(false);
+      this.btnDelete.setDisable(false);
+      if (selection.getStatusLoan() == EStatusLoan.RUN_OUT) btnFine.setDisable(false);
+   }
+
+   private void save(LoanEntity entity){
+      if (!IDS.add(entity.getIdUser())) {
+         alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "This user is fined already.")
+                 .show();
+         return;
+      }
+      FineEntity fine = FineEntity.builder()
+              .uuid(UUID.randomUUID())
+              .idUser(entity.getIdUser())
+              .cause("Didn't return the loan on time.")
+              .expiration(LocalDate.now().plusDays(15))
+              .build();
+      fineService.save(fine);
+      alert.buildAlert(Alert.AlertType.INFORMATION, "INFO", "User fined.")
+              .show();
+      entity.setStatusLoan(EStatusLoan.FINED);
+      this.repo.update(entity);
+      loans.set(indexSelected, entity);
+      this.tableLoans.getItems().set(indexSelected, entity);
+   }
+
+   private void update(LoanEntity loan){
+      loan.setLoanDate(dateLoan.getValue());
+      loan.setReturnDate(dateReturn.getValue());
+      this.repo.update(loan);
+      this.tableLoans.getItems().set(indexSelected, loan);
+      loans.set(indexSelected, loan);
+      alert.buildAlert(Alert.AlertType.INFORMATION, "UPDATED", "Record updated!")
+              .show();
+   }
+
+   private void delete(){
+      EStatusLoan statusSelected = loans.get(indexSelected).getStatusLoan();
+      if (statusSelected == EStatusLoan.ON_LOAN || statusSelected == EStatusLoan.RENEWED) {
+         alert.buildAlert(Alert.AlertType.ERROR, "NOT ALLOWED", "This is a temporary valid loan that can't be removed yet.")
+                 .show();
+         return;
+      }
+      this.repo.deleteByUuid(uuidSelected);
+      loans.remove(indexSelected);
+      this.tableLoans.getItems().remove(indexSelected);
    }
 }

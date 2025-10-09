@@ -46,11 +46,9 @@ public class Admin {
    @FXML
    private Tab tabMe;
 
+   private static final SessionManager MANAGER = SessionManager.getInstance();
    private static final Map<String, Integer> changes = GlobalNotificationChange.getInstance().getChanges();
 
-   /**
-    * Loads the content for the Admin Tabs in a lazy way using {@link ExecutorTabLoaderUtil} class.
-    */
    @FXML
    public void initialize() {
       this.btnLogout.setOnAction(this::handleLogout);
@@ -59,15 +57,13 @@ public class Admin {
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Loans.fxml", this.tabLoans);
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Fines.fxml", this.tabFines);
       ExecutorTabLoaderUtil.loadTab("/templates/commons/Me.fxml", this.tabMe);
-
    }
 
    @FXML
    private void handleLogout(ActionEvent event) {
-      SessionManager manager = SessionManager.getInstance();
-      SessionDto dto = manager.getSessionDto();
+      SessionDto dto = MANAGER.getSessionDto();
       if (dto != null) {
-         manager.logout();
+         MANAGER.logout();
          try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/templates/login.fxml"));
             Parent root = loader.load();

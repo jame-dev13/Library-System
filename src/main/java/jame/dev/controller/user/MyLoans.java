@@ -121,23 +121,13 @@ public class MyLoans {
                        input.setContentText("Enter the number of days for the renew: ");
                        input.showAndWait()
                                .ifPresent(value -> {
-                                  int intValue = Integer.parseInt(value);
-                                  if(intValue > 60) {
+                                  int daysPlus = Integer.parseInt(value);
+                                  if(daysPlus > 60) {
                                      ALERT.buildAlert(Alert.AlertType.WARNING, "NOT ALLOWED", "Can't renew a Loan for more than 60 days")
                                              .show();
                                      return;
                                   }
-                                  loan.setStatusLoan(EStatusLoan.RENEWED);
-                                  loan.setReturnDate(LocalDate.now().plusDays(intValue));
-                                  REPO.update(loan);
-                                  loans.set(indexSelected, LoanDetailsDto.builder()
-                                          .uuid(loan.getUuid())
-                                          .title(loanMap.title())
-                                          .author(loanMap.author())
-                                          .statusLoan(loan.getStatusLoan())
-                                          .remainingDays(intValue)
-                                          .build());
-                                  this.tableLoans.getItems().set(indexSelected, loans.get(indexSelected));
+                                  this.renew(loan, loanMap, daysPlus);
                                });
                     }
                  });
@@ -153,5 +143,19 @@ public class MyLoans {
       this.indexSelected = -1;
       this.btnReturnLoan.setDisable(true);
       this.btnRenew.setDisable(true);
+   }
+
+   private void renew(LoanEntity loan, LoanDetailsDto loanMap, int daysPlus){
+      loan.setStatusLoan(EStatusLoan.RENEWED);
+      loan.setReturnDate(LocalDate.now().plusDays(daysPlus));
+      REPO.update(loan);
+      loans.set(indexSelected, LoanDetailsDto.builder()
+              .uuid(loan.getUuid())
+              .title(loanMap.title())
+              .author(loanMap.author())
+              .statusLoan(loan.getStatusLoan())
+              .remainingDays(daysPlus)
+              .build());
+      this.tableLoans.getItems().set(indexSelected, loans.get(indexSelected));
    }
 }
