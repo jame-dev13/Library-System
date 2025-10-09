@@ -6,10 +6,7 @@ import jame.dev.models.entitys.UserEntity;
 import jame.dev.models.enums.ERole;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.service.UserService;
-import jame.dev.utils.CustomAlert;
-import jame.dev.utils.EmailSender;
-import jame.dev.utils.SessionManager;
-import jame.dev.utils.TokenGenerator;
+import jame.dev.utils.*;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -53,6 +50,7 @@ public class Users {
    @FXML
    private Button btnSave, btnClear, btnDrop;
 
+   @FXML private Label lblName, lblEmail, lblUsername, lblPwd;
 
    private CRUDRepo<UserEntity> repo;
 
@@ -91,6 +89,12 @@ public class Users {
       this.btnClear.setOnAction(this::handleClear);
       this.btnSave.setOnAction(this::handleSave);
       this.btnDrop.setOnAction(this::handleDelete);
+
+      ComponentValidationUtil.addValidation(txtName, lblName, ValidatorUtil::isValidString, "Name is not valid.");
+      ComponentValidationUtil.addValidation(txtEmail, lblEmail, ValidatorUtil::isEmailValid, "Email is not valid.");
+      ComponentValidationUtil.addValidation(txtUsername, lblUsername, ValidatorUtil::isValidString, "Username is not valid.");
+      ComponentValidationUtil.addValidation(txtPassword, lblPwd, ValidatorUtil::isValidString,
+              !ValidatorUtil.pwdIsStrong(txtPassword.getText().trim()) ? "Password weak": "");
       //filter listener
       FilteredList<AdminDto> filteredData =
               new FilteredList<>(this.tableAdmins.getItems(), p -> true);

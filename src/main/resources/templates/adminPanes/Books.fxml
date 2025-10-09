@@ -25,13 +25,13 @@
       <items>
         <AnchorPane prefHeight="373.0" prefWidth="859.0">
           <children>
-                  <SplitPane dividerPositions="0.6473616473616474" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <SplitPane dividerPositions="0.6833976833976834" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
                       <AnchorPane minHeight="300.0" minWidth="500.0" prefHeight="160.0" prefWidth="100.0">
                            <children>
                     <VBox alignment="CENTER" prefHeight="491.0" prefWidth="632.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                       <children>
-                                    <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" orientation="VERTICAL" prefHeight="426.0" prefWidth="508.0" prefWrapLength="500.0" vgap="15.0" VBox.vgrow="ALWAYS">
+                                    <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="15.0" orientation="VERTICAL" prefHeight="426.0" prefWidth="508.0" prefWrapLength="500.0" vgap="15.0" VBox.vgrow="ALWAYS">
                                        <children>
                                           <VBox alignment="CENTER" spacing="5.0">
                                              <children>
@@ -53,15 +53,6 @@
                                     <ComboBox fx:id="boxGenre" prefWidth="150.0" promptText="Genre" />
                                                 <Label text="Publication Date" />
                                                 <DatePicker fx:id="pickerPubDate" promptText="Pub. Date" />
-                                    <Label text="Filter" />
-                                    <TextField fx:id="txtSearch" alignment="CENTER" promptText="Search">
-                                      <cursor>
-                                        <Cursor fx:constant="HAND" />
-                                      </cursor>
-                                      <padding>
-                                        <Insets left="10.0" right="10.0" />
-                                      </padding>
-                                    </TextField>
                                              </children>
                                           </VBox>
                                        </children>
@@ -76,7 +67,7 @@
                     </VBox>
                            </children>
                         </AnchorPane>
-                      <AnchorPane minHeight="350.0" minWidth="200.0" prefHeight="160.0" prefWidth="100.0">
+                      <AnchorPane minHeight="350.0" minWidth="220.0" prefHeight="160.0" prefWidth="150.0">
                            <children>
                     <VBox alignment="CENTER" maxWidth="250.0" minWidth="-Infinity" prefHeight="199.0" prefWidth="200.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                       <children>
@@ -88,10 +79,23 @@
                             <Point3D />
                           </rotationAxis>
                         </ImageView>
-                        <Button fx:id="btnUpdate" disable="true" mnemonicParsing="false" prefHeight="34.0" prefWidth="89.0" styleClass="update" text="Update" />
-                        <Button fx:id="btnSave" mnemonicParsing="false" prefHeight="34.0" prefWidth="73.0" styleClass="save" text="Save" />
-                        <Button fx:id="btnClear" mnemonicParsing="false" prefHeight="34.0" prefWidth="78.0" styleClass="clear" text="Clear" />
-                        <Button fx:id="btnDrop" disable="true" mnemonicParsing="false" prefHeight="34.0" prefWidth="80.0" styleClass="delete" text="Drop" />
+                        <Label text="Filter" />
+                        <TextField fx:id="txtSearch" alignment="CENTER" promptText="Search">
+                          <cursor>
+                            <Cursor fx:constant="HAND" />
+                          </cursor>
+                          <padding>
+                            <Insets left="10.0" right="10.0" />
+                          </padding>
+                        </TextField>
+                                    <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="5.0" prefWrapLength="500.0" vgap="5.0">
+                                       <children>
+                              <Button fx:id="btnUpdate" disable="true" mnemonicParsing="false" prefHeight="34.0" prefWidth="89.0" styleClass="update" text="Update" />
+                              <Button fx:id="btnSave" mnemonicParsing="false" prefHeight="34.0" prefWidth="73.0" styleClass="save" text="Save" />
+                              <Button fx:id="btnClear" mnemonicParsing="false" prefHeight="34.0" prefWidth="78.0" styleClass="clear" text="Clear" />
+                              <Button fx:id="btnDrop" disable="true" mnemonicParsing="false" prefHeight="34.0" prefWidth="80.0" styleClass="delete" text="Drop" />
+                                       </children>
+                                    </FlowPane>
                       </children>
                                  <padding>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -135,7 +139,8 @@
                     </TableView>
                   </content>
                 </ScrollPane>
-              </children></VBox>
+              </children>
+                  </VBox>
           </children>
         </AnchorPane>
       </items>
