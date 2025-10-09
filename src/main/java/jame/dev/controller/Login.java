@@ -31,8 +31,6 @@ public class Login {
    @FXML
    private Label lbUsername;
    @FXML
-   private Label lbPassword;
-   @FXML
    private Button btnLogin;
 
    @FXML
@@ -58,8 +56,6 @@ public class Login {
       btnLogin.setOnAction(this::handleClickLogin);
       btnToSignUp.setOnAction(this::handleClickGoToSignUp);
       ComponentValidationUtil.addValidation(txtUsername, lbUsername, ValidatorUtil::isValidString, "Username not valid.");
-      ComponentValidationUtil.addValidation(txtPassword, lbPassword, ValidatorUtil::pwdIsStrong,
-              !ValidatorUtil.pwdIsStrong(txtPassword.getText()) ? "Password weak": "");
    }
 
    /**
