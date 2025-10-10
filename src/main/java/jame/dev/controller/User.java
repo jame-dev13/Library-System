@@ -13,7 +13,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -89,12 +88,10 @@ public class User {
                             stage.show();
                          } catch (IOException e) {
                             Platform.runLater(() ->
-                                    ALERT.buildAlert(Alert.AlertType.ERROR, "ERROR", "Error loading the view.")
-                                            .show());
-                            log.severe("Error loading the resource: " + e);
+                                    ALERT.errorAlert("Error loading the view"));
+                            log.severe("Error loading the resource: " + e.getMessage());
                          }
                       },
-                      () -> ALERT.buildAlert(Alert.AlertType.ERROR, "ERROR", "No Session active")
-                              .show());
+                      () -> ALERT.errorAlert("No session present."));
    }
 }

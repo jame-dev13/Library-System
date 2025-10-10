@@ -128,20 +128,27 @@ public class ModalBookCopies {
               .ifPresentOrElse(copy -> {
                          int plusDays = Integer.parseInt(textDaysLoan.getText().trim());
                          if (plusDays > 60) {
-                            ALERT.buildAlert(Alert.AlertType.WARNING, "NOT ALLOWED", "You can't request a loan for more than 60 days")
-                                    .show();
+                            ALERT.errorAlert("You can't request a loan for more than 60 days");
                             return;
                          }
-                         this.save(copy, plusDays);
-                         ALERT
-                                 .buildAlert(Alert.AlertType.INFORMATION, "SUCCESS", "Loan saved.")
-                                 .show();
+                         LoanEntity loan = LoanEntity.builder()
+                                 .uuid(UUID.randomUUID())
+                                 .idUser(SessionManager.getInstance().getSessionDto().id())
+                                 .idCopy(copy.getId())
+                                 .loanDate(LocalDate.parse(textDateNow.getText().trim()))
+                                 .returnDate(LocalDate.now().plusDays(plusDays))
+                                 .statusLoan(EStatusLoan.ON_LOAN)
+                                 .build();
+                         if (CheckFinesUtil.isFined(loan.getIdUser())) {
+                            ALERT.errorAlert("You have fines, you can't request loans now.");
+                            return;
+                         }
+                         this.save(loan, copy);
+                         ALERT.infoAlert("Loan saved.");
                          changes.registerChange(EGlobalNames.LOAN_CLIENT.name());
                          changes.registerChange(EGlobalNames.HISTORY.name());
                       },
-                      () -> ALERT
-                              .buildAlert(Alert.AlertType.ERROR, "ERROR", "No value present.")
-                              .show());
+                      () -> ALERT.errorAlert("No value present."));
       this.btnClear.fire();
    }
 
@@ -155,20 +162,7 @@ public class ModalBookCopies {
       this.btnLoan.setDisable(true);
    }
 
-   private void save(CopyEntity copy, int plusDays){
-      LoanEntity loan = LoanEntity.builder()
-              .uuid(UUID.randomUUID())
-              .idUser(SessionManager.getInstance().getSessionDto().id())
-              .idCopy(copy.getId())
-              .loanDate(LocalDate.parse(textDateNow.getText().trim()))
-              .returnDate(LocalDate.now().plusDays(plusDays))
-              .statusLoan(EStatusLoan.ON_LOAN)
-              .build();
-      if (CheckFinesUtil.isFined(loan.getIdUser())) {
-         ALERT.buildAlert(Alert.AlertType.INFORMATION, "UNAUTHORIZED", "You have fines, you can't request loans now.")
-                 .show();
-         return;
-      }
+   private void save(LoanEntity loan, CopyEntity copy){
       this.loanRepo.save(loan);
       copy.setBorrowed(true);
       this.copyRepo.update(copy);

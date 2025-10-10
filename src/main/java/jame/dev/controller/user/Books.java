@@ -5,6 +5,7 @@ import jame.dev.controller.user.modal.ModalBookCopies;
 import jame.dev.dtos.books.BooksDto;
 import jame.dev.models.enums.EGenre;
 import jame.dev.service.BookService;
+import jame.dev.utils.ui.CustomAlert;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -18,13 +19,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import lombok.extern.java.Log;
 
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-
+@Log
 public class Books {
 
    @FXML private ComboBox<EGenre> boxGenre;
@@ -45,6 +47,7 @@ public class Books {
    private static final String MODAL_COPIES = "/templates/userPanes/modal/modalShowCopies.fxml";
    private static List<BooksDto> books;
    private static FilteredList<BooksDto> filteredList;
+   private static final CustomAlert ALERT = CustomAlert.getInstance();
 
    @FXML private void initialize() throws IOException {
       this.loadDto();
@@ -124,7 +127,8 @@ public class Books {
          stage.initModality(Modality.APPLICATION_MODAL);
          stage.showAndWait();
       }catch (IOException e){
-         throw new RuntimeException("Can´t load the resource view: ", e);
+         ALERT.errorAlert("Can't load the modal.");
+         log.severe(e.getMessage());
       }
    }
 
@@ -144,7 +148,8 @@ public class Books {
          stage.initModality(Modality.APPLICATION_MODAL);
          stage.showAndWait();
       }catch (IOException e){
-         throw new RuntimeException("Can´t load the resource view: ", e);
+         ALERT.errorAlert("Can't load the modal.");
+         log.severe(e.getMessage());
       }
    }
 }

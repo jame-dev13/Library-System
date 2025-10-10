@@ -141,12 +141,10 @@ public class Copies {
    private void handleSave(ActionEvent event) {
       try {
          this.save();
-         alert.buildAlert(Alert.AlertType.INFORMATION, "SAVE", "Copy saved successfully.")
-                 .show();
+         alert.infoAlert("Copy saved.");
       } catch (NullPointerException e) {
-         alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Empty fields present.")
-                 .show();
-         log.severe(e.toString());
+         alert.errorAlert("Empty fields present.");
+         log.severe(e.getMessage());
       } finally {
          this.btnClear.fire();
       }
@@ -157,15 +155,13 @@ public class Copies {
       this.repo.findByUuid(this.uuidSelected)
               .ifPresentOrElse(this::update,
                       () -> alert
-                              .buildAlert(Alert.AlertType.WARNING, "WARNING", "Not found.")
-                              .show());
+                              .warningAlert("Not found."));
       this.btnClear.fire();
    }
 
    @FXML
    private void handleDelete(ActionEvent event) {
-      alert.buildAlert(Alert.AlertType.CONFIRMATION, "DELETE", "Do you want to delete this copy?")
-              .showAndWait()
+      alert.deleteConfirmAlert("Do you want to delete this record?")
               .ifPresent(confirmation -> {
                  if (confirmation == ButtonType.OK) {
                     this.repo.deleteByUuid(uuidSelected);
@@ -208,8 +204,7 @@ public class Copies {
    private void update(CopyEntity copy) {
       copy.setStatusCopy(boxStatus.getSelectionModel().getSelectedItem());
       copy.setLanguage(boxLanguage.getSelectionModel().getSelectedItem());
-      alert.buildAlert(Alert.AlertType.CONFIRMATION, "UPDATE", "Do you want to update this record?")
-              .showAndWait()
+      alert.updateConfirmAlert("Dou you want to update this record?")
               .ifPresent(confirmation -> {
                  if (confirmation == ButtonType.OK) {
                     this.repo.update(copy);

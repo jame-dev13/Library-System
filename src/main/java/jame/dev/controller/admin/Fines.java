@@ -104,14 +104,12 @@ public class Fines{
 
    @FXML
    private void handleUpdateCause(ActionEvent event) {
-      ALERT.buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "¿You want update the cause for this fine?")
-              .showAndWait()
+      ALERT.updateConfirmAlert("Do toy want to update this fine cause?")
               .ifPresent(confirmation -> {
                  if (confirmation == ButtonType.OK) {
                     REPO.findByUuid(uuidSelected)
                             .ifPresentOrElse(this::updateCause,
-                                    () -> ALERT.buildAlert(Alert.AlertType.INFORMATION, "INFO", "Can't find the associated fine.")
-                                            .show());
+                                    () -> ALERT.warningAlert("Can't find the associated fine."));
                  }
               });
       this.btnClear.fire();
@@ -119,8 +117,7 @@ public class Fines{
 
    @FXML
    private void handleDeleteFine(ActionEvent event) {
-      ALERT.buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Do you want remove this fine?")
-              .showAndWait()
+      ALERT.deleteConfirmAlert("Do you want to remove this fine?")
               .ifPresent(confirmation -> {
                  if (confirmation == ButtonType.OK) {
                     REPO.deleteByUuid(uuidSelected);

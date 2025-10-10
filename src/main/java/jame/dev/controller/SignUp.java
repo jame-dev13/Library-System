@@ -52,7 +52,7 @@ public class SignUp {
    @FXML
    private Button btnToSignIn;
    @FXML
-   private CRUDRepo<UserEntity> repo;
+   private final CRUDRepo<UserEntity> REPO = new UserService();
    private UserEntity user;
    private String token;
    private static final CustomAlert alert = CustomAlert.getInstance();
@@ -64,7 +64,6 @@ public class SignUp {
     */
    @FXML
    private void initialize() throws IOException {
-      this.repo = new UserService();
       btnReg.setOnAction(this::handleSignUp);
       btnToSignIn.setOnAction(this::handleReturnToSignIn);
       ComponentValidationUtil.addValidation(txtName, lbName, ValidatorUtil::isValidString, "Name not valid.");
@@ -90,10 +89,7 @@ public class SignUp {
 
       if (!ValidatorUtil.isValidString(name, username) && !ValidatorUtil.isEmailValid(email)) {
          Platform.runLater(() ->
-                 alert.buildAlert(Alert.AlertType.ERROR,
-                                 "ERROR",
-                                 "Names can't start with numbers or any other characters that is not a letter, same for email")
-                         .show()
+                 alert.warningAlert("Names can't start with numbers or any other characters that is not a letter, same for email")
          );
          return;
       }
@@ -121,8 +117,7 @@ public class SignUp {
          Platform.runLater(() -> {
             this.btnReg.setDisable(true);
             if (!emailSent) {
-               alert.buildAlert(Alert.AlertType.INFORMATION, "NOT FOUND", "Your email address could not be found.")
-                       .show();
+               alert.errorAlert("Can't sent the email.");
                return;
             }
             checkVerification(this.token);
@@ -145,19 +140,18 @@ public class SignUp {
       input.setContentText("Code: ");
       Optional<String> inputPresent = input.showAndWait();
       while (inputPresent.isPresent() && !inputPresent.get().equals(token)) {
-         alert.buildAlert(Alert.AlertType.INFORMATION, "INFORMATION", "Values are not equals.")
-                 .show();
+         alert.errorAlert("Values are not the same.");
          inputPresent = input.showAndWait();
       }
 
       inputPresent.ifPresentOrElse(_ -> {
          this.user.setVerified(true);
-         this.repo.save(this.user);
+         this.REPO.save(this.user);
          this.token = null;
          this.user = null;
-         alert.buildAlert(Alert.AlertType.INFORMATION, "REGISTER", "Sign Up success, you can signIn now!").showAndWait();
+         alert.infoAlert("SignUp success, you can do login now");
          this.btnToSignIn.fire();
-      }, () -> alert.buildAlert(Alert.AlertType.ERROR, "CANCEL", "Operation canceled, try again.").show());
+      }, () -> alert.warningAlert("Operation canceled, try again"));
       this.btnReg.setDisable(true);
    }
 
@@ -178,9 +172,8 @@ public class SignUp {
          stage.show();
       } catch (IOException e) {
          Platform.runLater(() ->
-                 alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Can't load SignIn page.")
-                         .show());
-         log.severe("Resource loading went wrong" + e);
+                 alert.errorAlert("Can't load SignIn page."));
+         log.severe("Resource loading went wrong" + e.getMessage());
       }
    }
 }

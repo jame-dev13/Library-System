@@ -55,7 +55,8 @@ public class Users {
    @FXML
    private Button btnSave, btnClear, btnDrop;
 
-   @FXML private Label lblName, lblEmail, lblUsername, lblPwd;
+   @FXML
+   private Label lblName, lblEmail, lblUsername, lblPwd;
 
    private static final CRUDRepo<UserEntity> REPO = new UserService();
 
@@ -86,7 +87,7 @@ public class Users {
       ComponentValidationUtil.addValidation(txtEmail, lblEmail, ValidatorUtil::isEmailValid, "Email is not valid.");
       ComponentValidationUtil.addValidation(txtUsername, lblUsername, ValidatorUtil::isValidString, "Username is not valid.");
       ComponentValidationUtil.addValidation(txtPassword, lblPwd, ValidatorUtil::isValidString,
-              !ValidatorUtil.pwdIsStrong(txtPassword.getText().trim()) ? "Password weak": "");
+              !ValidatorUtil.pwdIsStrong(txtPassword.getText().trim()) ? "Password weak" : "");
       //filter listener
       FilteredList<AdminDto> filteredData =
               new FilteredList<>(this.tableAdmins.getItems(), p -> true);
@@ -178,8 +179,7 @@ public class Users {
                       u.username().equals(user.getUsername()));
 
       if (isDuplicateEntryIn) {
-         alert.buildAlert(Alert.AlertType.WARNING, "WARNING", "Entry duplicated! Check Email or Username values.")
-                 .show();
+         alert.warningAlert("Entry duplicated! Check Email or Username values.");
          this.btnClear.fire();
          return;
       }
@@ -188,17 +188,14 @@ public class Users {
          boolean mailSent = EmailSender.mailToWPassword(user.getEmail(), txtPassword.getText().trim());
          Platform.runLater(() -> {
             this.btnSave.setDisable(true);
-            if(!mailSent){
-               alert.buildAlert(Alert.AlertType.INFORMATION, "NOT FOUND", "Your email address could not be found.")
-                       .show();
+            if (!mailSent) {
+               alert.warningAlert("Your email address could not be found.");
                return;
             }
-            alert.buildAlert(Alert.AlertType.INFORMATION, "INFO", "Email sent to: " + user.getEmail() + " please check it.")
-                    .show();
+            alert.infoAlert("Email sent to: " + user.getEmail() + " please check it.");
             this.save(user);
             //notify
-            alert.buildAlert(Alert.AlertType.CONFIRMATION, "SUCCESS!", "Admin added!")
-                    .show();
+            alert.infoAlert( "Admin added!");
          });
       };
       Thread.ofVirtual().start(emailTo);
@@ -217,14 +214,11 @@ public class Users {
       String usernameSelected = this.tableAdmins.getSelectionModel()
               .getSelectedItem().email();
       if (usernameSession.equals(usernameSelected)) {
-         alert.buildAlert(Alert.AlertType.WARNING, "WARNING", "You can´t delete you here.")
-                 .show();
+         alert.errorAlert("You are trying to delete yourself data.");
          this.btnClear.fire();
          return;
       }
-      alert.buildAlert(Alert.AlertType.WARNING, "DELETE",
-                      "¿Do you want delete this user?")
-              .showAndWait()
+      alert.deleteConfirmAlert("Do you want to delete this user?")
               .ifPresent(confirmation -> {
                  if (confirmation == ButtonType.OK) {
                     REPO.deleteByUuid(this.uuidSelected);
@@ -247,23 +241,23 @@ public class Users {
    @FXML
    private void handleFilter(KeyEvent key, FilteredList<AdminDto> filteredList) {
       String text = txtSearch.getText().trim();
-         filteredList.setPredicate(user -> {
-            if (text.isEmpty()) return true;
-            try {
+      filteredList.setPredicate(user -> {
+         if (text.isEmpty()) return true;
+         try {
 
-               return user.uuid().toString().contains(text) ||
-                       user.name().contains(text) ||
-                       user.email().contains(text) ||
-                       user.username().contains(text) ||
-                       user.role() == ERole.valueOf(text.toUpperCase());
-            } catch (IllegalArgumentException e) {
-               return false;
-            }
-         });
+            return user.uuid().toString().contains(text) ||
+                    user.name().contains(text) ||
+                    user.email().contains(text) ||
+                    user.username().contains(text) ||
+                    user.role() == ERole.valueOf(text.toUpperCase());
+         } catch (IllegalArgumentException e) {
+            return false;
+         }
+      });
       this.tableAdmins.setItems(filteredList);
    }
 
-   private void mapToDto(){
+   private void mapToDto() {
       this.users = REPO.getAll().stream()
               .filter(u -> u.getRole() == ERole.ADMIN &&
                       u.getId().intValue() != SessionManager.getInstance().getSessionDto().id())
@@ -278,7 +272,7 @@ public class Users {
               .collect(Collectors.toList());
    }
 
-   private void save(UserEntity user){
+   private void save(UserEntity user) {
       REPO.save(user);
       AdminDto admin = AdminDto.builder()
               .id(null)
