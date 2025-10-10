@@ -1,7 +1,6 @@
 package jame.dev.utils.unit;
 
 import jame.dev.utils.ui.CustomAlert;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,12 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 @DisplayName("Custom Alert tests")
 public class CustomAlertTests {
 
-   private CustomAlert customAlert;
-
-   @BeforeEach
-   void setUp(){
-      this.customAlert = CustomAlert.getInstance();
-   }
+   private static final CustomAlert customAlert = CustomAlert.getInstance();
 
    @Test
    @DisplayName("Same instance")

@@ -56,18 +56,17 @@ public class Me {
    @FXML
    private void handleUpdate(ActionEvent event) {
       if(txtPassword.getText().isBlank()){
-         alert.buildAlert(Alert.AlertType.INFORMATION, "ERROR", "Password field empty").show();
+         alert.errorAlert("Password field empty");
          return;
       }
-      alert.buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Do you want update your own info?")
-              .showAndWait()
+      alert.updateConfirmAlert("Do you want update your own info?")
               .ifPresent(confirmation -> {
                  if (confirmation == ButtonType.OK) {
                     REPO.findByUuid(session.getSessionDto().uuid())
                             .ifPresentOrElse(userEntity -> {
                                this.update(userEntity);
-                               alert.buildAlert(Alert.AlertType.INFORMATION, "INFO", "Information updated successfully.").show();
-                            }, () -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Information required not found.").show());
+                               alert.infoAlert("Information updated successfully.");
+                            }, () -> alert.errorAlert("Information required not found."));
                  }
               });
       this.btnClear.fire();
@@ -80,7 +79,7 @@ public class Me {
                  txtName.setText(entity.getName());
                  txtEmail.setText(entity.getEmail());
                  txtUsername.setText(entity.getUsername());
-              }, () -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "No information available!").show());
+              }, () -> alert.warningAlert("No information available!"));
    }
 
    private void update(UserEntity userEntity) {

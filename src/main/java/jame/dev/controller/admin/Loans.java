@@ -208,7 +208,8 @@ public class Loans {
                     loan.getStatusLoan() == EStatusLoan.valueOf(text.toUpperCase());
          });
       } catch (IllegalArgumentException e) {
-         alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Value is not defined.").show();
+         alert.errorAlert( "Value is not defined.");
+         log.severe(e.getMessage());
       }
    }
 
@@ -228,7 +229,7 @@ public class Loans {
          stage.initModality(Modality.APPLICATION_MODAL);
          stage.showAndWait();
       } catch (IOException e) {
-         Platform.runLater(() -> new Label("Error loading modal."));
+         Platform.runLater(() -> alert.errorAlert("Error loading modal."));
          log.severe(e.getMessage());
       }
    }
@@ -249,7 +250,7 @@ public class Loans {
          stage.initModality(Modality.APPLICATION_MODAL);
          stage.showAndWait();
       } catch (IOException e) {
-         Platform.runLater(() -> new Label("Error loading modal."));
+         Platform.runLater(() -> alert.errorAlert("Error loading modal."));
          log.severe(e.getMessage());
       }
    }
@@ -276,8 +277,7 @@ public class Loans {
 
    private void save(LoanEntity entity){
       if (!IDS.add(entity.getIdUser())) {
-         alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "This user is fined already.")
-                 .show();
+         alert.warningAlert( "This user is fined already.");
          return;
       }
       FineEntity fine = FineEntity.builder()
@@ -287,8 +287,7 @@ public class Loans {
               .expiration(LocalDate.now().plusDays(15))
               .build();
       fineService.save(fine);
-      alert.buildAlert(Alert.AlertType.INFORMATION, "INFO", "User fined.")
-              .show();
+      alert.infoAlert( "User fined.");
       entity.setStatusLoan(EStatusLoan.FINED);
       this.repo.update(entity);
       loans.set(indexSelected, entity);
@@ -301,15 +300,13 @@ public class Loans {
       this.repo.update(loan);
       this.tableLoans.getItems().set(indexSelected, loan);
       loans.set(indexSelected, loan);
-      alert.buildAlert(Alert.AlertType.INFORMATION, "UPDATED", "Record updated!")
-              .show();
+      alert.infoAlert( "Record updated!");
    }
 
    private void delete(){
       EStatusLoan statusSelected = loans.get(indexSelected).getStatusLoan();
       if (statusSelected == EStatusLoan.ON_LOAN || statusSelected == EStatusLoan.RENEWED) {
-         alert.buildAlert(Alert.AlertType.ERROR, "NOT ALLOWED", "This is a temporary valid loan that can't be removed yet.")
-                 .show();
+         alert.warningAlert("This is a temporary valid loan that can't be removed yet.");
          return;
       }
       this.repo.deleteByUuid(uuidSelected);

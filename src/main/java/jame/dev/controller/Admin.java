@@ -12,7 +12,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -40,12 +39,10 @@ public class Admin {
 
    @FXML
    private Tab tabLoans;
-
-   @FXML
-   private Tab tabFines;
    @FXML
    private Tab tabMe;
 
+   private static final CustomAlert ALERT = CustomAlert.getInstance();
    private static final SessionManager MANAGER = SessionManager.getInstance();
    private static final Map<String, Integer> changes = GlobalNotificationChange.getInstance().getChanges();
 
@@ -55,7 +52,6 @@ public class Admin {
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Users.fxml", this.tabUsers);
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Books.fxml", this.tabBooks);
       ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Loans.fxml", this.tabLoans);
-      ExecutorTabLoaderUtil.loadTab("/templates/adminPanes/Fines.fxml", this.tabFines);
       ExecutorTabLoaderUtil.loadTab("/templates/commons/Me.fxml", this.tabMe);
    }
 
@@ -73,16 +69,12 @@ public class Admin {
             stage.show();
          } catch (IOException e) {
             Platform.runLater(() ->
-                    CustomAlert.getInstance()
-                            .buildAlert(Alert.AlertType.ERROR, "ERROR", "Error loading the view.")
-                            .show());
+                    ALERT.errorAlert("Error loading the view"));
             log.severe("Error loading the resource: " + e);
          }
       } else {
          Platform.runLater(() ->
-                 CustomAlert.getInstance()
-                         .buildAlert(Alert.AlertType.ERROR, "ERROR", "No Session active")
-                         .show());
+                 ALERT.errorAlert("No session present."));
       }
    }
 }

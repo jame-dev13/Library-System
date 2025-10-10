@@ -114,19 +114,27 @@ public class ShowCopies {
       try {
          int plusDays = Integer.parseInt(txtDays.getText().trim());
          if (plusDays > 60) {
-            ALERT.buildAlert(Alert.AlertType.WARNING, "NOT ALLOWED", "You can't request a loan for more than 60 days")
-                    .show();
+            ALERT.warningAlert("You can't request a loan for more than 60 days");
             return;
          }
-         this.save(plusDays);
-         ALERT.buildAlert(Alert.AlertType.INFORMATION, "SUCCESS", "Loan Saved")
-                 .show();
+         LoanEntity loan = LoanEntity.builder()
+                 .uuid(UUID.randomUUID())
+                 .idUser(SessionManager.getInstance().getSessionDto().id())
+                 .idCopy(Integer.parseInt(txtIdCopy.getText().trim()))
+                 .loanDate(LocalDate.parse(txtDateNow.getText().trim()))
+                 .returnDate(LocalDate.now().plusDays(plusDays))
+                 .statusLoan(EStatusLoan.ON_LOAN)
+                 .build();
+         if (CheckFinesUtil.isFined(loan.getIdUser())) {
+            ALERT.warningAlert("You have fines, you can't request loans now.");
+            return;
+         }
+         this.save(loan, plusDays);
+         ALERT.infoAlert("Loan Saved");
          changes.registerChange(EGlobalNames.LOAN_CLIENT.name());
          changes.registerChange(EGlobalNames.HISTORY.name());
-
       } catch (NullPointerException e) {
-         ALERT.buildAlert(Alert.AlertType.ERROR, "ERROR", "THE FIELDS CAN'T BE NULL")
-                 .show();
+         ALERT.errorAlert("THE FIELDS CAN'T BE EMPTY");
          log.severe(e.getMessage());
       } finally {
          this.btnClear.fire();
@@ -164,20 +172,8 @@ public class ShowCopies {
       this.tableCopies.setItems(filteredList);
    }
 
-   private void save(int plusDays){
-      LoanEntity loan = LoanEntity.builder()
-              .uuid(UUID.randomUUID())
-              .idUser(SessionManager.getInstance().getSessionDto().id())
-              .idCopy(Integer.parseInt(txtIdCopy.getText().trim()))
-              .loanDate(LocalDate.parse(txtDateNow.getText().trim()))
-              .returnDate(LocalDate.now().plusDays(plusDays))
-              .statusLoan(EStatusLoan.ON_LOAN)
-              .build();
-      if (CheckFinesUtil.isFined(loan.getIdUser())) {
-         ALERT.buildAlert(Alert.AlertType.INFORMATION, "UNAUTHORIZED", "You have fines, you can't request loans now.")
-                 .show();
-         return;
-      }
+   private void save(LoanEntity loan, int plusDays){
+
       LOANS_REPO.save(loan);
       REPO_COPIES.findByUuid(this.tableCopies.getSelectionModel().getSelectedItem().uuid())
               .ifPresent(copy -> {

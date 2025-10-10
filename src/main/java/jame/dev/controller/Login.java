@@ -74,14 +74,14 @@ public class Login {
               .ifPresentOrElse(dto -> {
                  session.login(dto);
                  Platform.runLater(() ->
-                         alert.buildAlert(Alert.AlertType.INFORMATION, "LOGIN", "Login attempt successfully")
-                                 .show());
+                         alert.infoAlert("Login attempt successfully.")
+                 );
                  switch (dto.role()) {
                     case USER -> redirectTo(actionEvent, "/templates/userView.fxml");
                     case ADMIN -> redirectTo(actionEvent, "/templates/adminView.fxml");
-                    default -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Login failed.").show();
+                    default -> alert.errorAlert("Role unknow.");
                  }
-              }, () -> alert.buildAlert(Alert.AlertType.WARNING, "WARNING", "Login attempt failed.").show());
+              }, () -> alert.warningAlert("Login attempt failed."));
    }
 
    /**
@@ -111,8 +111,8 @@ public class Login {
          stage.setScene(scene);
          stage.show();
       } catch (IOException e) {
-         Platform.runLater(() -> alert.buildAlert(Alert.AlertType.ERROR, "ERROR", "Redirection failed").show());
-         log.severe("Resource loading went wrong: " + e);
+         Platform.runLater(() -> alert.errorAlert("Redirection failed."));
+         log.severe("Resource loading went wrong: " + e.getMessage());
       }
    }
 }

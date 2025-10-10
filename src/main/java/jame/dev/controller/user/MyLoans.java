@@ -89,8 +89,7 @@ public class MyLoans {
    @FXML
    private void handleReturnLoan(ActionEvent event) {
       REPO.findByUuid(uuidSelected).ifPresentOrElse(loan ->
-                      ALERT.buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "You want to return this book?")
-                              .showAndWait()
+                      ALERT.deleteConfirmAlert("You want to return this book?")
                               .ifPresent(confirmation -> {
                                  if (confirmation == ButtonType.OK) {
                                     loan.setStatusLoan(EStatusLoan.RETURNED);
@@ -99,7 +98,7 @@ public class MyLoans {
                                     REPO.update(loan);
                                  }
                               }),
-              () -> ALERT.buildAlert(Alert.AlertType.WARNING, "NOT FOUND", "Loan not found.").show());
+              () -> ALERT.warningAlert("Loan not found."));
       this.btnClear.fire();
    }
 
@@ -107,12 +106,10 @@ public class MyLoans {
    private void handleRenewLoan(ActionEvent event) {
       REPO.findByUuid(uuidSelected).ifPresentOrElse(loan -> {
          if (loan.getStatusLoan() == EStatusLoan.RUN_OUT || loan.getStatusLoan() == EStatusLoan.FINED) {
-            ALERT.buildAlert(Alert.AlertType.ERROR, "ERROR", "You can't renew your loan now")
-                    .show();
+            ALERT.errorAlert("You can't renew your loan now");
             return;
          }
-         ALERT.buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Do you want to renew this loan?")
-                 .showAndWait()
+         ALERT.updateConfirmAlert("Do you want to renew this loan?")
                  .ifPresent(confirmation -> {
                     if (confirmation == ButtonType.OK) {
                        LoanDetailsDto loanMap = this.tableLoans.getSelectionModel().getSelectedItem();
@@ -123,8 +120,7 @@ public class MyLoans {
                                .ifPresent(value -> {
                                   int daysPlus = Integer.parseInt(value);
                                   if(daysPlus > 60) {
-                                     ALERT.buildAlert(Alert.AlertType.WARNING, "NOT ALLOWED", "Can't renew a Loan for more than 60 days")
-                                             .show();
+                                     ALERT.warningAlert( "Can't renew a Loan for more than 60 days");
                                      return;
                                   }
                                   this.renew(loan, loanMap, daysPlus);
@@ -132,7 +128,7 @@ public class MyLoans {
                     }
                  });
 
-      }, () -> ALERT.buildAlert(Alert.AlertType.WARNING, "NOT FOUND", "Loan not found.").show());
+      }, () -> ALERT.warningAlert("Loan not found."));
       this.btnClear.fire();
    }
 
