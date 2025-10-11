@@ -1,5 +1,8 @@
 package jame.dev.models.enums;
 
+/**
+ * Enum constants to represent the language field in {@link jame.dev.models.entitys.CopyEntity} object.
+ */
 public enum ELanguage {
     ESP, // Español
     ENG, // Inglés

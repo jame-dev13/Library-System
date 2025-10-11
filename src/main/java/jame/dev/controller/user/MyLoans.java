@@ -1,10 +1,12 @@
 package jame.dev.controller.user;
 
 import jame.dev.dtos.loans.LoanDetailsDto;
+import jame.dev.models.entitys.CopyEntity;
 import jame.dev.models.entitys.LoanEntity;
 import jame.dev.models.enums.EStatusLoan;
 import jame.dev.repositorys.CRUDRepo;
 import jame.dev.repositorys.Joinable;
+import jame.dev.service.CopyService;
 import jame.dev.service.LoanService;
 import jame.dev.service.joins.LoanDetailsService;
 import jame.dev.utils.ui.CustomAlert;
@@ -48,7 +50,8 @@ public class MyLoans {
    //dependencies
    private static final CRUDRepo<LoanEntity> REPO = new LoanService();
    private static final Joinable<LoanDetailsDto> JOINABLE = new LoanDetailsService();
-
+   private static final CRUDRepo<CopyEntity> COPIES_REPO = new CopyService();
+   private static List<CopyEntity> copies;
    private static List<LoanDetailsDto> loans;
    private static final CustomAlert ALERT = CustomAlert.getInstance();
 
@@ -56,6 +59,7 @@ public class MyLoans {
    @FXML
    private void initialize() throws IOException {
       loans = JOINABLE.getJoins();
+      copies = COPIES_REPO.getAll();
       tableConfig();
       this.btnReturnLoan.setOnAction(this::handleReturnLoan);
       this.btnRenew.setOnAction(this::handleRenewLoan);
@@ -96,10 +100,19 @@ public class MyLoans {
                                     loans.remove(this.indexSelected);
                                     this.tableLoans.getItems().remove(this.indexSelected);
                                     REPO.update(loan);
+                                    releaseCopy(loan);
                                  }
                               }),
               () -> ALERT.warningAlert("Loan not found."));
       this.btnClear.fire();
+   }
+
+   private void releaseCopy(LoanEntity loan) {
+      copies.stream()
+              .filter(c -> c.getId() == loan.getIdCopy())
+              .peek(c -> c.setBorrowed(false))
+              .findFirst()
+              .ifPresent(COPIES_REPO::update);
    }
 
    @FXML

@@ -46,6 +46,11 @@ public class Admin {
    private static final SessionManager MANAGER = SessionManager.getInstance();
    private static final Map<String, Integer> changes = GlobalNotificationChange.getInstance().getChanges();
 
+   /**
+    * initializes the actions for the components in the view.
+    * Load all the tabs in parallel and sets his content.
+    * See in {@link ExecutorTabLoaderUtil} class.
+    */
    @FXML
    public void initialize() {
       this.btnLogout.setOnAction(this::handleLogout);
@@ -55,6 +60,13 @@ public class Admin {
       ExecutorTabLoaderUtil.loadTab("/templates/commons/Me.fxml", this.tabMe);
    }
 
+   /**
+    * Does the Listener for the logout click action.
+    * It gets the singleton instance of {@link SessionManager} manager, to get access to the {@link SessionDto} object that is already logged
+    * and if present calls {@code manager.logout();} and then loads the route
+    * to the login page, setting a new scene and get the current stage.
+    * @param event the ActionEvent
+    */
    @FXML
    private void handleLogout(ActionEvent event) {
       SessionDto dto = MANAGER.getSessionDto();

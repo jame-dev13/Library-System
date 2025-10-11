@@ -7,6 +7,18 @@ import lombok.Builder;
 
 import java.util.UUID;
 
+/**
+ * Builds an immutable object to represent a CopyDetailsDto witch is built by
+ * a combinations of {@link jame.dev.models.entitys.BookEntity} object and
+ * {@link jame.dev.models.entitys.CopyEntity} object properties.
+ * @param uuid
+ * @param idCopy
+ * @param copyNum
+ * @param bookName
+ * @param genre
+ * @param status
+ * @param language
+ */
 @Builder
 public record CopyDetailsDto(
         UUID uuid,

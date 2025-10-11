@@ -10,10 +10,18 @@ import jame.dev.utils.db.DQLActions;
 import java.util.List;
 import java.util.UUID;
 
-public class CopyDetailsService implements Joinable<CopyDetailsDto> {
+/**
+ * Service class that implement the contract defined on {@link Joinable} interface
+ * to get the data set for a prepared query with table joins.
+ */
+public final class CopyDetailsService implements Joinable<CopyDetailsDto> {
+   /**
+    * Passes a sql query to be performed for the class {@link DQLActions}{@code .select(String sql, ResultMapper rs)}
+    * @return A List witch contains objects of CopyDetailsDto data.
+    */
    @Override
    public List<CopyDetailsDto> getJoins() {
-      String sql = """
+      final String sql = """
               SELECT c.id AS ID, c.uuid AS UUID,
               c.copy_num AS COPY_N,
               b.title AS TITLE, b.genre AS GENRE,

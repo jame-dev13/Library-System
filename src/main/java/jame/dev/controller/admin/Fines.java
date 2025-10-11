@@ -25,6 +25,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Controller class to gives functionality to the view associated  with the Fines.
+ * @author jame-dev13
+ */
 @Log
 public class Fines{
 
@@ -57,6 +61,10 @@ public class Fines{
    private static final CustomAlert ALERT = CustomAlert.getInstance();
    private static FilteredList<FineDetailsDto> filteredList;
 
+   /**
+    * Init listeners for the components.
+    * @throws IOException
+    */
    @FXML
    private void initialize() throws IOException {
       this.btnClear.setOnAction(this::handleClear);
@@ -65,6 +73,10 @@ public class Fines{
       this.txtFilter.setOnKeyTyped(k -> this.handleFilter(k, filteredList));
    }
 
+   /**
+    * Configures the columns and the table data witch they are going to store.
+    * Selection, listeners and filter are configure here too.
+    */
    @FXML
    private void tableConfig() {
       //cols
@@ -91,6 +103,10 @@ public class Fines{
       filteredList = new FilteredList<>(this.tableFines.getItems(), _ -> true);
    }
 
+   /**
+    * Cleans up the fields, aux variables and disable or enables buttons.
+    * @param event the Action Event.
+    */
    @FXML
    private void handleClear(ActionEvent event) {
       this.tableFines.getSelectionModel().clearSelection();
@@ -102,6 +118,10 @@ public class Fines{
       this.indexSelected = -1;
    }
 
+   /**
+    * Handles the listener to update the property 'cause' for a {@link FineEntity} object
+    * @param event the Action Event.
+    */
    @FXML
    private void handleUpdateCause(ActionEvent event) {
       ALERT.updateConfirmAlert("Do toy want to update this fine cause?")
@@ -115,6 +135,10 @@ public class Fines{
       this.btnClear.fire();
    }
 
+   /**
+    * Listener method that handles the deletion action for an {@link FineEntity} object.
+    * @param event the Action Event.
+    */
    @FXML
    private void handleDeleteFine(ActionEvent event) {
       ALERT.deleteConfirmAlert("Do you want to remove this fine?")
@@ -128,6 +152,12 @@ public class Fines{
       this.btnClear.fire();
    }
 
+   /**
+    * Takes an {@link FilteredList} and sets a {@link java.util.function.Predicate} for
+    * evaluate the filter on the list and set it to the table.
+    * @param keyEvent the Key Event.
+    * @param filteredList The list that sets the filtered data.
+    */
    @FXML
    private void handleFilter(KeyEvent keyEvent, FilteredList<FineDetailsDto> filteredList) {
       String value = txtFilter.getText().trim();
@@ -143,6 +173,14 @@ public class Fines{
       this.tableFines.setItems(filteredList);
    }
 
+   /**
+    * This set the data before the view load.
+    * Takes an id witch going to be used for filter the data
+    * and then return a list witch contains all the fines associated
+    * with the user and set it to the local, also it calls the method used
+    * to configure the table.
+    * @param id the user id
+    */
    @FXML
    protected void setIdUser(int id) {
       fines = FINES_DETAILS.getJoins()
@@ -153,12 +191,20 @@ public class Fines{
       tableConfig();
    }
 
+   /**
+    * Set the data before the view load and class
+    * the method for configure the table.
+    */
    @FXML
    protected void setData() {
-      fines = FINES_DETAILS.getJoins();
       tableConfig();
+      fines = FINES_DETAILS.getJoins();
    }
 
+   /**
+    * Takes the selection on the table as input and then sets values according to it.
+    * @param selection the {@link FineDetailsDto} object selected.
+    */
    private void onSelection(FineDetailsDto selection){
       this.uuidSelected = selection.uuid();
       this.indexSelected = tableFines.getSelectionModel().getSelectedIndex();
@@ -167,6 +213,11 @@ public class Fines{
       this.txtNewCause.setText(selection.cause());
    }
 
+   /**
+    * Controls the update case for the current selected value in the table, updating
+    * the db, list and table record associated.
+    * @param f the {@link FineEntity} object.
+    */
    private void updateCause(FineEntity f) {
       f.setCause(txtNewCause.getText().trim());
       REPO.update(f);

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Defines The creation of the SQl Table Scheme.
+ * Defines The creation of the SQl Table Scheme for this application.
  */
 @Log
 public final class Schema {
@@ -40,9 +40,18 @@ public final class Schema {
       tables.forEach(this::createTable);
    }
 
+   /**
+    * Creates any table in sql.
+    * Given a name and a query to be performed, it does a null check for both
+    * throwing a supplier exception that is a {@link java.util.NoSuchElementException} if no one
+    * is specified.
+    * tries the connection with the db, prepares the statement with the query and then executes it.
+    * @param name the db table name.
+    * @param query the sql query.
+    */
    private void createTable(String name, String query) {
-      Optional.ofNullable(name).orElseThrow(NullPointerException::new);
-      Optional.ofNullable(query).orElseThrow(NullPointerException::new);
+      Optional.ofNullable(name).orElseThrow();
+      Optional.ofNullable(query).orElseThrow();
       try (Connection connection = dbInstance.getConnection();
            PreparedStatement st = connection.prepareStatement(query)) {
          st.execute();
@@ -184,9 +193,19 @@ public final class Schema {
               """;
    }
 
+   /**
+    * Query to drop the Trigger if it exists.
+    * @return a String sql query
+    */
    private String queryDropTriggerIfExists(){
       return "DROP TRIGGER IF EXISTS after_insert_loan;";
    }
+
+   /**
+    * Query to create a Trigger on the db associated with the table
+    * loans ah history_loans.
+    * @return a String sql query.
+    */
    private String queryTriggerHistoryLoans(){
       return """
               CREATE TRIGGER after_insert_loan

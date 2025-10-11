@@ -30,6 +30,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Controller class to gives functionality associated on the users in the view
+ * @author jame-dev13
+ */
 @Log
 public class Users {
 
@@ -119,6 +123,7 @@ public class Users {
       tableAdmins.setItems(observable);
 
       //listener
+      //set global uuid and index
       this.tableAdmins.setOnMouseClicked(_ ->
               Optional.ofNullable(this.tableAdmins.getSelectionModel().getSelectedItem())
                       .ifPresent(selected -> {
@@ -151,7 +156,7 @@ public class Users {
 
    /***
     * Manages the build of data witch is going to be saved
-    * by the repository, also it updates the local ArrayList and sends a communication username
+    * by the repository/service, also it updates the local ArrayList and sends a communication username
     * to the new user, finally fire the clear button and shows an {@link CustomAlert}
     * for confirmation or error.
     */
@@ -177,6 +182,11 @@ public class Users {
       boolean isDuplicateEntryIn = this.users.stream()
               .anyMatch(u -> u.email().equals(user.getEmail()) ||
                       u.username().equals(user.getUsername()));
+      if(!ValidatorUtil.isValidString(user.getName(), user.getUsername())&&
+              !ValidatorUtil.isEmailValid(user.getEmail())){
+         alert.warningAlert("The field are not valid, please check it out.");
+         return;
+      }
 
       if (isDuplicateEntryIn) {
          alert.warningAlert("Entry duplicated! Check Email or Username values.");
@@ -257,6 +267,9 @@ public class Users {
       this.tableAdmins.setItems(filteredList);
    }
 
+   /**
+    * maps the current Memory List to a dto class.
+    */
    private void mapToDto() {
       this.users = REPO.getAll().stream()
               .filter(u -> u.getRole() == ERole.ADMIN &&
@@ -272,6 +285,10 @@ public class Users {
               .collect(Collectors.toList());
    }
 
+   /**
+    * Logic for save an {@link UserEntity} object into the db.
+    * @param user the {@link UserEntity} object.
+    */
    private void save(UserEntity user) {
       REPO.save(user);
       AdminDto admin = AdminDto.builder()

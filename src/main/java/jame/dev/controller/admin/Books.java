@@ -32,6 +32,7 @@ import java.util.*;
 /**
  * Controller class for a specific pane that manages CRUD operations
  * for books.
+ * @author jame-dev13
  */
 @Log
 public class Books {
@@ -138,12 +139,14 @@ public class Books {
       this.tableBooks.setItems(observable);
 
       //listeners
+      //select the data present on the selected row
       this.tableBooks.setOnMouseClicked(l -> {
          Optional.ofNullable(this.tableBooks.getSelectionModel().getSelectedItem())
                  .ifPresent(this::setFieldsOnSelection);
          this.btnUpdate.setDisable(false);
          this.btnDrop.setDisable(false);
 
+         //load popOver on two clicks
          if (l.getClickCount() == 2) {
             repo.findByUuid(this.selectedUuid)
                     .ifPresentOrElse(this::loadPopOver,
@@ -180,9 +183,8 @@ public class Books {
    }
 
    /**
-    * Do an insertion through the repository, it maps the data and Build an
-    * {@link BookEntity}
-    *
+    * Handles the insertion of the data taken from the client in the view and builds
+    * an {@link BookEntity} and then it saves into the db.
     * @param e The ActionEvent
     */
    @FXML
@@ -278,6 +280,11 @@ public class Books {
       this.tableBooks.setItems(filteredData);
    }
 
+   /**
+    * Loads a stage that is used like a modal, and then gain access to the controller of
+    * {@link Copies} to set it info about the book.
+    * @param book the BookEntity object
+    */
    @FXML
    private void loadPopOver(BookEntity book) {
       try {
@@ -300,12 +307,21 @@ public class Books {
       }
    }
 
+   /**
+    * logic to save the object into the db.
+    * @param book the BookEntity
+    */
    private void save(BookEntity book) {
       this.repo.save(book);
       tableBooks.getItems().add(book);
       booksE.add(book);
    }
 
+
+   /**
+    * Logic to set data and then do and update into the db.
+    * @param book the BookEntity
+    */
    private void update(BookEntity book) {
       book.setTitle(txtTitle.getText().trim());
       book.setAuthor(txtAuthor.getText().trim());
@@ -319,6 +335,10 @@ public class Books {
       this.tableBooks.getItems().set(selectedIndex, bookUp);
    }
 
+   /**
+    * Logic to remove a book from the view and from the db.
+    * @param uuid the {@link UUID} unique identifier of the book object
+    */
    private void delete(UUID uuid) {
       this.repo.deleteByUuid(uuid);
       this.tableBooks.getItems().remove(selectedIndex);
@@ -326,6 +346,10 @@ public class Books {
       bookNameSet.remove(book.getTitle());
    }
 
+   /**
+    * Logic to set the data info to the fields in the view
+    * @param selection an {@link BookEntity} object.
+    */
    private void setFieldsOnSelection(BookEntity selection) {
       this.selectedUuid = selection.getUuid();
       this.selectedIndex = this.tableBooks.getSelectionModel().getSelectedIndex();

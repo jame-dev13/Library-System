@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Controller class for gives functionality to the view of ModalBookCopies.fxml
+ */
 public class ModalBookCopies {
 
    @FXML
@@ -58,8 +61,8 @@ public class ModalBookCopies {
    @FXML
    private Button btnClear;
 
-   private CRUDRepo<CopyEntity> copyRepo;
-   private CRUDRepo<LoanEntity> loanRepo;
+   private final CRUDRepo<CopyEntity> copyRepo = new CopyService();
+   private final CRUDRepo<LoanEntity> loanRepo = new LoanService();
 
    private static List<CopyEntity> copies;
    private CopyEntity copySelected;
@@ -67,14 +70,22 @@ public class ModalBookCopies {
    private static final CustomAlert ALERT = CustomAlert.getInstance();
    private static final GlobalNotificationChange changes = GlobalNotificationChange.getInstance();
 
+   /**
+    * Initializes the component actions, like listeners, data etc.
+    * @throws IOException
+    */
    @FXML
    private void initialize() throws IOException {
-      this.copyRepo = new CopyService();
-      this.loanRepo = new LoanService();
       this.btnLoan.setOnAction(this::handleSaveLoan);
       this.btnClear.setOnAction(this::handleClear);
    }
 
+   /**
+    * Used for call the controller class and then calls the method out from the class.
+    * it loads all the copies associated with the current book in the view and applies
+    * the config defined on the method tableConfig().
+    * @param booksDto the {@link BooksDto} object.
+    */
    @FXML
    public void setBookInfo(BooksDto booksDto) {
       this.idBook = booksDto.id();
@@ -92,6 +103,9 @@ public class ModalBookCopies {
       tableConfig();
    }
 
+   /**
+    * set the properties, listeners, data, selection for the table on this class and hi columns.
+    */
    @FXML
    private void tableConfig() {
       //columns
@@ -122,6 +136,12 @@ public class ModalBookCopies {
       );
    }
 
+   /**
+    * Handles the request of a loan, it's going to evaluate if the requested days for the loan it's greater than
+    * 60, if it is the return out of the method and notifies the user.
+    * Also evaluates that the user doesn't have fines to do the loan.
+    * @param event the ActionEvent.
+    */
    @FXML
    private void handleSaveLoan(ActionEvent event) {
       Optional.ofNullable(this.copySelected)
@@ -152,6 +172,10 @@ public class ModalBookCopies {
       this.btnClear.fire();
    }
 
+   /**
+    * Cleans up the fields in the view, enable - diable components and set variables aux.
+    * @param event the ActionEvent
+    */
    @FXML
    private void handleClear(ActionEvent event) {
       this.tableCopies.getSelectionModel().clearSelection();
@@ -162,6 +186,14 @@ public class ModalBookCopies {
       this.btnLoan.setDisable(true);
    }
 
+   /**
+    * Logic for add a Loan.
+    * Takes a {@link LoanEntity} object for save it on the db and a
+    * {@link CopyEntity} object for set his property borrowed to true, so being it this copy can't
+    * be loaned again until be returned.
+    * @param loan {@link LoanEntity} object.
+    * @param copy {@link CopyEntity} object.
+    */
    private void save(LoanEntity loan, CopyEntity copy){
       this.loanRepo.save(loan);
       copy.setBorrowed(true);

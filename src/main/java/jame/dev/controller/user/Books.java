@@ -26,6 +26,10 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+
+/**
+ * Controller class that gives functionality to the view.
+ */
 @Log
 public class Books {
 
@@ -49,6 +53,10 @@ public class Books {
    private static FilteredList<BooksDto> filteredList;
    private static final CustomAlert ALERT = CustomAlert.getInstance();
 
+   /**
+    * init all components listeners, data, etc
+    * @throws IOException
+    */
    @FXML private void initialize() throws IOException {
       this.loadDto();
       configTable();
@@ -70,6 +78,9 @@ public class Books {
       });
    }
 
+   /**
+    * configures the table properties and th columns too.
+    */
    @FXML private void configTable(){
       //columns
       colUuid.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().uuid()));
@@ -99,6 +110,10 @@ public class Books {
       });
    }
 
+   /**
+    * Maps the {@link jame.dev.models.entitys.BookEntity} List object to
+    * {@link BooksDto} and returns an unmodifiable object of {@link List}.
+    */
    private void loadDto(){
       books = new BookService().getAll().stream()
               .map(book -> BooksDto.builder()
@@ -115,6 +130,9 @@ public class Books {
               .toList();
    }
 
+   /**
+    * Loads the modal for see all the copies of the different books existing and available to loan.
+    */
    @FXML private void loadModal(){
       try{
          URL url = Main.class.getResource(MODAL_COPIES);
@@ -132,6 +150,10 @@ public class Books {
       }
    }
 
+   /**
+    * Loads the entire list of Copies associated with the specific selected book.
+    * @param booksDto the {@link BooksDto} object.
+    */
    @FXML private void loadModal(BooksDto booksDto){
       try{
          URL url = Main.class.getResource(Books.MODAL_BOOK_COPIES);

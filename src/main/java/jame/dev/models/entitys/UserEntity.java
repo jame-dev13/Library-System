@@ -6,6 +6,9 @@ import lombok.*;
 
 import java.util.UUID;
 
+/**
+ * Entity class to perform DB operation for a User object with DAO.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

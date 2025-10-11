@@ -10,7 +10,19 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+/**
+ * Service Class that implements the contract defined in {@link IAuthRepo} to perform
+ * a sign-in evaluating the data on the db table users.
+ */
 public final class AuthService implements IAuthRepo {
+   /**
+    * First builds an {@link UserDto} with the selection data of the given fields
+    * and checks the password, if isn't valid then early returns null and sign-in attempt will fail.
+    * If verification password pass, then retrieves the necessary data to builds a {@link SessionDto} object
+    * that will be returned.
+    * @param user {@link UserDto} object.
+    * @return null or {@link SessionDto} depends on the case.
+    */
    @Override
    public SessionDto signIn(UserDto user) {
       final String SQL_VERIFICATION = """

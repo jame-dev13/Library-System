@@ -22,6 +22,11 @@ public final class ConnectionDB {
 
    private ConnectionDB(){}
 
+   /**
+    * Get the current instance or create a new one only if
+    * it's called for the very first time.
+    * @return ConnectionDB instance
+    */
    public static ConnectionDB getInstance() {
       if (instance == null) {
          synchronized (ConnectionDB.class) {

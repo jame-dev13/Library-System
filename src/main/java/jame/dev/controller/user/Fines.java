@@ -10,20 +10,32 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import lombok.extern.java.Log;
 
 import java.io.IOException;
 import java.time.LocalDate;
 
+/**
+ * Controller class that gives functionality to the view.
+ */
+@Log
 public class Fines {
    @FXML private TableView<FineUserDto> tableFines;
    @FXML private TableColumn<FineUserDto, String> colCause;
    @FXML private TableColumn<FineUserDto, LocalDate> colExp;
    @FXML private TableColumn<FineUserDto, Integer> colDays;
 
+   /**
+    * Init components, listeners, data, etc.
+    * @throws IOException if the components cannot be loaded correctly.
+    */
    @FXML private void initialize() throws IOException{
       initTable();
    }
 
+   /**
+    * Init the table properties like selection, data, listeners, etc.
+    */
    @FXML private void initTable(){
       //cols
       colCause.setCellValueFactory(data ->

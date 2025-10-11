@@ -8,9 +8,15 @@ import jame.dev.utils.session.SessionManager;
 
 import java.util.List;
 import java.util.UUID;
-
-public class LoanDetailsService implements Joinable<LoanDetailsDto> {
-
+/**
+ * Service class that implement the contract defined on {@link Joinable} interface
+ * to get the data set for a prepared query with table joins.
+ */
+public final class LoanDetailsService implements Joinable<LoanDetailsDto> {
+   /**
+    * Passes a sql query to be performed for the class {@link DQLActions}{@code .select(String sql, ResultMapper rs)}
+    * @return A List witch contains objects of LoanDetailsDto data.
+    */
    @Override
    public List<LoanDetailsDto> getJoins() {
       final String sql = """

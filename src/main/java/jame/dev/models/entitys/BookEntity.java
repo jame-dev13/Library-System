@@ -6,6 +6,9 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * Entity class to perform DB operation for a Book object with DAO.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

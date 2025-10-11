@@ -1,9 +1,11 @@
 package jame.dev.controller.admin;
 
+import jame.dev.models.entitys.CopyEntity;
 import jame.dev.models.entitys.FineEntity;
 import jame.dev.models.entitys.LoanEntity;
 import jame.dev.models.enums.EStatusLoan;
 import jame.dev.repositorys.CRUDRepo;
+import jame.dev.service.CopyService;
 import jame.dev.service.FineService;
 import jame.dev.service.LoanService;
 import jame.dev.utils.ui.CustomAlert;
@@ -26,9 +28,15 @@ import lombok.extern.java.Log;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
+/**
+ * Controller class that gives functionality to the view of Loans.
+ * @author jame-dev13
+ */
 @Log
 public class Loans {
 
@@ -71,8 +79,9 @@ public class Loans {
    private TextField txtFilter;
 
    private final CRUDRepo<LoanEntity> repo = new LoanService();
+   private static final CRUDRepo<CopyEntity> COPIES_REPO = new CopyService();
+   private static List<CopyEntity> copies;
    private static List<LoanEntity> loans;
-   private static Set<Integer> IDS = new HashSet<>();
    private static final FineService fineService = new FineService();
    private UUID uuidSelected;
    private int indexSelected;
@@ -88,10 +97,7 @@ public class Loans {
       this.labelDateToday.setText(LocalDate.now().toString());
       //loan data
       loans = repo.getAll();
-      IDS = fineService.getAll()
-              .stream()
-              .map(FineEntity::getIdUser)
-              .collect(Collectors.toSet());
+      copies = COPIES_REPO.getAll();
       //table
       tableConfig();
 
@@ -111,6 +117,9 @@ public class Loans {
               .ifPresent(this::updateStatusOnLoad);
    }
 
+   /**
+    * Method to set Columns and Table properties like, dataType, selection, listeners and data.
+    */
    @FXML
    private void tableConfig() {
       //columns
@@ -137,6 +146,7 @@ public class Loans {
          LoanEntity selected = this.tableLoans.getSelectionModel().getSelectedItem();
          Optional.ofNullable(selected).ifPresent(this::onSelection);
          int clicks = m.getClickCount();
+         //two clicks for load modal to see the fines associated with the user.
          if (clicks == 2) {
             repo.findByUuid(uuidSelected)
                     .ifPresentOrElse(l -> loadModalFines(l.getIdUser()),
@@ -146,6 +156,10 @@ public class Loans {
       });
    }
 
+   /**
+    * Cleans up the fields, selection, and enable/disable components.
+    * @param event
+    */
    @FXML
    private void handleClear(ActionEvent event) {
       //fields
@@ -162,6 +176,10 @@ public class Loans {
       this.indexSelected = -1;
    }
 
+   /**
+    * Listener method to Fine a user.
+    * @param event the ActionEvent.
+    */
    @FXML
    private void handleFine(ActionEvent event) {
       alert.buildAlert(Alert.AlertType.CONFIRMATION, "CONFIRMATION", "Do you want fine this user?")
@@ -175,6 +193,10 @@ public class Loans {
       this.btnClear.fire();
    }
 
+   /**
+    * Set the new data for the current selected object.
+    * @param event the ActionEvent.
+    */
    @FXML
    private void handleSet(ActionEvent event) {
       this.repo.findByUuid(uuidSelected)
@@ -182,6 +204,10 @@ public class Loans {
       this.btnClear.fire();
    }
 
+   /**
+    * Delete a loan {@link LoanEntity} object
+    * @param event the ActionEvent.
+    */
    @FXML
    private void handleDelete(ActionEvent event) {
       alert.buildAlert(Alert.AlertType.CONFIRMATION,
@@ -196,6 +222,13 @@ public class Loans {
       this.btnClear.fire();
    }
 
+   /**
+    * Filter data into the table taking the TextField text present for input,
+    * then on reference to it a predicate is going to be evaluated and finally
+    * the table going to set his own data on reference this FilteredList.
+    * @param event the KeyEvent.
+    * @param filteredList the {@link FilteredList} that going to be set.
+    */
    @FXML
    private void handleFilter(KeyEvent event, FilteredList<LoanEntity> filteredList) {
       try {
@@ -213,6 +246,11 @@ public class Loans {
       }
    }
 
+   /**
+    * Tries to load the stage using like a modal to see the fines associated
+    * with a user using his id to search it.
+    * @param id the {@link LoanEntity} idUser property
+    */
    @FXML
    private void loadModalFines(int id) {
       try {
@@ -234,6 +272,10 @@ public class Loans {
       }
    }
 
+   /**
+    * Loads a stage using it like a modal to see all the registed fines.
+    * @param event the Action Event.
+    */
    @FXML
    private void loadModalFines(ActionEvent event) {
       try {
@@ -255,6 +297,13 @@ public class Loans {
       }
    }
 
+   /**
+    * On the load, it will update the property statusLoan of a {@link LoanEntity} object if
+    * the Localdate.now().ifAfter(LoanEntity.getReturnDate()) gets true.
+    * The update is in reference to {@link EStatusLoan}, more specifically to:
+    * {@code EStatusLoan.RUN_OUT} if the given statusLoan is equal to {@code EStatusLoan.ON_LOAN} too.
+    * @param l the {@link List} of LoanEntities.
+    */
    private void updateStatusOnLoad(List<LoanEntity> l){
       l.stream()
               .filter(loan -> LocalDate.now().isAfter(loan.getReturnDate())
@@ -265,6 +314,10 @@ public class Loans {
               });
    }
 
+   /**
+    * Set some values on relation with the current selection
+    * @param selection the {@link LoanEntity} object
+    */
    private void onSelection(LoanEntity selection){
       this.uuidSelected = selection.getUuid();
       this.indexSelected = this.tableLoans.getSelectionModel().getSelectedIndex();
@@ -275,11 +328,14 @@ public class Loans {
       if (selection.getStatusLoan() == EStatusLoan.RUN_OUT) btnFine.setDisable(false);
    }
 
+   /**
+    * Logic to save a FineEntity object.
+    * This a built-in action generates a Fine in just a click,
+    * build the Entity and save it into the db, an updates the given {@link LoanEntity}
+    * on the view with the {@link EStatusLoan} of {@code EStatusLoan.FINED}
+    * @param entity the {@link LoanEntity} object.
+    */
    private void save(LoanEntity entity){
-      if (!IDS.add(entity.getIdUser())) {
-         alert.warningAlert( "This user is fined already.");
-         return;
-      }
       FineEntity fine = FineEntity.builder()
               .uuid(UUID.randomUUID())
               .idUser(entity.getIdUser())
@@ -292,9 +348,24 @@ public class Loans {
       this.repo.update(entity);
       loans.set(indexSelected, entity);
       this.tableLoans.getItems().set(indexSelected, entity);
+      //release the copy borrowed
+      this.releaseCopy(entity);
    }
 
+   /**
+    * {@link LoanEntity} object can only change his loanDate and returnDate property
+    * This evaluates that the difference between both dates is less than 60, only in that
+    * case the update is valid, otherwise an alert notifies the user.
+    * @param loan the {@link LoanEntity} object.
+    */
    private void update(LoanEntity loan){
+      LocalDate newDate = dateLoan.getValue();
+      LocalDate newReturn = dateReturn.getValue();
+      int diff = (int) ChronoUnit.DAYS.between(newReturn, newDate);
+      if(diff > 60){
+         alert.warningAlert("The maximum of days for a Loan is 60 days.");
+         return;
+      }
       loan.setLoanDate(dateLoan.getValue());
       loan.setReturnDate(dateReturn.getValue());
       this.repo.update(loan);
@@ -303,6 +374,10 @@ public class Loans {
       alert.infoAlert( "Record updated!");
    }
 
+   /**
+    * Removes from the view, memory and db a not valid temporary Loan, a Loan is temporary
+    * valid if his status is Equal to {@code EStatusLoan.ON_LOAN or EStatusLoan.RENEWED}
+    */
    private void delete(){
       EStatusLoan statusSelected = loans.get(indexSelected).getStatusLoan();
       if (statusSelected == EStatusLoan.ON_LOAN || statusSelected == EStatusLoan.RENEWED) {
@@ -311,6 +386,19 @@ public class Loans {
       }
       this.repo.deleteByUuid(uuidSelected);
       loans.remove(indexSelected);
-      this.tableLoans.getItems().remove(indexSelected);
+      LoanEntity loan = this.tableLoans.getItems().remove(indexSelected);
+      releaseCopy(loan);
+   }
+
+   /**
+    * if a user is fined then the copy associated with his loan it's going to be released.
+    * @param loan the {@link LoanEntity} object.
+    */
+   private void releaseCopy(LoanEntity loan){
+      copies.stream()
+              .filter(c -> c.getId() == loan.getIdCopy())
+              .peek(c -> c.setBorrowed(false))
+              .findFirst()
+              .ifPresent(COPIES_REPO::update);
    }
 }

@@ -35,6 +35,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Controller class that gives functionality to the view.
+ *
+ * @author jame-dev13
+ */
 @Log
 public class ShowCopies {
    @FXML
@@ -62,15 +67,22 @@ public class ShowCopies {
    @FXML
    private Button btnClear;
 
+   //dependencies
    private static final CRUDRepo<LoanEntity> LOANS_REPO = new LoanService();
-   private static List<CopyDetailsDto> copies;
    private static final Joinable<CopyDetailsDto> COPY_INFO = new CopyDetailsService();
    private static final CRUDRepo<CopyEntity> REPO_COPIES = new CopyService();
+
+   private static List<CopyDetailsDto> copies;
    private FilteredList<CopyDetailsDto> filteredList;
    private static final CustomAlert ALERT = CustomAlert.getInstance();
    private static final GlobalNotificationChange changes = GlobalNotificationChange.getInstance();
    private int indexSelected;
 
+   /**
+    * init components events and data.
+    *
+    * @throws IOException
+    */
    @FXML
    private void initialize() throws IOException {
       copies = COPY_INFO.getJoins();
@@ -80,6 +92,9 @@ public class ShowCopies {
       this.txtFilter.setOnKeyTyped(keyEvent -> this.handleFilter(keyEvent, filteredList));
    }
 
+   /**
+    * set the properties, listeners, data, selection for the table on this class and hi columns.
+    */
    @FXML
    private void tableConfig() {
       this.colCopyN.setCellValueFactory(data ->
@@ -109,6 +124,15 @@ public class ShowCopies {
       filteredList = new FilteredList<>(this.tableCopies.getItems(), _ -> true);
    }
 
+   /**
+    * Handles the request of a loan, it's going to evaluate the txtDays.getText() to check if
+    * the value present is greater than 60, if it, throws an {@link CustomAlert} alert to the user, otherwise
+    * builds  the {@link LoanEntity} object and evaluates again, this time the class {@link CheckFinesUtil} using isFined(int id)
+    * going to evaluate if the id of the user that request the loan is already fined, if it is then again a alert is throw to the view,
+    * otherwise the loan it's going to be saved.
+    *
+    * @param event the ActionEvent
+    */
    @FXML
    private void handleLoan(ActionEvent event) {
       try {
@@ -141,6 +165,11 @@ public class ShowCopies {
       }
    }
 
+   /**
+    * Cleans up all the fields, selection, aux, and disable/enable components.
+    *
+    * @param event
+    */
    @FXML
    private void handleClear(ActionEvent event) {
       this.btnLoan.setDisable(true);
@@ -152,27 +181,40 @@ public class ShowCopies {
       this.indexSelected = -1;
    }
 
+   /**
+    * Takes an {@link FilteredList} of type {@link CopyDetailsDto} and set a predicate that will compare
+    * the text on txtFilter field, if isEmpty() just return true, otherwise: evaluates if the properties of the copy in the predicate
+    * contains it and then sets the result to the table.
+    *
+    * @param event        the KeyEvent.
+    * @param filteredList the filtered list that set up the filter.
+    */
    @FXML
    private void handleFilter(KeyEvent event, FilteredList<CopyDetailsDto> filteredList) {
       String text = txtFilter.getText().trim();
       String textEnum = text.toUpperCase();
       filteredList.setPredicate(copy -> {
          if (text.isEmpty()) return true;
-         try {
-            return copy.idCopy().toString().contains(text) ||
-                    String.valueOf(copy.copyNum()).contains(text) ||
-                    copy.bookName().contains(text) ||
-                    copy.genre().name().contains(textEnum) ||
-                    copy.status().name().contains(textEnum) ||
-                    copy.language().name().contains(textEnum);
-         } catch (IllegalArgumentException e) {
-            return false;
-         }
+         return copy.idCopy().toString().contains(text) ||
+                 String.valueOf(copy.copyNum()).contains(text) ||
+                 copy.bookName().contains(text) ||
+                 copy.genre().name().contains(textEnum) ||
+                 copy.status().name().contains(textEnum) ||
+                 copy.language().name().contains(textEnum);
+
       });
       this.tableCopies.setItems(filteredList);
    }
 
-   private void save(LoanEntity loan, int plusDays){
+   /**
+    * Logic for doing the save action.
+    * It saves the loan object into the db, and then finds the current selected object from there, if it is present
+    * then change his property borrowed to true and update.
+    * finally removes the element on the indexSelected position from the local Array and from the table.
+    * @param loan the {@link LoanEntity} object.
+    * @param plusDays the int value of days to add.
+    */
+   private void save(LoanEntity loan, int plusDays) {
 
       LOANS_REPO.save(loan);
       REPO_COPIES.findByUuid(this.tableCopies.getSelectionModel().getSelectedItem().uuid())

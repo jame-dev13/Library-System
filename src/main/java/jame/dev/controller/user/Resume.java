@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controller class that gives functionality to the view
+ */
 public class Resume {
 
    @FXML
@@ -20,11 +23,18 @@ public class Resume {
    private Label labelMsg;
    private final Joinable<EGenre> repo = new HistoryLoanService();
 
+   /**
+    * Init components listeners, data, etc.
+    * @throws IOException if the components cannot be loaded correctly.
+    */
    @FXML
    private void initialize() throws IOException {
       loadChart();
    }
 
+   /**
+    * Loads a PieChart with al the genres of the books that the user has requested for a loan.
+    */
    @FXML
    private void loadChart() {
       List<EGenre> genres = repo.getJoins();

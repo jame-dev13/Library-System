@@ -24,6 +24,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
+ * Controller class to gives functionality to the view associated  with the Copies.
  * @author jame-dev13
  */
 @Log
@@ -60,15 +61,19 @@ public class Copies {
    @FXML
    private Button btnDelete;
 
-   private CRUDRepo<CopyEntity> repo;
+   private final CRUDRepo<CopyEntity> repo = new CopyService();
    private static List<CopyEntity> copies;
    private UUID uuidSelected;
    private int indexSelected;
    private static final CustomAlert alert = CustomAlert.getInstance();
 
+   /**
+    * It initializes the components and other tools.
+    * @throws IOException if the view does not load right.
+    */
+
    @FXML
    private void initialize() throws IOException {
-      this.repo = new CopyService();
       //fields
       this.boxStatus.setItems(FXCollections.observableArrayList(EStatusCopy.values()));
       this.boxLanguage.setItems(FXCollections.observableArrayList(ELanguage.values()));
@@ -110,6 +115,11 @@ public class Copies {
       });
    }
 
+   /**
+    * Uses for load a modal thar contains copies {@link CopyEntity} data,
+    * it will filter the copies associated on the book that it's been requested.
+    * @param book the {@link BookEntity} object
+    */
    @FXML
    public void setBookInfo(BookEntity book) {
       Optional.ofNullable(this.repo.getAll())
@@ -124,6 +134,10 @@ public class Copies {
       this.configTable();
    }
 
+   /**
+    * Clean up the fields, selections, enable/disable actions presents in the view.
+    * @param event on click Action Event.
+    */
    @FXML
    private void handleClear(ActionEvent event) {
       this.txtCopyNum.setText(String.valueOf(copies.size() + 1));
@@ -137,6 +151,11 @@ public class Copies {
       this.indexSelected = -1;
    }
 
+   /**
+    * Listener method for the button to do a save {@link CopyEntity} operation.
+    * @param event the Action Event
+    * @exception NullPointerException on an empty field present in the build.
+    */
    @FXML
    private void handleSave(ActionEvent event) {
       try {
@@ -150,6 +169,10 @@ public class Copies {
       }
    }
 
+   /**
+    * Listener method for the button to do an update of {@link CopyEntity} operation if it is present.
+    * @param event the Action Event
+    */
    @FXML
    private void handleUpdate(ActionEvent event) {
       this.repo.findByUuid(this.uuidSelected)
@@ -159,6 +182,11 @@ public class Copies {
       this.btnClear.fire();
    }
 
+   /**
+    * Listener method to do a deletion action for a {@link CopyEntity} object if the user
+    * confirms it.
+    * @param event the Action Event.
+    */
    @FXML
    private void handleDelete(ActionEvent event) {
       alert.deleteConfirmAlert("Do you want to delete this record?")
@@ -172,6 +200,11 @@ public class Copies {
       this.btnClear.fire();
    }
 
+   /**
+    * Logic for set the data fields, aux variables, enable or disable buttons
+    * at the time the users does click in the table.
+    * @param selection the {@link CopyEntity} object that is selected.
+    */
    private void onSelection(CopyEntity selection) {
       //set aux
       this.uuidSelected = selection.getUuid();
@@ -187,6 +220,9 @@ public class Copies {
       this.btnSave.setDisable(true);
    }
 
+   /**
+    * Builds and {@link CopyEntity} object and then saves it in the db, list, and table.
+    */
    private void save() {
       CopyEntity copy = CopyEntity.builder()
               .uuid(UUID.randomUUID())
@@ -201,6 +237,11 @@ public class Copies {
       copies.add(copy);
    }
 
+   /**
+    * Set properties of the {@link CopyEntity} current selected object ant then
+    * do an update in the db, list and table.
+    * @param copy the {@link CopyEntity} object.
+    */
    private void update(CopyEntity copy) {
       copy.setStatusCopy(boxStatus.getSelectionModel().getSelectedItem());
       copy.setLanguage(boxLanguage.getSelectionModel().getSelectedItem());

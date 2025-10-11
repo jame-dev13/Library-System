@@ -47,7 +47,9 @@ public class User {
    private static final Map<String, Integer> changes = GlobalNotificationChange.getInstance().getChanges();
 
    /**
-    * Loads the content for the user Tabs in a lazy way using {@link ExecutorTabLoaderUtil} class.
+    * initializes the actions for the components in the view.
+    * Load all the tabs in parallel and sets his content.
+    * See in {@link ExecutorTabLoaderUtil} class.
     */
    @FXML
    private void initialize() {
@@ -72,6 +74,13 @@ public class User {
       ExecutorTabLoaderUtil.loadTab("/templates/userPanes/myLoans.fxml", this.tabMyLoans);
    }
 
+   /**
+    * Does the Listener for the logout click action.
+    * It gets the singleton instance of {@link SessionManager} manager, to get access to the {@link SessionDto} object that is already logged
+    * and if present calls {@code manager.logout();} and then loads the route
+    * to the login page, setting a new scene and get the current stage.
+    * @param event the ActionEvent
+    */
    @FXML
    private void handleLogout(ActionEvent event) {
       SessionManager manager = SessionManager.getInstance();

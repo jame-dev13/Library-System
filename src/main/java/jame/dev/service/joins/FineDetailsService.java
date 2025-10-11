@@ -6,8 +6,15 @@ import jame.dev.utils.db.DQLActions;
 
 import java.util.List;
 import java.util.UUID;
-
-public class FineDetailsService implements Joinable<FineDetailsDto> {
+/**
+ * Service class that implement the contract defined on {@link Joinable} interface
+ * to get the data set for a prepared query with table joins.
+ */
+public final class FineDetailsService implements Joinable<FineDetailsDto> {
+   /**
+    * Passes a sql query to be performed for the class {@link DQLActions}{@code .select(String sql, ResultMapper rs)}
+    * @return A List witch contains objects of FineDetailsDto data.
+    */
    @Override
    public List<FineDetailsDto> getJoins() {
       final String sql = """

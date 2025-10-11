@@ -12,9 +12,14 @@ import jame.dev.utils.ui.CustomAlert;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import lombok.extern.java.Log;
 
 import java.io.IOException;
 
+/**
+ * Controller class that gives functionality to the view from Me.fxml
+ */
+@Log
 public class Me {
 
    @FXML
@@ -36,6 +41,10 @@ public class Me {
    private static final CustomAlert alert = CustomAlert.getInstance();
    private static final CRUDRepo<UserEntity> REPO = new UserService();
 
+   /**
+    * Init all components and his behavior in the view.
+    * @throws IOException if it can't load the components
+    */
    @FXML
    private void initialize() throws IOException {
       this.setInfo();
@@ -48,11 +57,19 @@ public class Me {
               !ValidatorUtil.pwdIsStrong(txtPassword.getText()) ? "Password weak" : "");
    }
 
+   /**
+    * re-set the info on a click.
+    * @param event
+    */
    @FXML
    private void handleClear(ActionEvent event) {
       this.setInfo();
    }
 
+   /**
+    * Updates the current logged user info, if all fields are filled.
+    * @param event
+    */
    @FXML
    private void handleUpdate(ActionEvent event) {
       if(txtPassword.getText().isBlank()){
@@ -72,6 +89,9 @@ public class Me {
       this.btnClear.fire();
    }
 
+   /**
+    * sets the fields with the user info, so he can see what he could change.
+    */
    @FXML
    private void setInfo() {
       REPO.findByUuid(session.getSessionDto().uuid())
@@ -82,6 +102,11 @@ public class Me {
               }, () -> alert.warningAlert("No information available!"));
    }
 
+   /**
+    * Build an input {@link InfoUserDto} object to set the UserEntity with his data,
+    * then update the record associated in the db and session does logout and login again.
+    * @param userEntity the {@link UserEntity} object.
+    */
    private void update(UserEntity userEntity) {
       InfoUserDto userDto = InfoUserDto.builder()
               .name(txtName.getText().trim())
