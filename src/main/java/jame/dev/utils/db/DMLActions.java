@@ -26,47 +26,46 @@ import java.util.function.BiConsumer;
  *  DMLActions.insert(sql, "Juan Pérez", "juan@example.com");
  * }</pre>
  *
- * <p><b>Note:</b> The class depends on {@code ConnectionDB} to get the connection to the DB.</p>
+ * <p><b>Note:</b> The class depends on {@link ConnectionDB} to get the connection to the DB.</p>
  *
  * @author jame-dev13
  */
 @Log
 public final class DMLActions {
 
-   /**
-    * Return a {@link BiConsumer} encargado de asignar valores a un
-    * {@link PreparedStatement} en base a los parámetros proporcionados.
-    *
-    * @return un {@link BiConsumer} que recibe el PreparedStatement y un arreglo de parámetros.
-    */
    private static final ConnectionDB connectionDB = ConnectionDB.getInstance();
 
+   /**
+    * Return a {@link BiConsumer} that is who's going to set the params for the
+    * {@link PreparedStatement}.
+    * @return un {@link BiConsumer} that is accepting a {@code PreparedStatement} and
+    * a params array.
+    */
    private static BiConsumer<PreparedStatement, Object[]> setParams() {
-      return (ps, params) -> {
-         Optional.ofNullable(params)
-                 .ifPresentOrElse(objects -> {
-                    for (int i = 0; i < objects.length; i++) {
-                       try {
-                          ps.setObject((i + 1), objects[i]);
-                       } catch (SQLException e) {
-                          throw new RuntimeException("Error setting params at index: " + (i + 1) + ": " + e);
-                       }
-                    }
-                 }, () -> log.severe("Params are null."));
-      };
+      return (ps, params) ->
+              Optional.ofNullable(params)
+                      .ifPresentOrElse(objects -> {
+                         for (int i = 0; i < objects.length; i++) {
+                            try {
+                               ps.setObject((i + 1), objects[i]);
+                            } catch (SQLException e) {
+                               throw new RuntimeException("Error setting params at index: " + (i + 1) + ": " + e);
+                            }
+                         }
+                      }, () -> log.severe("Params are null."));
+
    }
 
    /**
-    * Ejecuta una sentencia DML (INSERT, UPDATE o DELETE).
+    * Executes a DML sentence: (INSERT, UPDATE o DELETE).
     *
-    * <p>Este método obtiene una conexión de {@link ConnectionDB},
-    * prepara la sentencia con los parámetros recibidos, la ejecuta
-    * y realiza commit si fue exitosa. En caso de error se hace rollback.</p>
+    * <p>This method gets the Connection, prepares the statement and
+    * executes the query doing a commit on success or a rollback on failure.</p>
     *
-    * @param sql    sentencia SQL a ejecutar (no debe ser nula).
-    * @param params parámetros opcionales para la sentencia SQL.
-    * @throws SQLException     si ocurre un error al ejecutar la sentencia o gestionar la conexión.
-    * @throws RuntimeException si falla el establecimiento de parámetros o la ejecución.
+    * @param sql query sentence (NonNull).
+    * @param params Optional params.
+    * @throws SQLException If the execution fail or can't get the connection with the db.
+    * @throws RuntimeException if there's a fail during setting params or execution.
     */
    private static void execute(String sql, Object... params) throws SQLException {
       Connection connection = connectionDB.getConnection();
@@ -89,35 +88,37 @@ public final class DMLActions {
    }
 
    /**
-    * Ejecuta una sentencia {@code INSERT} en la base de datos.
+    * Executes the sentence {@code INSERT} on the databse.
     *
-    * @param sql    sentencia SQL de inserción.
-    * @param params parámetros opcionales a insertar.
-    * @throws SQLException si ocurre un error durante la operación.
+    * @param sql    INSERT Sentence.
+    * @param params params to insert (optionals).
+    * @throws SQLException if an error is present during the operation.
     */
    public static void insert(String sql, Object... params) throws SQLException {
       execute(sql, params);
    }
 
    /**
-    * Ejecuta una sentencia {@code UPDATE} en la base de datos.
+    * Executes the sentence {@code UPDATE} on the database.
     *
-    * @param sql    sentencia SQL de actualización.
-    * @param params parámetros opcionales a actualizar.
-    * @throws SQLException si ocurre un error durante la operación.
+    * @param sql    UPDATE sentence.
+    * @param params params to update(Optional).
+    * @throws SQLException if an error is present during the operation.
     */
    public static void update(String sql, Object... params) throws SQLException {
       execute(sql, params);
    }
 
    /**
-    * Ejecuta una sentencia {@code DELETE} en la base de datos.
+    * Executes the sentence {@code DELETE} on the database.
     *
-    * @param sql    sentencia SQL de eliminación.
-    * @param params parámetros opcionales para la eliminación.
-    * @throws SQLException si ocurre un error durante la operación.
+    * @param sql    DELETE Sentence.
+    * @param params params to delete, in this case there must be arguments, if not, it will throw
+    an {@link java.util.NoSuchElementException}.
+    * @throws SQLException if an error is present during the operation.
     */
    public static void delete(String sql, Object... params) throws SQLException {
+      Optional.ofNullable(params).orElseThrow();
       execute(sql, params);
    }
 }

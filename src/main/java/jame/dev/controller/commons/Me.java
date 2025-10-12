@@ -50,9 +50,9 @@ public class Me {
       this.setInfo();
       this.btnClear.setOnAction(this::handleClear);
       this.btnUpdate.setOnAction(this::handleUpdate);
-      ComponentValidationUtil.addValidation(txtName, lblName, ValidatorUtil::isValidString, "Name not valid.");
+      ComponentValidationUtil.addValidation(txtName, lblName, ValidatorUtil::isValidName, "Name not valid.");
       ComponentValidationUtil.addValidation(txtEmail, lblEmail, ValidatorUtil::isEmailValid, "Email not valid.");
-      ComponentValidationUtil.addValidation(txtUsername, lblUsername, ValidatorUtil::isValidString, "Username not valid.");
+      ComponentValidationUtil.addValidation(txtUsername, lblUsername, ValidatorUtil::isValidName, "Username not valid.");
       ComponentValidationUtil.addValidation(txtPassword, lblPwd, ValidatorUtil::pwdIsStrong,
               !ValidatorUtil.pwdIsStrong(txtPassword.getText()) ? "Password weak" : "");
    }

@@ -10,6 +10,10 @@ import jame.dev.utils.db.DQLActions;
 
 import java.util.UUID;
 
+/**
+ * It initializes a {@code UserEntity} object with default properties and role of Admin.
+ * <p><b>Note: </b>This class depends on the {@link CRUDRepo} and {@link UserService} implementation.</p>
+ */
 public final class InitAdminUtil {
    private static final CRUDRepo<UserEntity> REPO = new UserService();
    private static final String SQL = """
@@ -17,6 +21,10 @@ public final class InitAdminUtil {
            WHERE username = ?
            """;
 
+   /**
+    * Simply loads a user cataloged as Admin. If there is
+    * a User into the db with this characters, then return outside the method.
+    */
    public static void init() {
       InfoUserDto userDto = InfoUserDto.builder()
               .name("admin")

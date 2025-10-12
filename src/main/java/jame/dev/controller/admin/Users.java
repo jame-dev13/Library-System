@@ -87,10 +87,10 @@ public class Users {
       this.btnSave.setOnAction(this::handleSave);
       this.btnDrop.setOnAction(this::handleDelete);
 
-      ComponentValidationUtil.addValidation(txtName, lblName, ValidatorUtil::isValidString, "Name is not valid.");
+      ComponentValidationUtil.addValidation(txtName, lblName, ValidatorUtil::isValidName, "Name is not valid.");
       ComponentValidationUtil.addValidation(txtEmail, lblEmail, ValidatorUtil::isEmailValid, "Email is not valid.");
-      ComponentValidationUtil.addValidation(txtUsername, lblUsername, ValidatorUtil::isValidString, "Username is not valid.");
-      ComponentValidationUtil.addValidation(txtPassword, lblPwd, ValidatorUtil::isValidString,
+      ComponentValidationUtil.addValidation(txtUsername, lblUsername, ValidatorUtil::isValidName, "Username is not valid.");
+      ComponentValidationUtil.addValidation(txtPassword, lblPwd, ValidatorUtil::isValidName,
               !ValidatorUtil.pwdIsStrong(txtPassword.getText().trim()) ? "Password weak" : "");
       //filter listener
       FilteredList<AdminDto> filteredData =
@@ -182,7 +182,7 @@ public class Users {
       boolean isDuplicateEntryIn = this.users.stream()
               .anyMatch(u -> u.email().equals(user.getEmail()) ||
                       u.username().equals(user.getUsername()));
-      if(!ValidatorUtil.isValidString(user.getName(), user.getUsername())&&
+      if(!ValidatorUtil.isValidName(user.getName(), user.getUsername())&&
               !ValidatorUtil.isEmailValid(user.getEmail())){
          alert.warningAlert("The field are not valid, please check it out.");
          return;
@@ -195,7 +195,7 @@ public class Users {
       }
       //add the new user if a mail has been sent to him
       Runnable emailTo = () -> {
-         boolean mailSent = EmailSender.mailToWPassword(user.getEmail(), txtPassword.getText().trim());
+         boolean mailSent = EmailSender.mailTo(user.getEmail(), txtPassword.getText().trim(), "This is yout login password, you can chane it latter inside the application: ");
          Platform.runLater(() -> {
             this.btnSave.setDisable(true);
             if (!mailSent) {

@@ -55,7 +55,7 @@ public class Login {
       this.repo = new AuthService();
       btnLogin.setOnAction(this::handleClickLogin);
       btnToSignUp.setOnAction(this::handleClickGoToSignUp);
-      ComponentValidationUtil.addValidation(txtUsername, lbUsername, ValidatorUtil::isValidString, "Username not valid.");
+      ComponentValidationUtil.addValidation(txtUsername, lbUsername, ValidatorUtil::isValidName, "Username not valid.");
    }
 
    /**

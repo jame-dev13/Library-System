@@ -65,16 +65,16 @@ public class SignUp {
    private void initialize() throws IOException {
       btnReg.setOnAction(this::handleSignUp);
       btnToSignIn.setOnAction(this::handleReturnToSignIn);
-      ComponentValidationUtil.addValidation(txtName, lbName, ValidatorUtil::isValidString, "Name not valid.");
+      ComponentValidationUtil.addValidation(txtName, lbName, ValidatorUtil::isValidName, "Name not valid.");
       ComponentValidationUtil.addValidation(txtEmail, lbEmail, ValidatorUtil::isEmailValid, "Email not valid.");
-      ComponentValidationUtil.addValidation(txtUsername, lbUsername, ValidatorUtil::isValidString, "Username not valid.");
+      ComponentValidationUtil.addValidation(txtUsername, lbUsername, ValidatorUtil::isValidName, "Username not valid.");
       ComponentValidationUtil.addValidation(txtPassword, lbPwd, ValidatorUtil::pwdIsStrong,
               !ValidatorUtil.pwdIsStrong(txtPassword.getText()) ? "Password weak" : "");
    }
 
    /**
     * Handles the registration logic for a user with the ROLE of USER.
-    * It Validates using {@link ValidatorUtil}.isValidString(String... s) and isEmailValid(String email)
+    * It Validates using {@link ValidatorUtil}.isValidName(String... s) and isEmailValid(String email)
     * clean the data before the insertion.
     * Also, builds an {@link InfoUserDto} record object, witch mutates the password property doing it a hash of
     * 12 rounds, this object is immutable after that, builds the {@link UserEntity} object
@@ -94,7 +94,7 @@ public class SignUp {
       String username = txtUsername.getText().trim();
       String password = txtPassword.getText().trim();
 
-      if (!ValidatorUtil.isValidString(name, username) && !ValidatorUtil.isEmailValid(email)) {
+      if (!ValidatorUtil.isValidName(name, username) && !ValidatorUtil.isEmailValid(email)) {
          Platform.runLater(() ->
                  alert.warningAlert("Names can't start with numbers or any other characters that is not a letter, same for email")
          );
@@ -118,9 +118,8 @@ public class SignUp {
               .build();
 
       this.token = this.user.getToken();
-
       Runnable r = () -> {
-         boolean emailSent = EmailSender.mailTo(this.user.getEmail(), this.token);
+         boolean emailSent = EmailSender.mailTo(this.user.getEmail(), this.token, "Please enter the below verification code in the application to finish your register :).");
          Platform.runLater(() -> {
             this.btnReg.setDisable(true);
             if (!emailSent) {

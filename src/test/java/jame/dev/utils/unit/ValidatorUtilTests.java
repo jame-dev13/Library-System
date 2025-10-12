@@ -11,16 +11,16 @@ public class ValidatorUtilTests {
 
    @Test
    @DisplayName("Valid String")
-   public void isValidString(){
-      Assertions.assertTrue(ValidatorUtil.isValidString("Hi i'm a valid String"), "Should pass because it just contains letters");
-      Assertions.assertFalse(ValidatorUtil.isValidString("SELECT * FROM users WHERE 1 = 1;"), "Should fail because it contains especial chars not allowed.");
+   public void isValidName(){
+      Assertions.assertTrue(ValidatorUtil.isValidName("Hi i'm a valid String"), "Should pass because it just contains letters");
+      Assertions.assertFalse(ValidatorUtil.isValidName("SELECT * FROM users WHERE 1 = 1;"), "Should fail because it contains especial chars not allowed.");
    }
 
    @Test
    @DisplayName("Valid usernames")
    public void isValidUsername(){
-      Assertions.assertTrue(ValidatorUtil.isValidString("angelote13", "angelo2.dev", "jame.dev013", "jam.dev13"), "Should pass because it meets the requirements.");
-      Assertions.assertFalse(ValidatorUtil.isValidString("0angel", "1angelo2", "?angel"), "Should fail because it should starts with a letter.");
+      Assertions.assertTrue(ValidatorUtil.isValidName("angelote13", "angelo2.dev", "jame.dev013", "jam.dev13"), "Should pass because it meets the requirements.");
+      Assertions.assertFalse(ValidatorUtil.isValidName("0angel", "1angelo2", "?angel"), "Should fail because it should starts with a letter.");
    }
 
    @Test
